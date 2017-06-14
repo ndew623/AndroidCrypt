@@ -10,7 +10,11 @@ import java.io.File;
 
 public abstract class FileViewer extends Fragment{
     protected File[] fileList;
+    protected FileBrowser fileBrowser;
     public void setFileList(File[] fileList) {
         this.fileList=fileList;
+    }
+    public void setFileBrowser(FileBrowser fileBrowser) {
+        this.fileBrowser=fileBrowser;
     }
 }

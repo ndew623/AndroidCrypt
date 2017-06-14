@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -35,6 +36,7 @@ public class DebugFileViewer extends FileViewer {
         fileListView = (ListView) view.findViewById(R.id.fileListView);
         fileArrayAdapter = new FileArrayAdapter(getContext(),0);
         fileListView.setAdapter(fileArrayAdapter);
+        fileListView.setOnItemClickListener(onItemClickListener);
 
         updateFileArrayAdapterFileList();
 
@@ -46,10 +48,21 @@ public class DebugFileViewer extends FileViewer {
             return;
         }
         fileArrayAdapter.clear();
+        if (! fileBrowser.getCurrentPath().getAbsolutePath().equals(FileBrowser.topLevelInternal.getAbsolutePath())) {
+            fileArrayAdapter.add(FileBrowser.parentDirectory);
+        }
         fileArrayAdapter.addAll(fileList);
         fileArrayAdapter.notifyDataSetChanged();
     }
-
+    private AdapterView.OnItemClickListener onItemClickListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            File clickedFile = fileArrayAdapter.getItem(position);
+            if (clickedFile.isDirectory()) {
+                fileBrowser.changePath(clickedFile);
+            }
+        }
+    };
     private class FileArrayAdapter extends ArrayAdapter<File> {
         public FileArrayAdapter(Context context, int resource) {
             super(context, resource);
