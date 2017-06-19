@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Android AESCrypt</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="create_folder">Create Folder</string>
+    <string name="create">Create</string>
 </resources>

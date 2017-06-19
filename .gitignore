@@ -8,3 +8,4 @@
 /captures
 .externalNativeBuild
 misc.xml
+.idea/vcs.xml

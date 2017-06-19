@@ -1,6 +1,8 @@
-package com.dewdrop623.androidaescrypt.FileBrowsing;
+package com.dewdrop623.androidaescrypt.FileBrowsing.ui;
 
 import android.support.v4.app.Fragment;
+
+import com.dewdrop623.androidaescrypt.FileBrowsing.FileBrowser;
 
 import java.io.File;
 

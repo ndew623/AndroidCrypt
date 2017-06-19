@@ -1,16 +1,25 @@
-package com.dewdrop623.androidaescrypt.FileBrowsing;
+package com.dewdrop623.androidaescrypt.FileBrowsing.ui;
 
+import android.support.v4.app.DialogFragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.dewdrop623.androidaescrypt.FileBrowsing.FileBrowser;
+import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.DebugCreateDirectoryDialog;
+import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.DebugFileOptionsDialog;
+import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.FileOptionsDialog;
 import com.dewdrop623.androidaescrypt.R;
 
 import java.io.File;
@@ -20,8 +29,11 @@ import java.io.File;
  */
 
 public class DebugFileViewer extends FileViewer {
+    private static final String FRAGMENT_TAG = "debug_file_viewer_dialog";
+
     private ListView fileListView;
     private FileArrayAdapter fileArrayAdapter;
+    private Button createFolderButton;
 
     @Override
     public void setFileList(File[] fileList) {
@@ -37,6 +49,9 @@ public class DebugFileViewer extends FileViewer {
         fileArrayAdapter = new FileArrayAdapter(getContext(),0);
         fileListView.setAdapter(fileArrayAdapter);
         fileListView.setOnItemClickListener(onItemClickListener);
+
+        createFolderButton = (Button) view.findViewById(R.id.createFolderButton);
+        createFolderButton.setOnClickListener(createFolderButtonOnClickListener);
 
         updateFileArrayAdapterFileList();
 
@@ -60,7 +75,25 @@ public class DebugFileViewer extends FileViewer {
             File clickedFile = fileArrayAdapter.getItem(position);
             if (clickedFile.isDirectory()) {
                 fileBrowser.changePath(clickedFile);
+            } else {
+                DebugFileOptionsDialog debugFileOptionsDialog = new DebugFileOptionsDialog();
+                Bundle args = new Bundle();
+                args.putString(FileOptionsDialog.FILE_PATH_ARGUMENT, clickedFile.getAbsolutePath());
+                debugFileOptionsDialog.setArguments(args);
+                debugFileOptionsDialog.setFileBrowser(fileBrowser);
+                showDialogFragment(debugFileOptionsDialog);
             }
+        }
+    };
+    private View.OnClickListener createFolderButtonOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            DebugCreateDirectoryDialog debugCreateDirectoryDialog = new DebugCreateDirectoryDialog();
+            Bundle args = new Bundle();
+            args.putString(DebugCreateDirectoryDialog.NEW_DIRECTORY_PATH_ARGUMENT, fileBrowser.getCurrentPath().getAbsolutePath());
+            debugCreateDirectoryDialog.setArguments(args);
+            debugCreateDirectoryDialog.setFileBrowser(fileBrowser);
+            showDialogFragment(debugCreateDirectoryDialog);
         }
     };
     private class FileArrayAdapter extends ArrayAdapter<File> {
@@ -77,5 +110,14 @@ public class DebugFileViewer extends FileViewer {
             return super.getView(position, convertView, parent);
         }
     }
-
+    private void showDialogFragment(DialogFragment dialogFragment) {
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction ft = fragmentManager.beginTransaction();
+        Fragment prev = fragmentManager.findFragmentByTag(FRAGMENT_TAG);
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+        dialogFragment.show(ft, FRAGMENT_TAG);
+    }
 }

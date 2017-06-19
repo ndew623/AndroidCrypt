@@ -8,9 +8,9 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import com.dewdrop623.androidaescrypt.FileBrowsing.DebugFileViewer;
+import com.dewdrop623.androidaescrypt.FileBrowsing.ui.DebugFileViewer;
 import com.dewdrop623.androidaescrypt.FileBrowsing.FileBrowser;
-import com.dewdrop623.androidaescrypt.FileBrowsing.FileViewer;
+import com.dewdrop623.androidaescrypt.FileBrowsing.ui.FileViewer;
 
 public class MainActivity extends AppCompatActivity {
 

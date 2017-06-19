@@ -5,6 +5,10 @@ import android.os.FileObserver;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.dewdrop623.androidaescrypt.FileBrowsing.ui.FileViewer;
+import com.dewdrop623.androidaescrypt.FileOperations.FileCommand;
+import com.dewdrop623.androidaescrypt.FileOperations.FileModifier;
+
 import java.io.File;
 
 /**
@@ -15,7 +19,7 @@ public class FileBrowser {
 
     private File currentPath;
     private FileViewer fileViewer;
-    private FileObserver fileObserver;
+    private FileObserver fileChangeMonitor;
 
     public static final File parentDirectory = new File("..");
     public static final File topLevelInternal = new File(Environment.getExternalStorageDirectory().toString());
@@ -38,10 +42,10 @@ public class FileBrowser {
         fileViewer.setFileList(files);
     }
     private void monitorCurrentPathForChanges() {
-        if (fileObserver != null) {
-            fileObserver.stopWatching();
+        if (fileChangeMonitor != null) {
+            fileChangeMonitor.stopWatching();
         }
-        fileObserver = new FileObserver(currentPath.getAbsolutePath()) {
+        fileChangeMonitor = new FileObserver(currentPath.getAbsolutePath()) {
             @Override
             public void onEvent(int event, String path) {
                 event &= FileObserver.ALL_EVENTS;
@@ -56,7 +60,7 @@ public class FileBrowser {
                     });
             }
         };
-        fileObserver.startWatching();
+        fileChangeMonitor.startWatching();
     }
     public File getCurrentPath() {
         return currentPath;
@@ -73,7 +77,8 @@ public class FileBrowser {
         monitorCurrentPathForChanges();
         updateFileViewer();
     }
-    public void modifyFile(/*FileCommand fileCommand*/) {
-        //TODO execute file commands
+    public void modifyFile(FileCommand fileCommand) {
+        FileModifier fileModifier = new FileModifier(fileCommand);
+        fileModifier.execute();
     }
 }
