@@ -10,8 +10,8 @@ import java.io.File;
 
 public class FileDeleteOperator extends FileOperator {
     private boolean done=false;
-    public FileDeleteOperator(File file, String[] args){
-        super(file, args);
+    public FileDeleteOperator(File file, String arg){
+        super(file, arg);
     }
 
     @Override

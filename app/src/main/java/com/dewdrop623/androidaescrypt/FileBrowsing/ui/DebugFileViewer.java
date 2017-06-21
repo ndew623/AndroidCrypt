@@ -1,9 +1,9 @@
 package com.dewdrop623.androidaescrypt.FileBrowsing.ui;
 
-import android.support.v4.app.DialogFragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -19,7 +19,7 @@ import android.widget.TextView;
 import com.dewdrop623.androidaescrypt.FileBrowsing.FileBrowser;
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.DebugCreateDirectoryDialog;
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.DebugFileOptionsDialog;
-import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.FileOptionsDialog;
+import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.FileDialog;
 import com.dewdrop623.androidaescrypt.R;
 
 import java.io.File;
@@ -78,7 +78,7 @@ public class DebugFileViewer extends FileViewer {
             } else {
                 DebugFileOptionsDialog debugFileOptionsDialog = new DebugFileOptionsDialog();
                 Bundle args = new Bundle();
-                args.putString(FileOptionsDialog.FILE_PATH_ARGUMENT, clickedFile.getAbsolutePath());
+                args.putString(FileDialog.PATH_ARGUMENT, clickedFile.getAbsolutePath());
                 debugFileOptionsDialog.setArguments(args);
                 debugFileOptionsDialog.setFileBrowser(fileBrowser);
                 showDialogFragment(debugFileOptionsDialog);
@@ -90,7 +90,7 @@ public class DebugFileViewer extends FileViewer {
         public void onClick(View v) {
             DebugCreateDirectoryDialog debugCreateDirectoryDialog = new DebugCreateDirectoryDialog();
             Bundle args = new Bundle();
-            args.putString(DebugCreateDirectoryDialog.NEW_DIRECTORY_PATH_ARGUMENT, fileBrowser.getCurrentPath().getAbsolutePath());
+            args.putString(FileDialog.PATH_ARGUMENT, fileBrowser.getCurrentPath().getAbsolutePath());
             debugCreateDirectoryDialog.setArguments(args);
             debugCreateDirectoryDialog.setFileBrowser(fileBrowser);
             showDialogFragment(debugCreateDirectoryDialog);

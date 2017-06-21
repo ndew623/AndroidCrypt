@@ -4,4 +4,7 @@
     <string name="cancel">Cancel</string>
     <string name="create_folder">Create Folder</string>
     <string name="create">Create</string>
+    <string name="encrypt">Encrypt</string>
+    <string name="ok">Ok</string>
+    <string name="enter_password">Enter password</string>
 </resources>

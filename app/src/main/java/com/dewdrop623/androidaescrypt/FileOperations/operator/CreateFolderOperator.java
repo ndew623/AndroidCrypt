@@ -9,8 +9,8 @@ import java.io.File;
 public class CreateFolderOperator extends FileOperator{
     boolean done = false;
 
-    public CreateFolderOperator(File file, String[] args) {
-        super(file, args);
+    public CreateFolderOperator(File file, String arg) {
+        super(file, arg);
     }
 
     @Override

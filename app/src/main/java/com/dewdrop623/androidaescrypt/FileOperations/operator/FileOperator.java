@@ -8,10 +8,10 @@ import java.io.File;
 
 public abstract class FileOperator {
     protected File file;
-    protected String[] args;
-    public FileOperator(File file, String[] args) {
+    protected String arg;
+    public FileOperator(File file, String arg) {
         this.file = file;
-        this.args = args;
+        this.arg = arg;
     }
     public abstract int getProgress();
     public abstract void execute();

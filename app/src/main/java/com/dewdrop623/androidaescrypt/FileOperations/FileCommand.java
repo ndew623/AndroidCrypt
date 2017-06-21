@@ -9,8 +9,10 @@ import java.io.File;
 public class FileCommand {
     public File file;
     public FileOperationType fileOperationType;
-    public FileCommand(File file, FileOperationType fileOperationType) {
+    public String arg;
+    public FileCommand(File file, FileOperationType fileOperationType, String arg) {
         this.file=file;
         this.fileOperationType=fileOperationType;
+        this.arg = arg;
     }
 }
