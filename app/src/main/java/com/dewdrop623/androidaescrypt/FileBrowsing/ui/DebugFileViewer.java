@@ -20,6 +20,7 @@ import com.dewdrop623.androidaescrypt.FileBrowsing.FileBrowser;
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.DebugCreateDirectoryDialog;
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.DebugFileOptionsDialog;
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.FileDialog;
+import com.dewdrop623.androidaescrypt.MainActivity;
 import com.dewdrop623.androidaescrypt.R;
 
 import java.io.File;
@@ -29,7 +30,6 @@ import java.io.File;
  */
 
 public class DebugFileViewer extends FileViewer {
-    private static final String FRAGMENT_TAG = "debug_file_viewer_dialog";
 
     private ListView fileListView;
     private FileArrayAdapter fileArrayAdapter;
@@ -81,7 +81,7 @@ public class DebugFileViewer extends FileViewer {
                 args.putString(FileDialog.PATH_ARGUMENT, clickedFile.getAbsolutePath());
                 debugFileOptionsDialog.setArguments(args);
                 debugFileOptionsDialog.setFileBrowser(fileBrowser);
-                showDialogFragment(debugFileOptionsDialog);
+                ((MainActivity)getActivity()).showDialogFragment(debugFileOptionsDialog);
             }
         }
     };
@@ -93,7 +93,7 @@ public class DebugFileViewer extends FileViewer {
             args.putString(FileDialog.PATH_ARGUMENT, fileBrowser.getCurrentPath().getAbsolutePath());
             debugCreateDirectoryDialog.setArguments(args);
             debugCreateDirectoryDialog.setFileBrowser(fileBrowser);
-            showDialogFragment(debugCreateDirectoryDialog);
+            ((MainActivity)getActivity()).showDialogFragment(debugCreateDirectoryDialog);
         }
     };
     private class FileArrayAdapter extends ArrayAdapter<File> {
@@ -109,15 +109,5 @@ public class DebugFileViewer extends FileViewer {
             ((TextView)convertView).setText(getItem(position).getPath());
             return super.getView(position, convertView, parent);
         }
-    }
-    private void showDialogFragment(DialogFragment dialogFragment) {
-        FragmentManager fragmentManager = getFragmentManager();
-        FragmentTransaction ft = fragmentManager.beginTransaction();
-        Fragment prev = fragmentManager.findFragmentByTag(FRAGMENT_TAG);
-        if (prev != null) {
-            ft.remove(prev);
-        }
-        ft.addToBackStack(null);
-        dialogFragment.show(ft, FRAGMENT_TAG);
     }
 }

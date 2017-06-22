@@ -2,9 +2,10 @@ package com.dewdrop623.androidaescrypt.FileOperations;
 
 import android.os.AsyncTask;
 
+import com.dewdrop623.androidaescrypt.FileOperations.operator.AESCryptDecryptFileOperator;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.CreateFolderOperator;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileDeleteOperator;
-import com.dewdrop623.androidaescrypt.FileOperations.operator.FileEncryptOperator;
+import com.dewdrop623.androidaescrypt.FileOperations.operator.AESCryptEncryptFileOperator;
 
 /**
  * takes a file command and executes it in the background
@@ -26,7 +27,10 @@ public class FileModifier extends AsyncTask{
                 new FileDeleteOperator(fileCommand.file, null).execute();
                 break;
             case ENCRYPT:
-                new FileEncryptOperator(fileCommand.file, fileCommand.arg).execute();
+                new AESCryptEncryptFileOperator(fileCommand.file, fileCommand.args).execute();
+                break;
+            case DECRYPT:
+                new AESCryptDecryptFileOperator(fileCommand.file, fileCommand.args).execute();
                 break;
         }
         return null;

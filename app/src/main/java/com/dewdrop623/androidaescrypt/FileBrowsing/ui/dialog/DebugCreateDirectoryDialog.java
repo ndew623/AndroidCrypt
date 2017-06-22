@@ -20,11 +20,9 @@ public class DebugCreateDirectoryDialog extends FileDialog{
     private EditText folderNameEditText;
 
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        initFromArguments();
-
         View view = inflateLayout(R.layout.dialogfragment_debug_create_directory);
         folderNameEditText = (EditText) view.findViewById(R.id.folderNameEditText);
-        return createDialog(getString(R.string.create_folder), view);
+        return createDialog(getString(R.string.create_folder), view, getString(R.string.create));
     }
 
     @Override

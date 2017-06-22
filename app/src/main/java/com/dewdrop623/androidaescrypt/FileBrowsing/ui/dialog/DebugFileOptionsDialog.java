@@ -7,8 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import com.dewdrop623.androidaescrypt.FileOperations.FileCommand;
-import com.dewdrop623.androidaescrypt.FileOperations.FileOperationType;
+import com.dewdrop623.androidaescrypt.FileOperations.operator.AESCryptEncryptFileOperator;
 import com.dewdrop623.androidaescrypt.R;
 
 /**
@@ -17,54 +16,33 @@ import com.dewdrop623.androidaescrypt.R;
 
 public class DebugFileOptionsDialog extends FileDialog {
     Button encryptButton;
+    Button decryptButton;
     Button deleteButton;
-    FileCommand fileCommandWaitingForInput = null;
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        initFromArguments();
         View view = inflateLayout(R.layout.dialogfragment_debug_file_options);
         encryptButton = (Button) view.findViewById(R.id.encryptButton);
+        decryptButton = (Button) view.findViewById(R.id.decryptButton);
         deleteButton = (Button) view.findViewById(R.id.deleteButton);
-        encryptButton.setOnClickListener(inputNeededButtonOnClickListener);
-        deleteButton.setOnClickListener(noInputButtonOnClickListener);
-        return createDialog(file.getName(), view);
+        encryptButton.setOnClickListener(buttonOnClickListener);
+        decryptButton.setOnClickListener(buttonOnClickListener);
+        deleteButton.setOnClickListener(buttonOnClickListener);
+        return createDialog(file.getName(), view, null);
     }
-    private View.OnClickListener noInputButtonOnClickListener = new View.OnClickListener() {
+    private View.OnClickListener buttonOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             if (fileBrowser == null) {
                 Log.e("DebugFileOptionDialog", "You must call fileDialog.setFileBrowser(FileBrowser)");
                 return;
             }
-            FileOperationType fileOperationType = FileOperationType.NONE;
             if (v.getId() == deleteButton.getId()) {
-                fileOperationType = FileOperationType.DELETE;
+                showNewDialogAndDismiss(new DebugDeleteFileDialog());
+            } else if (v.getId() == encryptButton.getId()) {
+                showNewDialogAndDismiss(new DebugEncryptFileDialog());
+            } else if (v.getId() == decryptButton.getId()) {
+                showNewDialogAndDismiss(new DebugDecryptFileDialog());
             }
-            fileBrowser.modifyFile(new FileCommand(file, fileOperationType, null));
-            dismiss();
         }
     };
-    private View.OnClickListener inputNeededButtonOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            if (fileBrowser == null) {
-                Log.e("DebugFileOptionDialog", "You must call fileDialog.setFileBrowser(FileBrowser)");
-                return;
-            }
-            FileOperationType fileOperationType = FileOperationType.NONE;
-            String hint = "";
-            if (v.getId() == encryptButton.getId()) {
-                fileOperationType = FileOperationType.ENCRYPT;
-                hint = getString(R.string.enter_password);
-            }
-            fileCommandWaitingForInput = new FileCommand(file, fileOperationType, null);
-            getInputFromUser(hint);
-        }
-    };
-    @Override
-    protected void inputPositiveButtonOnClick(String input) {
-        fileCommandWaitingForInput.arg = input;
-        fileBrowser.modifyFile(fileCommandWaitingForInput);
-        dismiss();
-    }
 }

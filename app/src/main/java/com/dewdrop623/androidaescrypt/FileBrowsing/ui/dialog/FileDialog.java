@@ -3,6 +3,8 @@ package com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
@@ -11,6 +13,7 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.dewdrop623.androidaescrypt.FileBrowsing.FileBrowser;
+import com.dewdrop623.androidaescrypt.MainActivity;
 import com.dewdrop623.androidaescrypt.R;
 
 import java.io.File;
@@ -26,12 +29,16 @@ public class FileDialog extends DialogFragment {
 
     private EditText inputEditText;
 
-    protected void initFromArguments() {
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        initFromArguments();
+    }
+
+    private void initFromArguments() {
         file = new File(getArguments().getString(PATH_ARGUMENT));
     }
-    protected Dialog createDialog(String title, View view) {
-        return createDialog(title, view, null);
-    }
+
     protected Dialog createDialog(String title, View view, String positiveButtonText) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(title);
@@ -40,8 +47,9 @@ public class FileDialog extends DialogFragment {
         if (positiveButtonText != null) {
             builder.setPositiveButton(positiveButtonText, positiveOnClickListener);
         }
-
-        builder.setView(view);
+        if(view != null) {
+            builder.setView(view);
+        }
         return builder.create();
     }
     protected View inflateLayout(int layoutId) {
@@ -66,23 +74,10 @@ public class FileDialog extends DialogFragment {
         }
         return;
     }
-
-    protected void getInputFromUser(String hint) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        inputEditText = new EditText(getActivity());
-        inputEditText.setHint(hint);
-        builder.setView(inputEditText);
-        builder.setNegativeButton(R.string.cancel, null);
-        builder.setPositiveButton(R.string.ok, inputPositiveButtonOnClickListener);
-        builder.create().show();
-    }
-    private DialogInterface.OnClickListener inputPositiveButtonOnClickListener = new DialogInterface.OnClickListener() {
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-            inputPositiveButtonOnClick(inputEditText.getText().toString());
-        }
-    };
-    protected void inputPositiveButtonOnClick(String input) {
-        return;
+    protected void showNewDialogAndDismiss(FileDialog fileDialog) {
+        fileDialog.setArguments(getArguments());
+        fileDialog.setFileBrowser(fileBrowser);
+        ((MainActivity)getActivity()).showDialogFragment(fileDialog);
+        dismiss();
     }
 }

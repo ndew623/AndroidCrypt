@@ -1,6 +1,7 @@
 package com.dewdrop623.androidaescrypt.FileOperations.operator;
 
 import java.io.File;
+import java.util.HashMap;
 
 /**
  * interface for classes that do work on files
@@ -8,10 +9,10 @@ import java.io.File;
 
 public abstract class FileOperator {
     protected File file;
-    protected String arg;
-    public FileOperator(File file, String arg) {
+    protected HashMap<String, String> args;
+    public FileOperator(File file, HashMap<String, String> args) {
         this.file = file;
-        this.arg = arg;
+        this.args = args;
     }
     public abstract int getProgress();
     public abstract void execute();

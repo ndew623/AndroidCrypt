@@ -1,6 +1,7 @@
 package com.dewdrop623.androidaescrypt.FileOperations.operator;
 
 import java.io.File;
+import java.util.HashMap;
 
 /**
  * creates folders
@@ -9,8 +10,8 @@ import java.io.File;
 public class CreateFolderOperator extends FileOperator{
     boolean done = false;
 
-    public CreateFolderOperator(File file, String arg) {
-        super(file, arg);
+    public CreateFolderOperator(File file, HashMap<String, String> args) {
+        super(file, args);
     }
 
     @Override

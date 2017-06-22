@@ -7,4 +7,11 @@
     <string name="encrypt">Encrypt</string>
     <string name="ok">Ok</string>
     <string name="enter_password">Enter password</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="enter_filename">Enter filename</string>
+    <string name="no_match">The passwords do not match</string>
+    <string name="cannot_be_empty">cannot be empty</string>
+    <string name="file_name">File name</string>
+    <string name="password">Password</string>
+    <string name="decrypt">Decrypt</string>
 </resources>

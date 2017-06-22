@@ -3,6 +3,7 @@ package com.dewdrop623.androidaescrypt.FileOperations.operator;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileOperator;
 
 import java.io.File;
+import java.util.HashMap;
 
 /**
  * deletes files
@@ -10,8 +11,8 @@ import java.io.File;
 
 public class FileDeleteOperator extends FileOperator {
     private boolean done=false;
-    public FileDeleteOperator(File file, String arg){
-        super(file, arg);
+    public FileDeleteOperator(File file, HashMap<String, String> args){
+        super(file, args);
     }
 
     @Override
