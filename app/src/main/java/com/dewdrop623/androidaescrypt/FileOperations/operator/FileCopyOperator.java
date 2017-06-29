@@ -18,7 +18,7 @@ public class FileCopyOperator extends FileOperator {
     public FileCopyOperator(File file, HashMap<String, String> args) {
         super(file, args);
     }
-t\
+
     @Override
     public int getProgress() {
         if (done) {//TODO real updates

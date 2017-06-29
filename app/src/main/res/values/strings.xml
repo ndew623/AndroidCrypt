@@ -18,4 +18,5 @@
     <string name="copy_here">Copy Here</string>
     <string name="copy">Copy</string>
     <string name="move">Move</string>
+    <string name="rename">Rename</string>
 </resources>

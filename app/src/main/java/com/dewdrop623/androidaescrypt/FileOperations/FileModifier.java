@@ -8,6 +8,7 @@ import com.dewdrop623.androidaescrypt.FileOperations.operator.FileCopyOperator;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileDeleteOperator;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.AESCryptEncryptFileOperator;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileMoveOperator;
+import com.dewdrop623.androidaescrypt.FileOperations.operator.FileRenameOperator;
 
 /**
  * takes a file command and executes it in the background
@@ -39,6 +40,9 @@ public class FileModifier extends AsyncTask{
                 break;
             case COPY:
                 new FileCopyOperator(fileCommand.file, fileCommand.args).execute();
+                break;
+            case RENAME:
+                new FileRenameOperator(fileCommand.file, fileCommand.args).execute();
                 break;
         }
         return null;

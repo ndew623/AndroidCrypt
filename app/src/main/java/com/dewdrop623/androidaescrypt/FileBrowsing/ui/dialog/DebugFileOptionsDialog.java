@@ -19,6 +19,7 @@ public class DebugFileOptionsDialog extends FileDialog {
     Button decryptButton;
     Button copyButton;
     Button moveButton;
+    Button renameButton;
     Button deleteButton;
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -27,11 +28,13 @@ public class DebugFileOptionsDialog extends FileDialog {
         decryptButton = (Button) view.findViewById(R.id.decryptButton);
         copyButton = (Button) view.findViewById(R.id.copyButton);
         moveButton = (Button) view.findViewById(R.id.moveButton);
+        renameButton = (Button) view.findViewById(R.id.renameButton);
         deleteButton = (Button) view.findViewById(R.id.deleteButton);
         encryptButton.setOnClickListener(buttonOnClickListener);
         decryptButton.setOnClickListener(buttonOnClickListener);
         copyButton.setOnClickListener(buttonOnClickListener);
         moveButton.setOnClickListener(buttonOnClickListener);
+        renameButton.setOnClickListener(buttonOnClickListener);
         deleteButton.setOnClickListener(buttonOnClickListener);
         return createDialog(file.getName(), view, null);
     }
@@ -48,6 +51,8 @@ public class DebugFileOptionsDialog extends FileDialog {
                 showNewDialogAndDismiss(new DebugEncryptFileDialog());
             } else if (v.getId() == decryptButton.getId()) {
                 showNewDialogAndDismiss(new DebugDecryptFileDialog());
+            } else if (v.getId() == renameButton.getId()) {
+                showNewDialogAndDismiss(new DebugRenameFileDialog());
             } else if (v.getId() == copyButton.getId()) {
                 fileViewer.copyFile(file);
                 dismiss();

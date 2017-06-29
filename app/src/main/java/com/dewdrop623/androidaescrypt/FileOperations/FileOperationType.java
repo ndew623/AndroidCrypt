@@ -5,5 +5,5 @@ package com.dewdrop623.androidaescrypt.FileOperations;
  */
 
 public enum FileOperationType {
-    MOVE, COPY, CREATE_FILE, CREATE_FOLDER, DELETE, ENCRYPT, DECRYPT, NONE
+    RENAME, MOVE, COPY, CREATE_FILE, CREATE_FOLDER, DELETE, ENCRYPT, DECRYPT, NONE
 }
