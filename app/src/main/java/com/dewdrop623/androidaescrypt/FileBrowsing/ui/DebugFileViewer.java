@@ -20,10 +20,15 @@ import com.dewdrop623.androidaescrypt.FileBrowsing.FileBrowser;
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.DebugCreateDirectoryDialog;
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.DebugFileOptionsDialog;
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.FileDialog;
+import com.dewdrop623.androidaescrypt.FileOperations.FileCommand;
+import com.dewdrop623.androidaescrypt.FileOperations.FileOperationType;
+import com.dewdrop623.androidaescrypt.FileOperations.operator.FileCopyOperator;
+import com.dewdrop623.androidaescrypt.FileOperations.operator.FileMoveOperator;
 import com.dewdrop623.androidaescrypt.MainActivity;
 import com.dewdrop623.androidaescrypt.R;
 
 import java.io.File;
+import java.util.HashMap;
 
 /**
  * a simple fragment for displaying files and test functionality
@@ -31,9 +36,16 @@ import java.io.File;
 
 public class DebugFileViewer extends FileViewer {
 
+    private enum MoveState {
+        MOVE, COPY, NONE
+    }
+    private File moveCopyFile;
+    private MoveState moveState = MoveState.NONE;
+
     private ListView fileListView;
     private FileArrayAdapter fileArrayAdapter;
     private Button createFolderButton;
+    private Button moveCopyButton;
 
     @Override
     public void setFileList(File[] fileList) {
@@ -53,9 +65,33 @@ public class DebugFileViewer extends FileViewer {
         createFolderButton = (Button) view.findViewById(R.id.createFolderButton);
         createFolderButton.setOnClickListener(createFolderButtonOnClickListener);
 
+        moveCopyButton = (Button) view.findViewById(R.id.moveCopyButton);
+        moveCopyButton.setOnClickListener(moveCopyButtonOnClickListener);
+
         updateFileArrayAdapterFileList();
 
         return view;
+    }
+
+    @Override
+    public void moveFile(File file) {
+        super.moveFile(file);
+        moveCopyButton.setText(getString(R.string.move_here));
+        moveState = MoveState.MOVE;
+    }
+
+    @Override
+    public void copyFile(File file) {
+        super.copyFile(file);
+        moveCopyButton.setText(getString(R.string.copy_here));
+        moveState = MoveState.COPY;
+    }
+
+    @Override
+    protected void onMoveOrCopy(File file) {
+        super.onMoveOrCopy(file);
+        moveCopyFile=file;
+        moveCopyButton.setVisibility(View.VISIBLE);
     }
 
     private void updateFileArrayAdapterFileList() {
@@ -80,7 +116,7 @@ public class DebugFileViewer extends FileViewer {
                 Bundle args = new Bundle();
                 args.putString(FileDialog.PATH_ARGUMENT, clickedFile.getAbsolutePath());
                 debugFileOptionsDialog.setArguments(args);
-                debugFileOptionsDialog.setFileBrowser(fileBrowser);
+                debugFileOptionsDialog.setFileViewer(getSelfForButtonListeners());
                 ((MainActivity)getActivity()).showDialogFragment(debugFileOptionsDialog);
             }
         }
@@ -92,8 +128,29 @@ public class DebugFileViewer extends FileViewer {
             Bundle args = new Bundle();
             args.putString(FileDialog.PATH_ARGUMENT, fileBrowser.getCurrentPath().getAbsolutePath());
             debugCreateDirectoryDialog.setArguments(args);
-            debugCreateDirectoryDialog.setFileBrowser(fileBrowser);
+            debugCreateDirectoryDialog.setFileViewer(getSelfForButtonListeners());
             ((MainActivity)getActivity()).showDialogFragment(debugCreateDirectoryDialog);
+        }
+    };
+    private View.OnClickListener moveCopyButtonOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if(moveState == MoveState.NONE) {
+                return;
+            }
+            HashMap<String,String> args = new HashMap<>();
+            FileCommand fileCommand = null;
+            if(moveState == MoveState.MOVE) {
+                args.put(FileMoveOperator.FILE_MOVE_DESTINATION_ARG, fileBrowser.getCurrentPath().getAbsolutePath());
+                fileCommand = new FileCommand(moveCopyFile, FileOperationType.MOVE, args);
+            } else if (moveState == MoveState.COPY) {
+                args.put(FileCopyOperator.FILE_COPY_DESTINATION_ARG, fileBrowser.getCurrentPath().getAbsolutePath());
+                fileCommand = new FileCommand(moveCopyFile, FileOperationType.COPY, args);
+            }
+            sendFileCommandToFileBrowser(fileCommand);
+            moveCopyButton.setVisibility(View.GONE);
+            moveState = MoveState.NONE;
+            moveCopyFile = null;
         }
     };
     private class FileArrayAdapter extends ArrayAdapter<File> {
@@ -109,5 +166,8 @@ public class DebugFileViewer extends FileViewer {
             ((TextView)convertView).setText(getItem(position).getPath());
             return super.getView(position, convertView, parent);
         }
+    }
+    private FileViewer getSelfForButtonListeners() {
+        return this;
     }
 }

@@ -3,6 +3,7 @@ package com.dewdrop623.androidaescrypt.FileBrowsing.ui;
 import android.support.v4.app.Fragment;
 
 import com.dewdrop623.androidaescrypt.FileBrowsing.FileBrowser;
+import com.dewdrop623.androidaescrypt.FileOperations.FileCommand;
 
 import java.io.File;
 
@@ -18,5 +19,17 @@ public abstract class FileViewer extends Fragment{
     }
     public void setFileBrowser(FileBrowser fileBrowser) {
         this.fileBrowser=fileBrowser;
+    }
+    public void sendFileCommandToFileBrowser(FileCommand fileCommand) {
+        fileBrowser.modifyFile(fileCommand);
+    }
+    public void moveFile(File file) {
+        onMoveOrCopy(file);
+    }
+    public void copyFile(File file) {
+        onMoveOrCopy(file);
+    }
+    protected void onMoveOrCopy(File file) {
+
     }
 }

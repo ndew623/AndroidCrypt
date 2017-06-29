@@ -36,6 +36,6 @@ public class DebugCreateDirectoryDialog extends FileDialog{
 
         File newFolderFile = new File(file.getAbsolutePath()+"/"+folderName);
         FileCommand fileCommand = new FileCommand(newFolderFile, FileOperationType.CREATE_FOLDER, null);
-        fileBrowser.modifyFile(fileCommand);
+        fileViewer.sendFileCommandToFileBrowser(fileCommand);
     }
 }

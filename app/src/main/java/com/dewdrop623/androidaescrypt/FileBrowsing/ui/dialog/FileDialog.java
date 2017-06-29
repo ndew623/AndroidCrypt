@@ -12,7 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 
-import com.dewdrop623.androidaescrypt.FileBrowsing.FileBrowser;
+import com.dewdrop623.androidaescrypt.FileBrowsing.ui.FileViewer;
 import com.dewdrop623.androidaescrypt.MainActivity;
 import com.dewdrop623.androidaescrypt.R;
 
@@ -24,7 +24,7 @@ import java.io.File;
 
 public class FileDialog extends DialogFragment {
     public static final String PATH_ARGUMENT = "com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.PATH_ARGUMENT";
-    protected FileBrowser fileBrowser;
+    protected FileViewer fileViewer;
     protected File file;
 
     private EditText inputEditText;
@@ -56,8 +56,8 @@ public class FileDialog extends DialogFragment {
         return ((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(layoutId, null);
     }
 
-    public void setFileBrowser(FileBrowser fileBrowser) {
-        this.fileBrowser = fileBrowser;
+    public void setFileViewer(FileViewer fileViewer) {
+        this.fileViewer = fileViewer;
     }
 
     Dialog.OnClickListener positiveOnClickListener = new Dialog.OnClickListener() {
@@ -68,15 +68,15 @@ public class FileDialog extends DialogFragment {
     };
 
     protected void positiveButtonOnClick() {
-        if (fileBrowser == null) {
-            Log.e("DebugFileOptionDialog", "You must call fileDialog.setFileBrowser(FileBrowser)");
+        if (fileViewer == null) {
+            Log.e("DebugFileOptionDialog", "You must call fileDialog.setFileViewer(FileViewer)");
             return;
         }
         return;
     }
     protected void showNewDialogAndDismiss(FileDialog fileDialog) {
         fileDialog.setArguments(getArguments());
-        fileDialog.setFileBrowser(fileBrowser);
+        fileDialog.setFileViewer(fileViewer);
         ((MainActivity)getActivity()).showDialogFragment(fileDialog);
         dismiss();
     }

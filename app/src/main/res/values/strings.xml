@@ -14,4 +14,8 @@
     <string name="file_name">File name</string>
     <string name="password">Password</string>
     <string name="decrypt">Decrypt</string>
+    <string name="move_here">Move Here</string>
+    <string name="copy_here">Copy Here</string>
+    <string name="copy">Copy</string>
+    <string name="move">Move</string>
 </resources>

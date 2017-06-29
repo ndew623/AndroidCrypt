@@ -17,22 +17,28 @@ import com.dewdrop623.androidaescrypt.R;
 public class DebugFileOptionsDialog extends FileDialog {
     Button encryptButton;
     Button decryptButton;
+    Button copyButton;
+    Button moveButton;
     Button deleteButton;
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         View view = inflateLayout(R.layout.dialogfragment_debug_file_options);
         encryptButton = (Button) view.findViewById(R.id.encryptButton);
         decryptButton = (Button) view.findViewById(R.id.decryptButton);
+        copyButton = (Button) view.findViewById(R.id.copyButton);
+        moveButton = (Button) view.findViewById(R.id.moveButton);
         deleteButton = (Button) view.findViewById(R.id.deleteButton);
         encryptButton.setOnClickListener(buttonOnClickListener);
         decryptButton.setOnClickListener(buttonOnClickListener);
+        copyButton.setOnClickListener(buttonOnClickListener);
+        moveButton.setOnClickListener(buttonOnClickListener);
         deleteButton.setOnClickListener(buttonOnClickListener);
         return createDialog(file.getName(), view, null);
     }
     private View.OnClickListener buttonOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if (fileBrowser == null) {
+            if (fileViewer == null) {
                 Log.e("DebugFileOptionDialog", "You must call fileDialog.setFileBrowser(FileBrowser)");
                 return;
             }
@@ -42,6 +48,12 @@ public class DebugFileOptionsDialog extends FileDialog {
                 showNewDialogAndDismiss(new DebugEncryptFileDialog());
             } else if (v.getId() == decryptButton.getId()) {
                 showNewDialogAndDismiss(new DebugDecryptFileDialog());
+            } else if (v.getId() == copyButton.getId()) {
+                fileViewer.copyFile(file);
+                dismiss();
+            } else if (v.getId() == moveButton.getId()) {
+                fileViewer.moveFile(file);
+                dismiss();
             }
         }
     };

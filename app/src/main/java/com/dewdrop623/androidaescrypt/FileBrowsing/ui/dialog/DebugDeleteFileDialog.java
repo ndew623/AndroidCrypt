@@ -23,6 +23,6 @@ public class DebugDeleteFileDialog extends FileDialog{
     protected void positiveButtonOnClick() {
         super.positiveButtonOnClick();
         FileCommand fileCommand = new FileCommand(file, FileOperationType.DELETE, null);
-        fileBrowser.modifyFile(fileCommand);
+        fileViewer.sendFileCommandToFileBrowser(fileCommand);
     }
 }

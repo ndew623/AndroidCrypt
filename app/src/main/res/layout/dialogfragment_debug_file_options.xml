@@ -12,6 +12,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
     <Button
+        android:id="@+id/copyButton"
+        android:text="@string/copy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
+    <Button
+        android:id="@+id/moveButton"
+        android:text="@string/move"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
+    <Button
         android:id="@+id/deleteButton"
         android:text="@string/delete"
         android:layout_width="wrap_content"

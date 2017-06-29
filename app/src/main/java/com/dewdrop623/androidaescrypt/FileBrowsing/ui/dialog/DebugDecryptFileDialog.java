@@ -65,7 +65,7 @@ public class DebugDecryptFileDialog extends FileDialog {
         args.put(AESCryptDecryptFileOperator.AESCRYPT_FILE_OPERATOR_KEY_ARGUMENT, password);
         args.put(AESCryptDecryptFileOperator.AESCRYPT_FILE_OPERATOR_FILENAME_ARGUMENT, fileName);
         FileCommand fileCommand = new FileCommand(file, FileOperationType.DECRYPT, args);
-        fileBrowser.modifyFile(fileCommand);
+        fileViewer.sendFileCommandToFileBrowser(fileCommand);
         dismiss();
     }
 }
