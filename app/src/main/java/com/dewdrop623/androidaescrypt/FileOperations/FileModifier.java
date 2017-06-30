@@ -9,6 +9,7 @@ import com.dewdrop623.androidaescrypt.FileOperations.operator.FileDeleteOperator
 import com.dewdrop623.androidaescrypt.FileOperations.operator.AESCryptEncryptFileOperator;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileMoveOperator;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileRenameOperator;
+import com.dewdrop623.androidaescrypt.FileOperations.operator.folder.FolderDeleteOperator;
 
 /**
  * takes a file command and executes it in the background
@@ -22,6 +23,14 @@ public class FileModifier extends AsyncTask{
     }
     @Override
     protected Object doInBackground(Object[] params) {
+        if (fileCommand.file.isDirectory()) {
+            folderOperation();
+        } else {
+            fileOperation();
+        }
+        return null;
+    }
+    private void fileOperation() {
         switch (fileCommand.fileOperationType) {
             case CREATE_FOLDER:
                 new CreateFolderOperator(fileCommand.file, fileCommand.args).execute();
@@ -45,6 +54,15 @@ public class FileModifier extends AsyncTask{
                 new FileRenameOperator(fileCommand.file, fileCommand.args).execute();
                 break;
         }
-        return null;
+    }
+    private void folderOperation() {
+        switch (fileCommand.fileOperationType) {
+            case DELETE:
+                new FolderDeleteOperator(fileCommand.file, fileCommand.args).execute();
+                break;
+            case RENAME:
+                new FileRenameOperator(fileCommand.file, fileCommand.args).execute();
+                break;
+        }
     }
 }

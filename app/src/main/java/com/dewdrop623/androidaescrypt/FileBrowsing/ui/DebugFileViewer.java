@@ -3,10 +3,6 @@ package com.dewdrop623.androidaescrypt.FileBrowsing.ui;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,6 +57,7 @@ public class DebugFileViewer extends FileViewer {
         fileArrayAdapter = new FileArrayAdapter(getContext(),0);
         fileListView.setAdapter(fileArrayAdapter);
         fileListView.setOnItemClickListener(onItemClickListener);
+        fileListView.setOnItemLongClickListener(onItemLongClickListener);
 
         createFolderButton = (Button) view.findViewById(R.id.createFolderButton);
         createFolderButton.setOnClickListener(createFolderButtonOnClickListener);
@@ -112,13 +109,15 @@ public class DebugFileViewer extends FileViewer {
             if (clickedFile.isDirectory()) {
                 fileBrowser.changePath(clickedFile);
             } else {
-                DebugFileOptionsDialog debugFileOptionsDialog = new DebugFileOptionsDialog();
-                Bundle args = new Bundle();
-                args.putString(FileDialog.PATH_ARGUMENT, clickedFile.getAbsolutePath());
-                debugFileOptionsDialog.setArguments(args);
-                debugFileOptionsDialog.setFileViewer(getSelfForButtonListeners());
-                ((MainActivity)getActivity()).showDialogFragment(debugFileOptionsDialog);
+                openOptionsDialog(clickedFile);
             }
+        }
+    };
+    private AdapterView.OnItemLongClickListener onItemLongClickListener = new AdapterView.OnItemLongClickListener() {
+        @Override
+        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+            openOptionsDialog(fileArrayAdapter.getItem(position));
+            return true;
         }
     };
     private View.OnClickListener createFolderButtonOnClickListener = new View.OnClickListener() {
@@ -163,11 +162,25 @@ public class DebugFileViewer extends FileViewer {
             if (convertView == null) {
                 convertView = new TextView(getContext());
             }
-            ((TextView)convertView).setText(getItem(position).getPath());
-            return super.getView(position, convertView, parent);
+            File file = getItem(position);
+            String displayString = file.getAbsolutePath();
+            if(file.isDirectory()) {
+                displayString=displayString.concat("/");
+            }
+            ((TextView)convertView).setText(displayString);
+            return convertView;
         }
     }
     private FileViewer getSelfForButtonListeners() {
         return this;
+    }
+
+    private void openOptionsDialog(File clickedFile) {
+        DebugFileOptionsDialog debugFileOptionsDialog = new DebugFileOptionsDialog();
+        Bundle args = new Bundle();
+        args.putString(FileDialog.PATH_ARGUMENT, clickedFile.getAbsolutePath());
+        debugFileOptionsDialog.setArguments(args);
+        debugFileOptionsDialog.setFileViewer(getSelfForButtonListeners());
+        ((MainActivity)getActivity()).showDialogFragment(debugFileOptionsDialog);
     }
 }
