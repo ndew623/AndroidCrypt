@@ -3,12 +3,13 @@ package com.dewdrop623.androidaescrypt.FileOperations;
 import android.os.AsyncTask;
 
 import com.dewdrop623.androidaescrypt.FileOperations.operator.AESCryptDecryptFileOperator;
+import com.dewdrop623.androidaescrypt.FileOperations.operator.AESCryptEncryptFileOperator;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.CreateFolderOperator;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileCopyOperator;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileDeleteOperator;
-import com.dewdrop623.androidaescrypt.FileOperations.operator.AESCryptEncryptFileOperator;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileMoveOperator;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileRenameOperator;
+import com.dewdrop623.androidaescrypt.FileOperations.operator.folder.FolderCopyOperator;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.folder.FolderDeleteOperator;
 
 /**
@@ -59,6 +60,12 @@ public class FileModifier extends AsyncTask{
         switch (fileCommand.fileOperationType) {
             case DELETE:
                 new FolderDeleteOperator(fileCommand.file, fileCommand.args).execute();
+                break;
+            case MOVE:
+                new FileMoveOperator(fileCommand.file, fileCommand.args).execute();
+                break;
+            case COPY:
+                new FolderCopyOperator(fileCommand.file, fileCommand.args).execute();
                 break;
             case RENAME:
                 new FileRenameOperator(fileCommand.file, fileCommand.args).execute();

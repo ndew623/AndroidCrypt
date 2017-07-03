@@ -36,6 +36,12 @@ public class DebugFileOptionsDialog extends FileDialog {
         moveButton.setOnClickListener(buttonOnClickListener);
         renameButton.setOnClickListener(buttonOnClickListener);
         deleteButton.setOnClickListener(buttonOnClickListener);
+
+        if (file.isDirectory()) {
+            encryptButton.setVisibility(View.GONE);
+            decryptButton.setVisibility(View.GONE);
+        }
+
         return createDialog(file.getName(), view, null);
     }
     private View.OnClickListener buttonOnClickListener = new View.OnClickListener() {
