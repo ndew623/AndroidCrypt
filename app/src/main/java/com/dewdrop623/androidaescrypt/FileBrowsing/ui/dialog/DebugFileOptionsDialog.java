@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import com.dewdrop623.androidaescrypt.FileOperations.operator.AESCryptEncryptFileOperator;
 import com.dewdrop623.androidaescrypt.R;
 
 /**

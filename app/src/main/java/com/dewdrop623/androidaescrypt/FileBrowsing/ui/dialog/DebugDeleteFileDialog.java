@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 
 import com.dewdrop623.androidaescrypt.FileOperations.FileCommand;
+import com.dewdrop623.androidaescrypt.FileOperations.FileModifierService;
 import com.dewdrop623.androidaescrypt.FileOperations.FileOperationType;
 import com.dewdrop623.androidaescrypt.R;
 
@@ -22,7 +23,9 @@ public class DebugDeleteFileDialog extends FileDialog{
     @Override
     protected void positiveButtonOnClick() {
         super.positiveButtonOnClick();
-        FileCommand fileCommand = new FileCommand(file, FileOperationType.DELETE, null);
-        fileViewer.sendFileCommandToFileBrowser(fileCommand);
+        Bundle args = new Bundle();
+        args.putString(FileModifierService.FILEMODIFIERSERVICE_FILE, file.getAbsolutePath());
+        args.putInt(FileModifierService.FILEMODIFIERSERVICE_OPERATIONTYPE, FileOperationType.DELETE);
+        fileViewer.sendFileCommandToFileBrowser(args);
     }
 }

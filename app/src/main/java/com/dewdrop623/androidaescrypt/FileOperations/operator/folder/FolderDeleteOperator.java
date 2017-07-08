@@ -1,5 +1,8 @@
 package com.dewdrop623.androidaescrypt.FileOperations.operator.folder;
 
+import android.os.Bundle;
+
+import com.dewdrop623.androidaescrypt.FileOperations.FileModifierService;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileOperator;
 
 import java.io.File;
@@ -11,8 +14,8 @@ import java.util.HashMap;
 
 public class FolderDeleteOperator extends FileOperator{
     boolean done = false;
-    public FolderDeleteOperator(File file, HashMap<String, String> args) {
-        super(file, args);
+    public FolderDeleteOperator(File file, Bundle args, FileModifierService fileModifierService) {
+        super(file, args, fileModifierService);
     }
 
     @Override
@@ -24,7 +27,7 @@ public class FolderDeleteOperator extends FileOperator{
     }
 
     @Override
-    public void execute() {
+    public void doOperation() {
         deleteFolder(file);
         done=true;
     }

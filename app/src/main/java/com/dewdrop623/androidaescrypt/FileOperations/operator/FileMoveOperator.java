@@ -1,8 +1,10 @@
 package com.dewdrop623.androidaescrypt.FileOperations.operator;
 
-import java.io.File;
+import android.os.Bundle;
 
-import java.util.HashMap;
+import com.dewdrop623.androidaescrypt.FileOperations.FileModifierService;
+
+import java.io.File;
 
 /**
  * moves files
@@ -11,8 +13,8 @@ import java.util.HashMap;
 public class FileMoveOperator extends FileOperator {
     public static final String FILE_MOVE_DESTINATION_ARG = "com.dewdrop623.androidaescrypt.FileOperations.operator.FileMoveOperator.FILE_MOVE_DESTINATION_ARG";
     boolean done = false;
-    public FileMoveOperator(File file, HashMap<String, String> args) {
-        super(file, args);
+    public FileMoveOperator(File file, Bundle args, FileModifierService fileModifierService) {
+        super(file, args, fileModifierService);
     }
 
     @Override
@@ -24,8 +26,8 @@ public class FileMoveOperator extends FileOperator {
     }
 
     @Override
-    public void execute() {
-        File destination = new File(args.get(FILE_MOVE_DESTINATION_ARG)+"/"+file.getName());
+    public void doOperation() {
+        File destination = new File(args.getString(FILE_MOVE_DESTINATION_ARG)+"/"+file.getName());
         file.renameTo(destination);
     }
 }

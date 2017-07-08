@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.dewdrop623.androidaescrypt.FileOperations.FileCommand;
+import com.dewdrop623.androidaescrypt.FileOperations.FileModifierService;
 import com.dewdrop623.androidaescrypt.FileOperations.FileOperationType;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileRenameOperator;
 import com.dewdrop623.androidaescrypt.R;
@@ -32,9 +33,10 @@ public class DebugRenameFileDialog extends FileDialog {
     @Override
     protected void positiveButtonOnClick() {
         super.positiveButtonOnClick();
-        HashMap<String,String> args = new HashMap<>();
-        args.put(FileRenameOperator.NEW_FILENAME_ARG, fileNameEditText.getText().toString());
-        FileCommand fileCommand = new FileCommand(file, FileOperationType.RENAME, args);
-        fileViewer.sendFileCommandToFileBrowser(fileCommand);
+        Bundle args = new Bundle();
+        args.putString(FileRenameOperator.NEW_FILENAME_ARG, fileNameEditText.getText().toString());
+        args.putString(FileModifierService.FILEMODIFIERSERVICE_FILE, file.getAbsolutePath());
+        args.putInt(FileModifierService.FILEMODIFIERSERVICE_ARGS, FileOperationType.RENAME);
+        fileViewer.sendFileCommandToFileBrowser(args);
     }
 }

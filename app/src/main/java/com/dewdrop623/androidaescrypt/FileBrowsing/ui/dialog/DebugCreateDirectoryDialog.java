@@ -6,7 +6,9 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.dewdrop623.androidaescrypt.FileOperations.FileCommand;
+import com.dewdrop623.androidaescrypt.FileOperations.FileModifierService;
 import com.dewdrop623.androidaescrypt.FileOperations.FileOperationType;
+import com.dewdrop623.androidaescrypt.FileOperations.operator.folder.CreateFolderOperator;
 import com.dewdrop623.androidaescrypt.R;
 
 import java.io.File;
@@ -33,9 +35,10 @@ public class DebugCreateDirectoryDialog extends FileDialog{
             //TODO give error to user, toast maybe
             return;
         }
-
-        File newFolderFile = new File(file.getAbsolutePath()+"/"+folderName);
-        FileCommand fileCommand = new FileCommand(newFolderFile, FileOperationType.CREATE_FOLDER, null);
-        fileViewer.sendFileCommandToFileBrowser(fileCommand);
+        Bundle args = new Bundle();
+        args.putString(CreateFolderOperator.CREATE_FOLDER_OPERATOR_FOLDER_NAME, folderName);
+        args.putInt(FileModifierService.FILEMODIFIERSERVICE_OPERATIONTYPE, FileOperationType.CREATE_FOLDER);
+        args.putString(FileModifierService.FILEMODIFIERSERVICE_FILE, file.getAbsolutePath());
+        fileViewer.sendFileCommandToFileBrowser(args);
     }
 }

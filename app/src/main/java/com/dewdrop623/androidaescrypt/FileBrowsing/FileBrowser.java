@@ -1,13 +1,14 @@
 package com.dewdrop623.androidaescrypt.FileBrowsing;
 
+import android.content.Intent;
+import android.os.Bundle;
 import android.os.Environment;
 import android.os.FileObserver;
 import android.os.Handler;
 import android.os.Looper;
 
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.FileViewer;
-import com.dewdrop623.androidaescrypt.FileOperations.FileCommand;
-import com.dewdrop623.androidaescrypt.FileOperations.FileModifier;
+import com.dewdrop623.androidaescrypt.FileOperations.FileModifierService;
 
 import java.io.File;
 
@@ -77,8 +78,10 @@ public class FileBrowser {
         monitorCurrentPathForChanges();
         updateFileViewer();
     }
-    public void modifyFile(FileCommand fileCommand) {
-        FileModifier fileModifier = new FileModifier(fileCommand);
-        fileModifier.execute();
+
+    public void modifyFile(Bundle args) {
+        Intent intent = new Intent(fileViewer.getContext(), FileModifierService.class);
+        intent.putExtra(FileModifierService.FILEMODIFIERSERVICE_ARGS, args);
+        fileViewer.getContext().startService(intent);
     }
 }

@@ -1,11 +1,14 @@
 package com.dewdrop623.androidaescrypt.FileOperations.operator;
 
+import android.os.Bundle;
+
+import com.dewdrop623.androidaescrypt.FileOperations.FileModifierService;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
-import java.util.HashMap;
 
 /**
  * copies files
@@ -15,8 +18,8 @@ public class FileCopyOperator extends FileOperator {
     public static final String FILE_COPY_DESTINATION_ARG = "com.dewdrop623.androidaescrypt.FileOperations.operator.FileCopyOperator.FILE_COPY_DESTINATION_ARG";
     boolean done = false;
 
-    public FileCopyOperator(File file, HashMap<String, String> args) {
-        super(file, args);
+    public FileCopyOperator(File file, Bundle args, FileModifierService fileModifierService) {
+        super(file, args, fileModifierService);
     }
 
     @Override
@@ -28,9 +31,9 @@ public class FileCopyOperator extends FileOperator {
     }
 
     @Override
-    public void execute() {
+    public void doOperation() {
         try {
-            File desination = new File(args.get(FILE_COPY_DESTINATION_ARG) + "/" + file.getName());
+            File desination = new File(args.getString(FILE_COPY_DESTINATION_ARG) + "/" + file.getName());
             if (!desination.exists()) {
                 desination.createNewFile();
             }

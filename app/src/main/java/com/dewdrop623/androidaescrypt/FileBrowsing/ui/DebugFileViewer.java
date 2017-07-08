@@ -17,6 +17,7 @@ import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.DebugCreateDirector
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.DebugFileOptionsDialog;
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.FileDialog;
 import com.dewdrop623.androidaescrypt.FileOperations.FileCommand;
+import com.dewdrop623.androidaescrypt.FileOperations.FileModifierService;
 import com.dewdrop623.androidaescrypt.FileOperations.FileOperationType;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileCopyOperator;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileMoveOperator;
@@ -137,16 +138,18 @@ public class DebugFileViewer extends FileViewer {
             if(moveState == MoveState.NONE) {
                 return;
             }
-            HashMap<String,String> args = new HashMap<>();
-            FileCommand fileCommand = null;
+            Bundle args = new Bundle();
+            int fileOperationType = -1;
             if(moveState == MoveState.MOVE) {
-                args.put(FileMoveOperator.FILE_MOVE_DESTINATION_ARG, fileBrowser.getCurrentPath().getAbsolutePath());
-                fileCommand = new FileCommand(moveCopyFile, FileOperationType.MOVE, args);
+                args.putString(FileMoveOperator.FILE_MOVE_DESTINATION_ARG, fileBrowser.getCurrentPath().getAbsolutePath());
+                fileOperationType = FileOperationType.MOVE;
             } else if (moveState == MoveState.COPY) {
-                args.put(FileCopyOperator.FILE_COPY_DESTINATION_ARG, fileBrowser.getCurrentPath().getAbsolutePath());
-                fileCommand = new FileCommand(moveCopyFile, FileOperationType.COPY, args);
+                args.putString(FileCopyOperator.FILE_COPY_DESTINATION_ARG, fileBrowser.getCurrentPath().getAbsolutePath());
+                fileOperationType = FileOperationType.COPY;
             }
-            sendFileCommandToFileBrowser(fileCommand);
+            args.putInt(FileModifierService.FILEMODIFIERSERVICE_OPERATIONTYPE, fileOperationType);
+            args.putString(FileModifierService.FILEMODIFIERSERVICE_FILE, moveCopyFile.getAbsolutePath());
+            sendFileCommandToFileBrowser(args);
             moveCopyButton.setVisibility(View.GONE);
             moveState = MoveState.NONE;
             moveCopyFile = null;

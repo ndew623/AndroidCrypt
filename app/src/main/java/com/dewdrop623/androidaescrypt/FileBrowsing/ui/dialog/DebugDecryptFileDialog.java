@@ -8,14 +8,11 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.dewdrop623.androidaescrypt.FileOperations.FileCommand;
+import com.dewdrop623.androidaescrypt.FileOperations.FileModifierService;
 import com.dewdrop623.androidaescrypt.FileOperations.FileOperationType;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.AESCryptDecryptFileOperator;
 import com.dewdrop623.androidaescrypt.MainActivity;
 import com.dewdrop623.androidaescrypt.R;
-
-import java.util.HashMap;
-
-import es.vocali.util.AESCrypt;
 
 /**
  * decrypts files
@@ -61,11 +58,12 @@ public class DebugDecryptFileDialog extends FileDialog {
             ((MainActivity)getActivity()).showToast(getString(R.string.file_name)+" "+getString(R.string.cannot_be_empty));
             return;
         }
-        HashMap<String, String> args = new HashMap<>();
-        args.put(AESCryptDecryptFileOperator.AESCRYPT_FILE_OPERATOR_KEY_ARGUMENT, password);
-        args.put(AESCryptDecryptFileOperator.AESCRYPT_FILE_OPERATOR_FILENAME_ARGUMENT, fileName);
-        FileCommand fileCommand = new FileCommand(file, FileOperationType.DECRYPT, args);
-        fileViewer.sendFileCommandToFileBrowser(fileCommand);
+        Bundle args = new Bundle();
+        args.putString(AESCryptDecryptFileOperator.AESCRYPT_FILE_OPERATOR_KEY_ARGUMENT, password);
+        args.putString(AESCryptDecryptFileOperator.AESCRYPT_FILE_OPERATOR_FILENAME_ARGUMENT, fileName);
+        args.putString(FileModifierService.FILEMODIFIERSERVICE_FILE, file.getAbsolutePath());
+        args.putInt(FileModifierService.FILEMODIFIERSERVICE_OPERATIONTYPE, FileOperationType.DECRYPT);
+        fileViewer.sendFileCommandToFileBrowser(args);
         dismiss();
     }
 }

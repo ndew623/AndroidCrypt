@@ -1,10 +1,13 @@
 package com.dewdrop623.androidaescrypt.FileOperations.operator;
 
+import android.os.Bundle;
+
+import com.dewdrop623.androidaescrypt.FileOperations.FileModifierService;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
-import java.util.HashMap;
 
 import es.vocali.util.AESCrypt;
 
@@ -16,8 +19,8 @@ public class AESCryptEncryptFileOperator extends FileOperator {
 
     public static final String AESCRYPT_FILE_OPERATOR_KEY_ARGUMENT = "com.dewdrop623.androidaescrypt.FileOperations.operator.AESCryptEncryptFileOperator.AESCRYPT_FILE_OPERATOR_KEY_ARGUMENT";
     public static final String AESCRYPT_FILE_OPERATOR_FILENAME_ARGUMENT = "com.dewdrop623.androidaescrypt.FileOperations.operator.AESCryptEncryptFileOperator.AESCRYPT_FILE_OPERATOR_FILENAME_ARGUMENT";
-    public AESCryptEncryptFileOperator(File file, HashMap<String, String> args) {
-        super(file, args);
+    public AESCryptEncryptFileOperator(File file, Bundle args, FileModifierService fileModifierService) {
+        super(file, args, fileModifierService);
     }
 
     @Override
@@ -26,10 +29,10 @@ public class AESCryptEncryptFileOperator extends FileOperator {
     }
 
     @Override
-    public void execute() {
+    public void doOperation() {
         try {
-            AESCrypt aesCrypt = new AESCrypt(args.get(AESCRYPT_FILE_OPERATOR_KEY_ARGUMENT));
-            aesCrypt.encrypt(2, file.getAbsolutePath(), file.getParentFile()+"/"+args.get(AESCRYPT_FILE_OPERATOR_FILENAME_ARGUMENT));
+            AESCrypt aesCrypt = new AESCrypt(args.getString(AESCRYPT_FILE_OPERATOR_KEY_ARGUMENT));
+            aesCrypt.encrypt(2, file.getAbsolutePath(), file.getParentFile()+"/"+args.getString(AESCRYPT_FILE_OPERATOR_FILENAME_ARGUMENT));
         } catch (GeneralSecurityException gse) {
             //TODO deal with this
         } catch (UnsupportedEncodingException uee) {

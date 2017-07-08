@@ -7,15 +7,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.dewdrop623.androidaescrypt.FileOperations.FileCommand;
+import com.dewdrop623.androidaescrypt.FileOperations.FileModifierService;
 import com.dewdrop623.androidaescrypt.FileOperations.FileOperationType;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.AESCryptEncryptFileOperator;
 import com.dewdrop623.androidaescrypt.MainActivity;
 import com.dewdrop623.androidaescrypt.R;
-
-import java.util.HashMap;
-
-import es.vocali.util.AESCrypt;
 
 /**
  * get password and filename from user to encrypt file
@@ -67,11 +63,12 @@ public class DebugEncryptFileDialog extends FileDialog {
             ((MainActivity)getActivity()).showToast(getString(R.string.file_name)+" "+getString(R.string.cannot_be_empty));
             return;
         }
-        HashMap<String, String> args = new HashMap<>();
-        args.put(AESCryptEncryptFileOperator.AESCRYPT_FILE_OPERATOR_KEY_ARGUMENT,password1);
-        args.put(AESCryptEncryptFileOperator.AESCRYPT_FILE_OPERATOR_FILENAME_ARGUMENT, fileName);
-        FileCommand fileCommand = new FileCommand(file, FileOperationType.ENCRYPT, args);
-        fileViewer.sendFileCommandToFileBrowser(fileCommand);
+        Bundle args = new Bundle();
+        args.putString(AESCryptEncryptFileOperator.AESCRYPT_FILE_OPERATOR_KEY_ARGUMENT,password1);
+        args.putString(AESCryptEncryptFileOperator.AESCRYPT_FILE_OPERATOR_FILENAME_ARGUMENT, fileName);
+        args.putString(FileModifierService.FILEMODIFIERSERVICE_FILE, file.getAbsolutePath());
+        args.putInt(FileModifierService.FILEMODIFIERSERVICE_OPERATIONTYPE, FileOperationType.ENCRYPT);
+        fileViewer.sendFileCommandToFileBrowser(args);
         dismiss();
     }
 }
