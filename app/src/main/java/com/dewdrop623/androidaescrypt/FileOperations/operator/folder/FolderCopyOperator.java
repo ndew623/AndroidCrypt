@@ -7,6 +7,7 @@ import com.dewdrop623.androidaescrypt.FileOperations.operator.FileCopyOperator;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileOperator;
 
 import java.io.File;
+import java.util.ArrayList;
 
 /**
  * recursively copies a directories contents
@@ -14,7 +15,12 @@ import java.io.File;
 
 public class FolderCopyOperator extends FileOperator{
 
-    boolean done = false;
+    private ArrayList<File> toBeCopied = new ArrayList<>();
+    private ArrayList<File> dontOverwrite = new ArrayList<>();
+    private int dontOverwriteIndex = 0;
+    private File destination;
+    private int sourceParentDirectoryCharLength = 0;
+    private boolean done = false;
 
     public FolderCopyOperator(File file, Bundle args, FileModifierService fileModifierService) {
         super(file, args, fileModifierService);
@@ -29,22 +35,90 @@ public class FolderCopyOperator extends FileOperator{
     }
 
     @Override
-    public void doOperation() {
-        File destination = new File(args.getString(FileCopyOperator.FILE_COPY_DESTINATION_ARG));
-        copyFolder(file, destination);
+    protected void initMemVarFromArgs() {
+        destination = new File(args.getString(FileCopyOperator.FILE_COPY_DESTINATION_ARG));
+        sourceParentDirectoryCharLength = file.getParent().length();
     }
-    private void copyFolder(File folder, File destination) {
-        File newFolder = new File(destination.getAbsolutePath()+"/"+folder.getName());
-        newFolder.mkdir();
-        File[] contents = folder.listFiles();
-        for (File file : contents) {
-            if (file.isDirectory()) {
-                copyFolder(file, newFolder);
-            } else {
-                Bundle args = new Bundle();
-                args.putString(FileCopyOperator.FILE_COPY_DESTINATION_ARG, newFolder.getAbsolutePath());
-                new FileCopyOperator(file, args, fileModifierService).run();
+
+    @Override
+    public void doOperation() {
+        Bundle args = new Bundle();
+        for (File folder : toBeCopied) {
+            File newFolder = renameToDesination(folder);
+            newFolder.mkdir();
+            for(File file : folder.listFiles()) {
+                if (!file.isDirectory() && !dontOverwrite.contains(file)) {
+                    args.putString(FileCopyOperator.FILE_COPY_DESTINATION_ARG, newFolder.getAbsolutePath());
+                    new FileCopyOperator(file, args, fileModifierService).doOperationWithoutThreadOrUserQuestions();
+                }
             }
         }
     }
+
+    @Override
+    protected void prepareAndValidate() {
+        toBeCopied.add(file);
+        addSubdirectoriesOfPositionToList(0);
+        for(File folderToBeCopied : toBeCopied) {
+            for (File file : folderToBeCopied.listFiles()) {
+                File newFile = renameToDesination(file);
+                if (!newFile.isDirectory() && newFile.exists()) {
+                    dontOverwrite.add(file);
+                }
+            }
+        }
+    }
+
+    @Override
+    protected void getInfoFromUser() {
+        if (dontOverwriteIndex<dontOverwrite.size()) {
+            askYesNoRememberAnswer("Overwrite " + dontOverwrite.get(dontOverwriteIndex).getName() + "?", dontOverwrite.size() - dontOverwriteIndex, "conflict");
+        } else {
+            finishTakingInput();
+        }
+    }
+    @Override
+    protected void handleYesNoResponse(boolean yes) {
+
+    }
+
+    @Override
+    protected void handleTextOrCancelResponse(String response) {
+
+    }
+
+    @Override
+    public void handleYesNoRememberAnswerResponse(boolean yes, boolean remember) {
+        if (yes) {
+            dontOverwrite.remove(dontOverwriteIndex);
+        } else {
+            dontOverwriteIndex++;
+        }
+        if (remember) {
+            if (yes) {
+                dontOverwrite = (ArrayList<File>) dontOverwrite.subList(0, dontOverwriteIndex);
+            } else {
+                dontOverwriteIndex = dontOverwrite.size();
+            }
+        }
+        getInfoFromUser();
+    }
+
+    private void addSubdirectoriesOfPositionToList(int position) {
+        if(toBeCopied.size()<=position) {
+            return;
+        }
+        for(File file : toBeCopied.get(position).listFiles()) {
+            if (file.isDirectory()) {
+                toBeCopied.add(file);
+            }
+        }
+        addSubdirectoriesOfPositionToList(position+1);
+    }
+    private File renameToDesination(File file) {
+        File newFile = new File(destination.getAbsolutePath()+file.getAbsolutePath().substring(sourceParentDirectoryCharLength));
+        return newFile;
+    }
+
+
 }

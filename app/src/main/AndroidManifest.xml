@@ -23,7 +23,20 @@
         <service
             android:name=".FileOperations.FileModifierService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
+
+        <activity
+            android:name=".FileBrowsing.ui.dialog.questiondialog.QuestionDialog"
+            android:label="@string/title_activity_question_dialog"
+            android:theme="@style/DialogTheme"/>
+        <activity
+            android:name=".FileBrowsing.ui.dialog.questiondialog.YesNoQuestionDialog"
+            android:label="YesNoQuestionDialog"
+            android:theme="@style/DialogTheme"/>
+        <activity
+            android:name=".FileBrowsing.ui.dialog.questiondialog.YesNoRememberAnswerQuestionDialog"
+            android:label="YesNoQuestionDialog"
+            android:theme="@style/DialogTheme"/>
     </application>
 
 </manifest>

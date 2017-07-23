@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
 import com.dewdrop623.androidaescrypt.FileBrowsing.FileBrowser;
-import com.dewdrop623.androidaescrypt.FileOperations.FileCommand;
 
 import java.io.File;
 

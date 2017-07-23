@@ -25,8 +25,38 @@ public class FileDeleteOperator extends FileOperator {
     }
 
     @Override
+    protected void initMemVarFromArgs() {
+
+    }
+
+    @Override
+    protected void handleYesNoResponse(boolean yes) {
+
+    }
+
+    @Override
+    protected void handleYesNoRememberAnswerResponse(boolean yes, boolean remember) {
+
+    }
+
+    @Override
+    protected void handleTextOrCancelResponse(String response) {
+
+    }
+
+    @Override
     public void doOperation() {
         file.delete();//TODO there needs to be more here. needs logic for nonempty directories and for symbolic links
         done=true;
+    }
+
+    @Override
+    protected void prepareAndValidate() {
+
+    }
+
+    @Override
+    protected void getInfoFromUser() {
+        finishTakingInput();
     }
 }

@@ -19,4 +19,9 @@
     <string name="copy">Copy</string>
     <string name="move">Move</string>
     <string name="rename">Rename</string>
+    <string name="title_activity_question_dialog">QuestionDialog</string>
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
+    <string name="overwrite">Overwrite</string>
+    <string name="remember_answer_for_the_next">Remember answer for the next</string>
 </resources>

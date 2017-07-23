@@ -12,9 +12,37 @@ import java.io.File;
 
 public class FileMoveOperator extends FileOperator {
     public static final String FILE_MOVE_DESTINATION_ARG = "com.dewdrop623.androidaescrypt.FileOperations.operator.FileMoveOperator.FILE_MOVE_DESTINATION_ARG";
-    boolean done = false;
+
+    private boolean done = false;
+    private boolean conflict = false;
+    private File outputFile;
+
     public FileMoveOperator(File file, Bundle args, FileModifierService fileModifierService) {
         super(file, args, fileModifierService);
+    }
+
+    @Override
+    protected void initMemVarFromArgs() {
+        outputFile = new File(args.getString(FILE_MOVE_DESTINATION_ARG));
+    }
+
+    @Override
+    protected void handleYesNoResponse(boolean yes) {
+        if (yes) {
+            finishTakingInput();
+        } else {
+            cancelOperation();
+        }
+    }
+
+    @Override
+    protected void handleYesNoRememberAnswerResponse(boolean yes, boolean remember) {
+
+    }
+
+    @Override
+    protected void handleTextOrCancelResponse(String response) {
+
     }
 
     @Override
@@ -26,8 +54,26 @@ public class FileMoveOperator extends FileOperator {
     }
 
     @Override
-    public void doOperation() {
-        File destination = new File(args.getString(FILE_MOVE_DESTINATION_ARG)+"/"+file.getName());
-        file.renameTo(destination);
+    protected void doOperation() {
+        file.renameTo(outputFile);
+        done = true;
+    }
+
+    @Override
+    protected void prepareAndValidate() {
+        conflict = outputFile.exists();
+    }
+
+    @Override
+    protected void getInfoFromUser() {
+        if (conflict) {
+            askYesNo("Overwrite "+outputFile.getName()+"?");
+        } else {
+            finishTakingInput();
+        }
+    }
+    public void doOperationWithoutThreadOrUserQuestions() {
+        initMemVarFromArgs();
+        doOperation();
     }
 }

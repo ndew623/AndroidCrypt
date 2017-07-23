@@ -27,7 +27,27 @@ public class FolderDeleteOperator extends FileOperator{
     }
 
     @Override
-    public void doOperation() {
+    protected void initMemVarFromArgs() {
+
+    }
+
+    @Override
+    protected void handleYesNoResponse(boolean yes) {
+
+    }
+
+    @Override
+    protected void handleYesNoRememberAnswerResponse(boolean yes, boolean remember) {
+
+    }
+
+    @Override
+    protected void handleTextOrCancelResponse(String response) {
+
+    }
+
+    @Override
+    protected void doOperation() {
         deleteFolder(file);
         done=true;
     }
@@ -41,5 +61,19 @@ public class FolderDeleteOperator extends FileOperator{
             }
         }
         file.delete();
+    }
+
+    @Override
+    protected void prepareAndValidate() {
+
+    }
+
+    @Override
+    protected void getInfoFromUser() {
+        finishTakingInput();
+    }
+    public void doOperationWithoutThreadOrUserQuestions() {
+        initMemVarFromArgs();
+        doOperation();
     }
 }

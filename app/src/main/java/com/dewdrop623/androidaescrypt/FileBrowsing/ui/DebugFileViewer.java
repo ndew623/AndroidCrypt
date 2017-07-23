@@ -13,10 +13,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.dewdrop623.androidaescrypt.FileBrowsing.FileBrowser;
-import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.DebugCreateDirectoryDialog;
-import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.DebugFileOptionsDialog;
-import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.FileDialog;
-import com.dewdrop623.androidaescrypt.FileOperations.FileCommand;
+import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.filedialog.DebugCreateDirectoryDialog;
+import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.filedialog.DebugFileOptionsDialog;
+import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.filedialog.FileDialog;
 import com.dewdrop623.androidaescrypt.FileOperations.FileModifierService;
 import com.dewdrop623.androidaescrypt.FileOperations.FileOperationType;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileCopyOperator;
@@ -25,7 +24,6 @@ import com.dewdrop623.androidaescrypt.MainActivity;
 import com.dewdrop623.androidaescrypt.R;
 
 import java.io.File;
-import java.util.HashMap;
 
 /**
  * a simple fragment for displaying files and test functionality
@@ -141,7 +139,7 @@ public class DebugFileViewer extends FileViewer {
             Bundle args = new Bundle();
             int fileOperationType = -1;
             if(moveState == MoveState.MOVE) {
-                args.putString(FileMoveOperator.FILE_MOVE_DESTINATION_ARG, fileBrowser.getCurrentPath().getAbsolutePath());
+                args.putString(FileMoveOperator.FILE_MOVE_DESTINATION_ARG, fileBrowser.getCurrentPath().getAbsolutePath()+"/"+moveCopyFile.getName());
                 fileOperationType = FileOperationType.MOVE;
             } else if (moveState == MoveState.COPY) {
                 args.putString(FileCopyOperator.FILE_COPY_DESTINATION_ARG, fileBrowser.getCurrentPath().getAbsolutePath());

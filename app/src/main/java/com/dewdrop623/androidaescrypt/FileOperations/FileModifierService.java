@@ -5,15 +5,18 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
 
+import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.questiondialog.QuestionDialog;
+import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.questiondialog.YesNoQuestionDialog;
+import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.questiondialog.YesNoRememberAnswerQuestionDialog;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.AESCryptDecryptFileOperator;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.AESCryptEncryptFileOperator;
-import com.dewdrop623.androidaescrypt.FileOperations.operator.folder.CreateFolderOperator;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileCopyOperator;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileDeleteOperator;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileMoveOperator;
-import com.dewdrop623.androidaescrypt.FileOperations.operator.FileRenameOperator;
+import com.dewdrop623.androidaescrypt.FileOperations.operator.folder.CreateFolderOperator;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.folder.FolderCopyOperator;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.folder.FolderDeleteOperator;
+import com.dewdrop623.androidaescrypt.FileOperations.operator.folder.FolderMoveOperator;
 
 import java.io.File;
 
@@ -39,14 +42,11 @@ public class FileModifierService extends Service {
         args = intent.getBundleExtra(FILEMODIFIERSERVICE_ARGS);
         file = new File(args.getString(FILEMODIFIERSERVICE_FILE));
         fileOperationType = args.getInt(FILEMODIFIERSERVICE_OPERATIONTYPE);
-        Runnable operator;
         if (file.isDirectory()) {
-            operator = getFolderOperator();
+            folderOperation();
         } else {
-            operator = getFileOperator();
+            fileOperation();
         }
-        fileOperationThread = new Thread(operator);
-        fileOperationThread.start();
         return START_STICKY;
     }
 
@@ -55,55 +55,63 @@ public class FileModifierService extends Service {
         // TODO: Return the communication channel to the service.
         throw new UnsupportedOperationException("Not yet implemented");
     }
-    private Runnable getFileOperator() {
-        Runnable operator;
+    private void fileOperation() {
         switch (fileOperationType) {
             case FileOperationType.DELETE:
-                operator = new FileDeleteOperator(file, args, this);
+                new FileDeleteOperator(file, args, this).run();
                 break;
             case FileOperationType.ENCRYPT:
-                operator = new AESCryptEncryptFileOperator(file, args, this);
+                new AESCryptEncryptFileOperator(file, args, this).run();
                 break;
             case FileOperationType.DECRYPT:
-                operator = new AESCryptDecryptFileOperator(file, args, this);
+                new AESCryptDecryptFileOperator(file, args, this).run();
                 break;
             case FileOperationType.MOVE:
-                operator = new FileMoveOperator(file, args, this);
+                new FileMoveOperator(file, args, this).run();
                 break;
             case FileOperationType.COPY:
-                operator = new FileCopyOperator(file, args, this);
-                break;
-            case FileOperationType.RENAME:
-                operator = new FileRenameOperator(file, args, this);
+                new FileCopyOperator(file, args, this).run();
                 break;
             default:
-                operator = null;
                 break;
         }
-        return operator;
     }
-    private Runnable getFolderOperator() {
-        Runnable operator;
+    private void folderOperation() {
         switch (fileOperationType) {
             case FileOperationType.CREATE_FOLDER:
-                operator = new CreateFolderOperator(file, args, this);
+                new CreateFolderOperator(file, args, this).run();
                 break;
             case FileOperationType.DELETE:
-                operator = new FolderDeleteOperator(file, args, this);
+                new FolderDeleteOperator(file, args, this).run();
                 break;
             case FileOperationType.MOVE:
-                operator = new FileMoveOperator(file, args, this);
+                new FolderMoveOperator(file, args, this).run();
                 break;
             case FileOperationType.COPY:
-                operator = new FolderCopyOperator(file, args, this);
-                break;
-            case FileOperationType.RENAME:
-                operator = new FileRenameOperator(file, args, this);
+                new FolderCopyOperator(file, args, this).run();
                 break;
             default:
-                operator = null;
                 break;
         }
-        return operator;
     }
+    public void askYesNo(String question) {
+        Intent intent = new Intent(this, YesNoQuestionDialog.class);
+        intent.putExtra(QuestionDialog.QUESTION_ARG, question);
+        startActivity(intent);
+    }
+    public void askYesNoRememberAnswer(String question, int numberOfEvents, String typeOfEventString) {
+        Intent intent = new Intent(this, YesNoRememberAnswerQuestionDialog.class);
+        intent.putExtra(QuestionDialog.QUESTION_ARG, question);
+        intent.putExtra(YesNoRememberAnswerQuestionDialog.NUM_OF_EVENTS_ARG, numberOfEvents);
+        intent.putExtra(YesNoRememberAnswerQuestionDialog.TYPE_OF_EVENT_ARG, typeOfEventString);
+        startActivity(intent);
+    }
+    public void askForTextOrCancel(String question) {
+    }
+    public void testDialog() {
+        Intent intent = new Intent(this, YesNoQuestionDialog.class);
+        intent.putExtra(QuestionDialog.QUESTION_ARG, "Overwrite fake.file?");
+        startActivity(intent);
+    }
+
 }

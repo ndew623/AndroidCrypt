@@ -16,7 +16,10 @@ import java.nio.channels.FileChannel;
 
 public class FileCopyOperator extends FileOperator {
     public static final String FILE_COPY_DESTINATION_ARG = "com.dewdrop623.androidaescrypt.FileOperations.operator.FileCopyOperator.FILE_COPY_DESTINATION_ARG";
-    boolean done = false;
+
+    private boolean done = false;
+    private boolean conflict = false;
+    private File outputFile;
 
     public FileCopyOperator(File file, Bundle args, FileModifierService fileModifierService) {
         super(file, args, fileModifierService);
@@ -31,19 +34,41 @@ public class FileCopyOperator extends FileOperator {
     }
 
     @Override
-    public void doOperation() {
+    protected void initMemVarFromArgs() {
+        outputFile = new File(args.getString(FILE_COPY_DESTINATION_ARG) + "/" + file.getName());
+    }
+
+    @Override
+    protected void handleYesNoResponse(boolean yes) {
+        if (yes) {
+            finishTakingInput();
+        } else {
+            cancelOperation();
+        }
+    }
+
+    @Override
+    protected void handleYesNoRememberAnswerResponse(boolean yes, boolean remember) {
+
+    }
+
+    @Override
+    protected void handleTextOrCancelResponse(String response) {
+
+    }
+
+    @Override
+    protected void doOperation() {
         try {
-            File desination = new File(args.getString(FILE_COPY_DESTINATION_ARG) + "/" + file.getName());
-            if (!desination.exists()) {
-                desination.createNewFile();
+            if (!outputFile.exists()) {
+                outputFile.createNewFile();
             }
             FileChannel sourceChannel = null;
             FileChannel destinationChannel = null;
             try {
                 sourceChannel = new FileInputStream(file).getChannel();
-                destinationChannel = new FileOutputStream(desination).getChannel();
+                destinationChannel = new FileOutputStream(outputFile).getChannel();
                 destinationChannel.transferFrom(sourceChannel, 0, sourceChannel.size());
-
             } catch (IOException ioe) {
                 ioe.printStackTrace(); //TODO handle this
             } finally {
@@ -57,5 +82,24 @@ public class FileCopyOperator extends FileOperator {
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
+        done = true;
+    }
+
+    @Override
+    protected void prepareAndValidate() {
+        conflict = outputFile.exists();
+    }
+
+    @Override
+    protected void getInfoFromUser() {
+        if (conflict) {
+            askYesNo("Overwrite "+outputFile.getName()+"?");
+        } else {
+            finishTakingInput();
+        }
+    }
+    public void doOperationWithoutThreadOrUserQuestions() {
+        initMemVarFromArgs();
+        doOperation();
     }
 }
