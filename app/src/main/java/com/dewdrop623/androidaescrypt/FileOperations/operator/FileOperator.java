@@ -2,9 +2,11 @@ package com.dewdrop623.androidaescrypt.FileOperations.operator;
 
 import android.os.Bundle;
 
+import com.dewdrop623.androidaescrypt.FileBrowsing.FileBrowser;
 import com.dewdrop623.androidaescrypt.FileOperations.FileModifierService;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Stack;
 
 /**
@@ -19,6 +21,7 @@ public abstract class FileOperator{
     private static Stack<FileOperator> waitingForYesNoRememberAnswerResponse = new Stack<>();
     private static Stack<FileOperator> waitingForTextOrCancelResponse = new Stack<>();
     private Thread operationThread;
+    private static final char[] ILLEGAL_CHARACTERS = { '/', '\n', '\r', '\t', '\0', '\f', '`', '?', '*', '\\', '<', '>', '|', '\"', ':' };
     public FileOperator(File file, Bundle args, FileModifierService fileModifierService) {
         this.file = file;
         this.args = args;
@@ -63,6 +66,29 @@ public abstract class FileOperator{
     public static void userResponse(String response) {
         waitingForTextOrCancelResponse.pop().handleTextOrCancelResponse(response);
     }
+
+    protected boolean validFilename(String name) {
+        if (name==null || name.getBytes().length>100 || name.length()==0 || name.equals("..") || name.equals(".")) {
+            return false;
+        }
+        for (char c : ILLEGAL_CHARACTERS) {
+            for (char name_c : name.toCharArray()) {
+                if (c == name_c) {
+                    return false;
+                }
+            }
+        }
+       File testFile = new File(fileModifierService.getApplicationInfo().dataDir+"/"+name);
+        try {
+            if (testFile.createNewFile()) {
+                testFile.delete();
+            }
+        } catch (IOException ioe) {
+            return false;
+        }
+        return true;
+    }
+
     protected void askYesNo(String question) {
         waitingForYesNoResponse.add(this);
         fileModifierService.askYesNo(question);

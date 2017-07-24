@@ -3,6 +3,7 @@ package com.dewdrop623.androidaescrypt.FileOperations.operator;
 import android.os.Bundle;
 
 import com.dewdrop623.androidaescrypt.FileOperations.FileModifierService;
+import com.dewdrop623.androidaescrypt.R;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,6 +24,7 @@ public class AESCryptDecryptFileOperator extends FileOperator {
 
     private File outputFile;
     private boolean conflict = false;
+    private boolean validFilename = true;
 
     public AESCryptDecryptFileOperator(File file, Bundle args, FileModifierService fileModifierService) {
         super(file, args, fileModifierService);
@@ -49,7 +51,12 @@ public class AESCryptDecryptFileOperator extends FileOperator {
 
     @Override
     protected void handleTextOrCancelResponse(String response) {
-
+        if (response==null) {
+            cancelOperation();
+            return;
+        }
+        validFilename = validFilename(response);
+        getInfoFromUser();
     }
 
     @Override
@@ -73,11 +80,30 @@ public class AESCryptDecryptFileOperator extends FileOperator {
 
     @Override
     protected void prepareAndValidate() {
+        if(!file.exists()) {
+            fileModifierService.showToast(fileModifierService.getString(R.string.file_does_not_exist)+": "+file.getName());
+            cancelOperation();
+            return;
+        }
+        if(!file.canRead()) {
+            fileModifierService.showToast(fileModifierService.getString(R.string.file_not_readable)+": "+file.getName());
+            cancelOperation();
+            return;
+        }
+        if(!outputFile.getParentFile().canWrite()) {
+            fileModifierService.showToast(fileModifierService.getString(R.string.directory_not_writable)+": "+outputFile.getParentFile().getName());
+            cancelOperation();
+            return;
+        }
+        validFilename = validFilename(args.getString(AESCRYPT_FILE_OPERATOR_FILENAME_ARGUMENT));
         conflict = outputFile.exists();
     }
 
     @Override
     protected void getInfoFromUser() {
+        if(!validFilename) {
+            askForTextOrCancel(fileModifierService.getString(R.string.invalid_filename)+". "+fileModifierService.getString(R.string.try_again)+"?");
+        }
         if(conflict) {
             askYesNo("Overwrite " + outputFile.getName() + "?");
         } else {

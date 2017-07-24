@@ -3,6 +3,7 @@ package com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.questiondialog;
 import android.os.Bundle;
 import android.widget.EditText;
 
+import com.dewdrop623.androidaescrypt.FileOperations.operator.FileOperator;
 import com.dewdrop623.androidaescrypt.R;
 
 /**
@@ -15,7 +16,19 @@ public class TextOrCancelQuestionDialog extends QuestionDialog {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_textorcancel_question_dialog);
-        initButtons(R.string.cancel, R.string.ok);
+        initButtons(R.string.ok, R.string.cancel);
         inputEditText = (EditText) findViewById(R.id.inputEditText);
+    }
+
+    @Override
+    protected void onPositiveButtonClick() {
+        super.onPositiveButtonClick();
+        FileOperator.userResponse(inputEditText.getText().toString());
+    }
+
+    @Override
+    protected void onNegativeButtonClick() {
+        super.onNegativeButtonClick();
+        FileOperator.userResponse(null);
     }
 }

@@ -24,4 +24,12 @@
     <string name="yes">Yes</string>
     <string name="overwrite">Overwrite</string>
     <string name="remember_answer_for_the_next">Remember answer for the next</string>
+    <string name="could_not_find_directory">Could not find directory</string>
+    <string name="invalid_filename">Invalid filename</string>
+    <string name="try_again">Try again</string>
+    <string name="directory_not_writable">Directory not writable</string>
+    <string name="directory_not_readable">Directory not readable</string>
+    <string name="file_does_not_exist">File does not exist</string>
+    <string name="file_not_readable">File not readable</string>
+    <string name="file_not_writable">File not writable</string>
 </resources>

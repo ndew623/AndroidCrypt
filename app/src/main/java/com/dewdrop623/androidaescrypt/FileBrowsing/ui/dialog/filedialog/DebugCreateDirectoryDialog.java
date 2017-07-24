@@ -28,10 +28,6 @@ public class DebugCreateDirectoryDialog extends FileDialog{
     protected void positiveButtonOnClick() {
         super.positiveButtonOnClick();
         String folderName = folderNameEditText.getText().toString();
-        if (folderName.length() == 0) {
-            //TODO give error to user, toast maybe
-            return;
-        }
         Bundle args = new Bundle();
         args.putString(CreateFolderOperator.CREATE_FOLDER_OPERATOR_FOLDER_NAME, folderName);
         args.putInt(FileModifierService.FILEMODIFIERSERVICE_OPERATIONTYPE, FileOperationType.CREATE_FOLDER);

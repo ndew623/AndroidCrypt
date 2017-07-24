@@ -4,8 +4,10 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.widget.Toast;
 
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.questiondialog.QuestionDialog;
+import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.questiondialog.TextOrCancelQuestionDialog;
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.questiondialog.YesNoQuestionDialog;
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.questiondialog.YesNoRememberAnswerQuestionDialog;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.AESCryptDecryptFileOperator;
@@ -107,11 +109,12 @@ public class FileModifierService extends Service {
         startActivity(intent);
     }
     public void askForTextOrCancel(String question) {
-    }
-    public void testDialog() {
-        Intent intent = new Intent(this, YesNoQuestionDialog.class);
-        intent.putExtra(QuestionDialog.QUESTION_ARG, "Overwrite fake.file?");
+        Intent intent = new Intent(this, TextOrCancelQuestionDialog.class);
+        intent.putExtra(QuestionDialog.QUESTION_ARG, question);
         startActivity(intent);
+    }
+    public void showToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
 }

@@ -115,7 +115,10 @@ public class DebugFileViewer extends FileViewer {
     private AdapterView.OnItemLongClickListener onItemLongClickListener = new AdapterView.OnItemLongClickListener() {
         @Override
         public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-            openOptionsDialog(fileArrayAdapter.getItem(position));
+            File clickedFile = fileArrayAdapter.getItem(position);
+            if (clickedFile!=FileBrowser.parentDirectory) {
+                openOptionsDialog(clickedFile);
+            }
             return true;
         }
     };

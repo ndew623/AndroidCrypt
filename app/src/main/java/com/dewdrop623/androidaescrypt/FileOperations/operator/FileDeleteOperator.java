@@ -3,6 +3,7 @@ package com.dewdrop623.androidaescrypt.FileOperations.operator;
 import android.os.Bundle;
 
 import com.dewdrop623.androidaescrypt.FileOperations.FileModifierService;
+import com.dewdrop623.androidaescrypt.R;
 
 import java.io.File;
 
@@ -46,13 +47,22 @@ public class FileDeleteOperator extends FileOperator {
 
     @Override
     public void doOperation() {
-        file.delete();//TODO there needs to be more here. needs logic for nonempty directories and for symbolic links
+        file.delete();
         done=true;
     }
 
     @Override
     protected void prepareAndValidate() {
-
+        if (!file.exists()) {
+            fileModifierService.showToast(fileModifierService.getString(R.string.file_does_not_exist)+": "+file.getName());
+            cancelOperation();
+            return;
+        }
+        if (!file.canWrite()) {
+            fileModifierService.showToast(fileModifierService.getString(R.string.file_not_writable)+": "+file.getName());
+            cancelOperation();
+            return;
+        }
     }
 
     @Override

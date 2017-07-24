@@ -5,6 +5,7 @@ import android.os.Bundle;
 import com.dewdrop623.androidaescrypt.FileOperations.FileModifierService;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileCopyOperator;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileOperator;
+import com.dewdrop623.androidaescrypt.R;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -57,6 +58,26 @@ public class FolderCopyOperator extends FileOperator{
 
     @Override
     protected void prepareAndValidate() {
+        if (!file.exists()) {
+            fileModifierService.showToast(fileModifierService.getString(R.string.could_not_find_directory)+" "+file.getName());
+            cancelOperation();
+            return;
+        }
+        if (!destination.exists()) {
+            fileModifierService.showToast(fileModifierService.getString(R.string.could_not_find_directory)+" "+destination.getName());
+            cancelOperation();
+            return;
+        }
+        if (!file.canRead()) {
+            fileModifierService.showToast(fileModifierService.getString(R.string.directory_not_readable)+": "+file.getName());
+            cancelOperation();
+            return;
+        }
+        if (!destination.canWrite()) {
+            fileModifierService.showToast(fileModifierService.getString(R.string.directory_not_readable)+": "+destination.getName());
+            cancelOperation();
+            return;
+        }
         toBeCopied.add(file);
         addSubdirectoriesOfPositionToList(0);
         for(File folderToBeCopied : toBeCopied) {

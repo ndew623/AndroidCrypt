@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import com.dewdrop623.androidaescrypt.FileOperations.FileModifierService;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileOperator;
+import com.dewdrop623.androidaescrypt.R;
 
 import java.io.File;
 import java.util.HashMap;
@@ -65,7 +66,16 @@ public class FolderDeleteOperator extends FileOperator{
 
     @Override
     protected void prepareAndValidate() {
-
+        if (!file.exists()) {
+            fileModifierService.showToast(fileModifierService.getString(R.string.could_not_find_directory)+" "+file.getName());
+            cancelOperation();
+            return;
+        }
+        if (!file.canWrite()) {
+            fileModifierService.showToast(fileModifierService.getString(R.string.directory_not_writable)+": "+file.getName());
+            cancelOperation();
+            return;
+        }
     }
 
     @Override
