@@ -1,5 +1,5 @@
 #Internal package file, do not edit.
-#Mon Jul 24 17:11:14 UTC 2017
+#Mon Jul 24 17:23:50 UTC 2017
 210.set=ANDROID_RESOURCE
 282.file=/home/nick/Android/projects/AndroidAESCrypt/app/build/intermediates/res/resources-debug.ap_/res/color/abc_primary_text_disable_only_material_light.xml
 14.set=ANDROID_RESOURCE

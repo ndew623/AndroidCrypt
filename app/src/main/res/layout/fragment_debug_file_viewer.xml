@@ -17,6 +17,11 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true">
         <Button
+            android:id="@+id/cancelMoveCopyButton"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <Button
             android:id="@+id/moveCopyButton"
             android:visibility="gone"
             android:layout_width="wrap_content"

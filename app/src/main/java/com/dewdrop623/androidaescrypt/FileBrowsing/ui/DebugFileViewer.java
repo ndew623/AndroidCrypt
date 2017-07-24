@@ -41,6 +41,7 @@ public class DebugFileViewer extends FileViewer {
     private FileArrayAdapter fileArrayAdapter;
     private Button createFolderButton;
     private Button moveCopyButton;
+    private Button cancelMoveCopyButton;
 
     @Override
     public void setFileList(File[] fileList) {
@@ -64,6 +65,9 @@ public class DebugFileViewer extends FileViewer {
         moveCopyButton = (Button) view.findViewById(R.id.moveCopyButton);
         moveCopyButton.setOnClickListener(moveCopyButtonOnClickListener);
 
+        cancelMoveCopyButton = (Button) view.findViewById(R.id.cancelMoveCopyButton);
+        cancelMoveCopyButton.setOnClickListener(cancelMoveCopyButtonOnClickListener);
+
         updateFileArrayAdapterFileList();
 
         return view;
@@ -71,16 +75,16 @@ public class DebugFileViewer extends FileViewer {
 
     @Override
     public void moveFile(File file) {
-        super.moveFile(file);
         moveCopyButton.setText(getString(R.string.move_here));
         moveState = MoveState.MOVE;
+        super.moveFile(file);
     }
 
     @Override
     public void copyFile(File file) {
-        super.copyFile(file);
         moveCopyButton.setText(getString(R.string.copy_here));
         moveState = MoveState.COPY;
+        super.copyFile(file);
     }
 
     @Override
@@ -88,6 +92,14 @@ public class DebugFileViewer extends FileViewer {
         super.onMoveOrCopy(file);
         moveCopyFile=file;
         moveCopyButton.setVisibility(View.VISIBLE);
+        cancelMoveCopyButton.setVisibility(View.VISIBLE);
+        String cancelMCBText = "";
+        if (moveState == MoveState.COPY) {
+            cancelMCBText = getString(R.string.cancel)+" "+getString(R.string.copy);
+        } else if (moveState == MoveState.MOVE) {
+            cancelMCBText = getString(R.string.cancel)+" "+getString(R.string.move);
+        }
+        cancelMoveCopyButton.setText(cancelMCBText);
     }
 
     private void updateFileArrayAdapterFileList() {
@@ -100,6 +112,12 @@ public class DebugFileViewer extends FileViewer {
         }
         fileArrayAdapter.addAll(fileList);
         fileArrayAdapter.notifyDataSetChanged();
+    }
+    private void moveCopyReset() {
+        moveState = MoveState.NONE;
+        moveCopyFile = null;
+        moveCopyButton.setVisibility(View.GONE);
+        cancelMoveCopyButton.setVisibility(View.GONE);
     }
     private AdapterView.OnItemClickListener onItemClickListener = new AdapterView.OnItemClickListener() {
         @Override
@@ -151,9 +169,13 @@ public class DebugFileViewer extends FileViewer {
             args.putInt(FileModifierService.FILEMODIFIERSERVICE_OPERATIONTYPE, fileOperationType);
             args.putString(FileModifierService.FILEMODIFIERSERVICE_FILE, moveCopyFile.getAbsolutePath());
             sendFileCommandToFileBrowser(args);
-            moveCopyButton.setVisibility(View.GONE);
-            moveState = MoveState.NONE;
-            moveCopyFile = null;
+            moveCopyReset();
+        }
+    };
+    private View.OnClickListener cancelMoveCopyButtonOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            moveCopyReset();
         }
     };
     private class FileArrayAdapter extends ArrayAdapter<File> {
