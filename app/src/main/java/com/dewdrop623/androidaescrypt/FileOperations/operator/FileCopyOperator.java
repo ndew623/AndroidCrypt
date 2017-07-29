@@ -3,6 +3,7 @@ package com.dewdrop623.androidaescrypt.FileOperations.operator;
 import android.os.Bundle;
 
 import com.dewdrop623.androidaescrypt.FileOperations.FileModifierService;
+import com.dewdrop623.androidaescrypt.FileOperations.FileUtils;
 import com.dewdrop623.androidaescrypt.R;
 
 import java.io.File;
@@ -79,25 +80,8 @@ public class FileCopyOperator extends FileOperator {
 
     @Override
     protected void prepareAndValidate() {
-        if (!file.exists()) {
-            fileModifierService.showToast(fileModifierService.getString(R.string.file_does_not_exist)+": "+file.getName());
+        if(!FileUtils.fileMoveAndCopyValidationAndErrorToasts(file, outputFile.getParentFile(), fileModifierService)) {
             cancelOperation();
-            return;
-        }
-        if (!file.canRead()) {
-            fileModifierService.showToast(fileModifierService.getString(R.string.file_not_readable)+": "+file.getName());
-            cancelOperation();
-            return;
-        }
-        if (!outputFile.getParentFile().exists()) {
-            fileModifierService.showToast(fileModifierService.getString(R.string.could_not_find_directory)+": "+file.getParentFile().getName());
-            cancelOperation();
-            return;
-        }
-        if (!outputFile.getParentFile().canWrite()) {
-            fileModifierService.showToast(fileModifierService.getString(R.string.directory_not_writable)+": "+outputFile.getParentFile().getName());
-            cancelOperation();
-            return;
         }
         conflict = outputFile.exists();
     }
@@ -105,11 +89,13 @@ public class FileCopyOperator extends FileOperator {
     @Override
     protected void getInfoFromUser() {
         if (conflict) {
-            askYesNo("Overwrite "+outputFile.getName()+"?");
+            askYesNo(fileModifierService.getString(R.string.overwrite)+" "+outputFile.getName()+"?");
         } else {
             finishTakingInput();
         }
     }
+
+    @Override
     public void doOperationWithoutThreadOrUserQuestions() {
         initMemVarFromArgs();
         doOperation();

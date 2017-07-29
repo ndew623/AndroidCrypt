@@ -44,6 +44,10 @@ public abstract class FileOperator{
         fileModifierService.stopSelf();
     }
 
+    public void doOperationWithoutThreadOrUserQuestions() {
+        //optional override
+    }
+
     protected abstract void initMemVarFromArgs();
     protected abstract void prepareAndValidate();
     protected abstract void getInfoFromUser();

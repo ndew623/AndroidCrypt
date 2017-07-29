@@ -31,7 +31,8 @@ public class DebugRenameFileDialog extends FileDialog {
     protected void positiveButtonOnClick() {
         super.positiveButtonOnClick();
         Bundle args = new Bundle();
-        args.putString(FileMoveOperator.FILE_MOVE_DESTINATION_ARG, file.getParent().toString()+"/"+fileNameEditText.getText().toString());
+        args.putString(FileMoveOperator.FILE_MOVE_DESTINATION_ARG, file.getParent());
+        args.putString(FileMoveOperator.FILE_NEW_NAME_ARG, fileNameEditText.getText().toString());
         args.putString(FileModifierService.FILEMODIFIERSERVICE_FILE, file.getAbsolutePath());
         args.putInt(FileModifierService.FILEMODIFIERSERVICE_OPERATIONTYPE, FileOperationType.MOVE);
         fileViewer.sendFileCommandToFileBrowser(args);

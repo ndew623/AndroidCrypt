@@ -1,6 +1,5 @@
 package com.dewdrop623.androidaescrypt.FileOperations;
 
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -10,7 +9,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
-import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.questiondialog.QuestionDialog;
@@ -30,7 +28,6 @@ import com.dewdrop623.androidaescrypt.MainActivity;
 import com.dewdrop623.androidaescrypt.R;
 
 import java.io.File;
-import java.util.HashMap;
 
 public class FileModifierService extends Service {
 

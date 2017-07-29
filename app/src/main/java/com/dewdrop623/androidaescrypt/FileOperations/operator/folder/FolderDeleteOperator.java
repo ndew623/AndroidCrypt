@@ -57,7 +57,7 @@ public class FolderDeleteOperator extends FileOperator{
                 subfile.delete();
                 filesDeleted++;
             }
-            fileModifierService.updateNotification((filesDeleted*100) / filesToBeDeleted);
+            FileUtils.notificationUpdate(filesDeleted, filesToBeDeleted, fileModifierService);
         }
         file.delete();
     }

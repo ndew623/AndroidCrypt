@@ -6,7 +6,6 @@ import com.dewdrop623.androidaescrypt.FileOperations.FileModifierService;
 import com.dewdrop623.androidaescrypt.FileOperations.FileUtils;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileCopyOperator;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileOperator;
-import com.dewdrop623.androidaescrypt.R;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -35,57 +34,19 @@ public class FolderCopyOperator extends FileOperator{
 
     @Override
     public void doOperation() {
-        int filesToCopy = FileUtils.countFilesInFolder(toBeCopied.get(0))-dontOverwrite.size();
-        int filesCopied=0;
-        fileModifierService.updateNotification(0);
-        Bundle args = new Bundle();
-        for (File folder : toBeCopied) {
-            File newFolder = renameToDesination(folder);
-            newFolder.mkdir();
-            for (File file : folder.listFiles()) {
-                if (!file.isDirectory() && !dontOverwrite.contains(file)) {
-                    args.putString(FileCopyOperator.FILE_COPY_DESTINATION_ARG, newFolder.getAbsolutePath());
-                    new FileCopyOperator(file, args, fileModifierService).doOperationWithoutThreadOrUserQuestions();
-                    filesCopied++;
-                    fileModifierService.updateNotification((filesCopied*100)/filesToCopy);
-                }
-            }
-        }
+        FileUtils.moveOrCopyFolder(toBeCopied, destination, dontOverwrite, FileCopyOperator.FILE_COPY_DESTINATION_ARG, FileCopyOperator.class, sourceParentDirectoryCharLength, fileModifierService);
+
         fileModifierService.updateNotification(100);
     }
 
     @Override
     protected void prepareAndValidate() {
-        if (!file.exists()) {
-            fileModifierService.showToast(fileModifierService.getString(R.string.could_not_find_directory)+" "+file.getName());
+        if (!FileUtils.folderMoveAndCopyValidationAndErrorToasts(file, destination, fileModifierService))
+        {
             cancelOperation();
-            return;
         }
-        if (!destination.exists()) {
-            fileModifierService.showToast(fileModifierService.getString(R.string.could_not_find_directory)+" "+destination.getName());
-            cancelOperation();
-            return;
-        }
-        if (!file.canRead()) {
-            fileModifierService.showToast(fileModifierService.getString(R.string.directory_not_readable)+": "+file.getName());
-            cancelOperation();
-            return;
-        }
-        if (!destination.canWrite()) {
-            fileModifierService.showToast(fileModifierService.getString(R.string.directory_not_readable)+": "+destination.getName());
-            cancelOperation();
-            return;
-        }
-        toBeCopied.add(file);
-        addSubdirectoriesOfPositionToList(0);
-        for(File folderToBeCopied : toBeCopied) {
-            for (File file : folderToBeCopied.listFiles()) {
-                File newFile = renameToDesination(file);
-                if (!newFile.isDirectory() && newFile.exists()) {
-                    dontOverwrite.add(file);
-                }
-            }
-        }
+        toBeCopied = FileUtils.createListWithSubdirectories(file);
+        dontOverwrite = FileUtils.conflictsList(toBeCopied, destination, sourceParentDirectoryCharLength);
     }
 
     @Override
@@ -122,22 +83,4 @@ public class FolderCopyOperator extends FileOperator{
         }
         getInfoFromUser();
     }
-
-    private void addSubdirectoriesOfPositionToList(int position) {
-        if(toBeCopied.size()<=position) {
-            return;
-        }
-        for(File file : toBeCopied.get(position).listFiles()) {
-            if (file.isDirectory()) {
-                toBeCopied.add(file);
-            }
-        }
-        addSubdirectoriesOfPositionToList(position+1);
-    }
-    private File renameToDesination(File file) {
-        File newFile = new File(destination.getAbsolutePath()+file.getAbsolutePath().substring(sourceParentDirectoryCharLength));
-        return newFile;
-    }
-
-
 }

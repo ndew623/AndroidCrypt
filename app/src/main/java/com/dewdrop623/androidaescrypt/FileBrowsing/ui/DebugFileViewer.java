@@ -160,7 +160,7 @@ public class DebugFileViewer extends FileViewer {
             Bundle args = new Bundle();
             int fileOperationType = -1;
             if(moveState == MoveState.MOVE) {
-                args.putString(FileMoveOperator.FILE_MOVE_DESTINATION_ARG, fileBrowser.getCurrentPath().getAbsolutePath()+"/"+moveCopyFile.getName());
+                args.putString(FileMoveOperator.FILE_MOVE_DESTINATION_ARG, fileBrowser.getCurrentPath().getAbsolutePath());
                 fileOperationType = FileOperationType.MOVE;
             } else if (moveState == MoveState.COPY) {
                 args.putString(FileCopyOperator.FILE_COPY_DESTINATION_ARG, fileBrowser.getCurrentPath().getAbsolutePath());
