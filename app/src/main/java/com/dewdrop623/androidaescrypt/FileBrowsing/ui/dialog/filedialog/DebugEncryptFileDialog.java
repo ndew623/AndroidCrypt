@@ -44,7 +44,6 @@ public class DebugEncryptFileDialog extends FileDialog {
         return createDialog(R.string.encrypt+" "+file.getName(), view, null);
     }
 
-    //TODO check if file exists
     @Override
     protected void positiveButtonOnClick() {
         super.positiveButtonOnClick();

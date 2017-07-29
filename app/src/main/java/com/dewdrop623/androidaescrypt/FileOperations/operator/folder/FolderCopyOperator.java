@@ -3,6 +3,7 @@ package com.dewdrop623.androidaescrypt.FileOperations.operator.folder;
 import android.os.Bundle;
 
 import com.dewdrop623.androidaescrypt.FileOperations.FileModifierService;
+import com.dewdrop623.androidaescrypt.FileOperations.FileUtils;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileCopyOperator;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileOperator;
 import com.dewdrop623.androidaescrypt.R;
@@ -21,18 +22,9 @@ public class FolderCopyOperator extends FileOperator{
     private int dontOverwriteIndex = 0;
     private File destination;
     private int sourceParentDirectoryCharLength = 0;
-    private boolean done = false;
 
     public FolderCopyOperator(File file, Bundle args, FileModifierService fileModifierService) {
         super(file, args, fileModifierService);
-    }
-
-    @Override
-    public int getProgress() {
-        if(done) {
-            return 100;
-        }
-        return 0;
     }
 
     @Override
@@ -43,17 +35,23 @@ public class FolderCopyOperator extends FileOperator{
 
     @Override
     public void doOperation() {
+        int filesToCopy = FileUtils.countFilesInFolder(toBeCopied.get(0))-dontOverwrite.size();
+        int filesCopied=0;
+        fileModifierService.updateNotification(0);
         Bundle args = new Bundle();
         for (File folder : toBeCopied) {
             File newFolder = renameToDesination(folder);
             newFolder.mkdir();
-            for(File file : folder.listFiles()) {
+            for (File file : folder.listFiles()) {
                 if (!file.isDirectory() && !dontOverwrite.contains(file)) {
                     args.putString(FileCopyOperator.FILE_COPY_DESTINATION_ARG, newFolder.getAbsolutePath());
                     new FileCopyOperator(file, args, fileModifierService).doOperationWithoutThreadOrUserQuestions();
+                    filesCopied++;
+                    fileModifierService.updateNotification((filesCopied*100)/filesToCopy);
                 }
             }
         }
+        fileModifierService.updateNotification(100);
     }
 
     @Override
@@ -117,7 +115,7 @@ public class FolderCopyOperator extends FileOperator{
         }
         if (remember) {
             if (yes) {
-                dontOverwrite = (ArrayList<File>) dontOverwrite.subList(0, dontOverwriteIndex);
+                dontOverwrite = new ArrayList<>(dontOverwrite.subList(0, dontOverwriteIndex));
             } else {
                 dontOverwriteIndex = dontOverwrite.size();
             }

@@ -18,20 +18,11 @@ import java.nio.channels.FileChannel;
 public class FileCopyOperator extends FileOperator {
     public static final String FILE_COPY_DESTINATION_ARG = "com.dewdrop623.androidaescrypt.FileOperations.operator.FileCopyOperator.FILE_COPY_DESTINATION_ARG";
 
-    private boolean done = false;
     private boolean conflict = false;
     private File outputFile;
 
     public FileCopyOperator(File file, Bundle args, FileModifierService fileModifierService) {
         super(file, args, fileModifierService);
-    }
-
-    @Override
-    public int getProgress() {
-        if (done) {//TODO real updates
-            return 100;
-        }
-        return 0;
     }
 
     @Override
@@ -71,7 +62,7 @@ public class FileCopyOperator extends FileOperator {
                 destinationChannel = new FileOutputStream(outputFile).getChannel();
                 destinationChannel.transferFrom(sourceChannel, 0, sourceChannel.size());
             } catch (IOException ioe) {
-                ioe.printStackTrace(); //TODO handle this
+                fileModifierService.showToast(fileModifierService.getString(R.string.ioexception));
             } finally {
                 if (sourceChannel != null) {
                     sourceChannel.close();
@@ -83,7 +74,7 @@ public class FileCopyOperator extends FileOperator {
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
-        done = true;
+        fileModifierService.updateNotification(100);
     }
 
     @Override

@@ -3,7 +3,6 @@ package com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.questiondialog;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileOperator;
 import com.dewdrop623.androidaescrypt.R;

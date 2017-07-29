@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
-import java.util.HashMap;
 
 import es.vocali.util.AESCrypt;
 
@@ -60,21 +59,17 @@ public class AESCryptDecryptFileOperator extends FileOperator {
     }
 
     @Override
-    public int getProgress() {//TODO real progress updates
-        return 0;
-    }
-
-    @Override
     public void doOperation() {
         try {
             AESCrypt aesCrypt = new AESCrypt(args.getString(AESCRYPT_FILE_OPERATOR_KEY_ARGUMENT));
             aesCrypt.decrypt(file.getAbsolutePath(), outputFile.getAbsolutePath());
-        } catch (GeneralSecurityException gse) {
-            //TODO deal with this
+            fileModifierService.updateNotification(100);
+        }  catch (GeneralSecurityException gse) {
+            fileModifierService.showToast(fileModifierService.getString(R.string.general_security_exception));
         } catch (UnsupportedEncodingException uee) {
-            //TODO deal with this
+            fileModifierService.showToast(fileModifierService.getString(R.string.unsupported_encoding_exception));
         } catch (IOException ioe) {
-            //TODO deal with this
+            fileModifierService.showToast(fileModifierService.getString(R.string.ioexception));
         }
     }
 

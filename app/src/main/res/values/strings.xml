@@ -32,4 +32,10 @@
     <string name="file_does_not_exist">File does not exist</string>
     <string name="file_not_readable">File not readable</string>
     <string name="file_not_writable">File not writable</string>
+    <string name="progress">Progress</string>
+    <string name="done">Done</string>
+    <string name="operation_in_progress">Operation in progress</string>
+    <string name="general_security_exception">General Security Exception</string>
+    <string name="unsupported_encoding_exception">Unsupported Encoding Exception</string>
+    <string name="ioexception">IO Exception</string>
 </resources>

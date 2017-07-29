@@ -1,9 +1,16 @@
 package com.dewdrop623.androidaescrypt.FileOperations;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
+import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.questiondialog.QuestionDialog;
@@ -19,24 +26,40 @@ import com.dewdrop623.androidaescrypt.FileOperations.operator.folder.CreateFolde
 import com.dewdrop623.androidaescrypt.FileOperations.operator.folder.FolderCopyOperator;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.folder.FolderDeleteOperator;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.folder.FolderMoveOperator;
+import com.dewdrop623.androidaescrypt.MainActivity;
+import com.dewdrop623.androidaescrypt.R;
 
 import java.io.File;
+import java.util.HashMap;
 
 public class FileModifierService extends Service {
 
     public static final String FILEMODIFIERSERVICE_ARGS = "com.dewdrop623.androidaescrypt.FileOperations.FileModifierService.FILEMODIFIERSERVICE_ARGS";
     public static final String FILEMODIFIERSERVICE_FILE = "com.dewdrop623.androidaescrypt.FileOperations.FileModifierService.FILEMODIFIERSERVICE_FILE";
     public static final String FILEMODIFIERSERVICE_OPERATIONTYPE = "com.dewdrop623.androidaescrypt.FileOperations.FileModifierService.FILEMODIFIERSERVICE_OPERATIONTYPE";
-
+    public static int nextOperationProgressId = 1;
     private int fileOperationType = -1;
     private Bundle args;
     private File file;
-
-    private Thread fileOperationThread;
+    private int operationProgressId;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        operationProgressId = nextOperationProgressId;
+        nextOperationProgressId++;
+        //do in foreground so Android doesn't stop this service
+        Intent resultIntent = new Intent(this, MainActivity.class);
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        stackBuilder.addParentStack(MainActivity.class);
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(operationProgressId, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this).setSmallIcon(android.R.drawable.ic_menu_info_details)
+                .setContentTitle(getString(R.string.app_name))
+                .setContentText(getString(R.string.operation_in_progress))
+                .setContentIntent(resultPendingIntent);
+        startForeground(operationProgressId, builder.build());
     }
 
     @Override
@@ -116,5 +139,21 @@ public class FileModifierService extends Service {
     public void showToast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
-
+    public void updateNotification(int progress) {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this).setSmallIcon(android.R.drawable.ic_menu_edit)
+                .setContentTitle(getString(R.string.progress));
+        if (progress == 100) {
+            builder.setContentText(getString(R.string.done));
+        } else {
+            builder.setProgress(100, progress, false);
+        }
+        Intent resultIntent = new Intent(this, MainActivity.class);
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        stackBuilder.addParentStack(MainActivity.class);
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(operationProgressId, PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(resultPendingIntent);
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(operationProgressId, builder.build());
+    }
 }

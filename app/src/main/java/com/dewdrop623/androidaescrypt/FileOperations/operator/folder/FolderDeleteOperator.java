@@ -3,28 +3,22 @@ package com.dewdrop623.androidaescrypt.FileOperations.operator.folder;
 import android.os.Bundle;
 
 import com.dewdrop623.androidaescrypt.FileOperations.FileModifierService;
+import com.dewdrop623.androidaescrypt.FileOperations.FileUtils;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileOperator;
 import com.dewdrop623.androidaescrypt.R;
 
 import java.io.File;
-import java.util.HashMap;
 
 /**
  * recursively deletes folder contents
  */
 
 public class FolderDeleteOperator extends FileOperator{
-    boolean done = false;
+    private int filesToBeDeleted = 0;
+    private int filesDeleted = 0;
+
     public FolderDeleteOperator(File file, Bundle args, FileModifierService fileModifierService) {
         super(file, args, fileModifierService);
-    }
-
-    @Override
-    public int getProgress() {
-        if (done) {//TODO real progress updates
-            return 100;
-        }
-        return 0;
     }
 
     @Override
@@ -49,8 +43,10 @@ public class FolderDeleteOperator extends FileOperator{
 
     @Override
     protected void doOperation() {
+        filesToBeDeleted = FileUtils.countFilesInFolder(file);
+        fileModifierService.updateNotification(0);
         deleteFolder(file);
-        done=true;
+        fileModifierService.updateNotification(100);
     }
     private void deleteFolder(File file) {
         File[] subfiles = file.listFiles();
@@ -59,7 +55,9 @@ public class FolderDeleteOperator extends FileOperator{
                 deleteFolder(subfile);
             } else {
                 subfile.delete();
+                filesDeleted++;
             }
+            fileModifierService.updateNotification((filesDeleted*100) / filesToBeDeleted);
         }
         file.delete();
     }

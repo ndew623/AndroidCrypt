@@ -59,21 +59,17 @@ public class AESCryptEncryptFileOperator extends FileOperator {
     }
 
     @Override
-    public int getProgress() {
-        return 0;//TODO real progress report here
-    }
-
-    @Override
     public void doOperation() {
         try {
             AESCrypt aesCrypt = new AESCrypt(args.getString(AESCRYPT_FILE_OPERATOR_KEY_ARGUMENT));
             aesCrypt.encrypt(2, file.getAbsolutePath(), outputFile.getAbsolutePath());
+            fileModifierService.updateNotification(100);
         } catch (GeneralSecurityException gse) {
-            //TODO deal with this
+            fileModifierService.showToast(fileModifierService.getString(R.string.general_security_exception));
         } catch (UnsupportedEncodingException uee) {
-            //TODO deal with this
+            fileModifierService.showToast(fileModifierService.getString(R.string.unsupported_encoding_exception));
         } catch (IOException ioe) {
-            //TODO deal with this
+            fileModifierService.showToast(fileModifierService.getString(R.string.ioexception));
         }
     }
 

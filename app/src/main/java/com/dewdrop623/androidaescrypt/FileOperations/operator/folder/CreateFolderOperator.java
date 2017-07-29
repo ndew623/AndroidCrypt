@@ -13,7 +13,6 @@ import java.io.File;
  */
 
 public class CreateFolderOperator extends FileOperator {
-    boolean done = false;
     public static final String CREATE_FOLDER_OPERATOR_FOLDER_NAME = "com.dewdrop623.androidaescrypt.FileOperations.operator.folder.CreateFolderOperator.CREATE_FOLDER_OPERATOR_FOLDER_NAME";
 
     private File outputFile;
@@ -22,17 +21,11 @@ public class CreateFolderOperator extends FileOperator {
     public CreateFolderOperator(File file, Bundle args, FileModifierService fileModifierService) {
         super(file, args, fileModifierService);
     }
-    @Override
-    public int getProgress() {
-        if (done) {
-            return 100;
-        }
-        return 0;
-    }
+
     @Override
     public void doOperation() {
         outputFile.mkdir();
-        done = true;
+        fileModifierService.updateNotification(100);
     }
     @Override
     protected void initMemVarFromArgs() {

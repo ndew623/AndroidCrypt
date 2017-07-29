@@ -107,7 +107,7 @@ public class DebugFileViewer extends FileViewer {
             return;
         }
         fileArrayAdapter.clear();
-        if (! fileBrowser.getCurrentPath().getAbsolutePath().equals(FileBrowser.topLevelInternal.getAbsolutePath())) {
+        if (!fileBrowser.getCurrentPath().equals(new File("/")) /* || ! fileBrowser.getCurrentPath().getAbsolutePath().equals(FileBrowser.topLevelInternal.getAbsolutePath())*/) { //uncomment to prevent navigating from /sdcard to root
             fileArrayAdapter.add(FileBrowser.parentDirectory);
         }
         fileArrayAdapter.addAll(fileList);

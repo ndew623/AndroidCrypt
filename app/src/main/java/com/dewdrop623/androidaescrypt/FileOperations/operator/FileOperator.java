@@ -2,7 +2,6 @@ package com.dewdrop623.androidaescrypt.FileOperations.operator;
 
 import android.os.Bundle;
 
-import com.dewdrop623.androidaescrypt.FileBrowsing.FileBrowser;
 import com.dewdrop623.androidaescrypt.FileOperations.FileModifierService;
 
 import java.io.File;
@@ -21,7 +20,7 @@ public abstract class FileOperator{
     private static Stack<FileOperator> waitingForYesNoRememberAnswerResponse = new Stack<>();
     private static Stack<FileOperator> waitingForTextOrCancelResponse = new Stack<>();
     private Thread operationThread;
-    private static final char[] ILLEGAL_CHARACTERS = { '/', '\n', '\r', '\t', '\0', '\f', '`', '?', '*', '\\', '<', '>', '|', '\"', ':' };
+    private static final char[] ILLEGAL_CHARACTERS = { '/', '\n', '\r', '\t', '\0', '\f'};
     public FileOperator(File file, Bundle args, FileModifierService fileModifierService) {
         this.file = file;
         this.args = args;
@@ -32,7 +31,6 @@ public abstract class FileOperator{
         initMemVarFromArgs();
         prepareAndValidate();
         getInfoFromUser();
-        fileModifierService.stopSelf();
     }
 
     public void cancelOperation() {
@@ -46,7 +44,6 @@ public abstract class FileOperator{
         fileModifierService.stopSelf();
     }
 
-    public abstract int getProgress();
     protected abstract void initMemVarFromArgs();
     protected abstract void prepareAndValidate();
     protected abstract void getInfoFromUser();
@@ -106,9 +103,9 @@ public abstract class FileOperator{
             @Override
             public void run() {
                 doOperation();
+                fileModifierService.stopSelf();
             }
         });
         operationThread.start();
-        fileModifierService.stopSelf();
     }
 }

@@ -3,6 +3,7 @@ package com.dewdrop623.androidaescrypt.FileOperations.operator.folder;
 import android.os.Bundle;
 
 import com.dewdrop623.androidaescrypt.FileOperations.FileModifierService;
+import com.dewdrop623.androidaescrypt.FileOperations.FileUtils;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileMoveOperator;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileOperator;
 import com.dewdrop623.androidaescrypt.R;
@@ -21,7 +22,6 @@ public class FolderMoveOperator extends FileOperator {
     private int dontOverwriteIndex = 0;
     private File destination;
     private int sourceParentDirectoryCharLength = 0;
-    private boolean done = false;
 
     public FolderMoveOperator(File file, Bundle args, FileModifierService fileModifierService) {
         super(file, args, fileModifierService);
@@ -61,15 +61,10 @@ public class FolderMoveOperator extends FileOperator {
     }
 
     @Override
-    public int getProgress() {
-        if (done) {//TODO real progress updates
-            return 100;
-        }
-        return 0;
-    }
-
-    @Override
     public void doOperation() {
+        int filesToBeMoved = FileUtils.countFilesInFolder(toBeMoved.get(0))-dontOverwrite.size();
+        int filesMoved = 0;
+        fileModifierService.updateNotification(0);
         Bundle args = new Bundle();
         for (File folder : toBeMoved) {
             File newFolder = renameToDesination(folder);
@@ -78,6 +73,8 @@ public class FolderMoveOperator extends FileOperator {
                 if (!file.isDirectory() && !dontOverwrite.contains(file)) {
                     args.putString(FileMoveOperator.FILE_MOVE_DESTINATION_ARG, newFolder.getAbsolutePath()+"/"+file.getName());
                     new FileMoveOperator(file, args, fileModifierService).doOperationWithoutThreadOrUserQuestions();
+                    filesMoved++;
+                    fileModifierService.updateNotification((filesMoved*100)/filesToBeMoved);
                 }
             }
         }
@@ -87,7 +84,7 @@ public class FolderMoveOperator extends FileOperator {
                 toBeMoved.get(i).delete();
             }
         }
-        done=true;
+        fileModifierService.updateNotification(100);
     }
 
     @Override
@@ -97,7 +94,7 @@ public class FolderMoveOperator extends FileOperator {
             cancelOperation();
             return;
         }
-        if (!destination.exists()) {
+        if (!destination.getParentFile().exists()) {
             fileModifierService.showToast(fileModifierService.getString(R.string.could_not_find_directory)+" "+destination.getName());
             cancelOperation();
             return;
@@ -107,7 +104,7 @@ public class FolderMoveOperator extends FileOperator {
             cancelOperation();
             return;
         }
-        if (!destination.canWrite()) {
+        if (!destination.getParentFile().canWrite()) {
             fileModifierService.showToast(fileModifierService.getString(R.string.directory_not_readable)+": "+destination.getName());
             cancelOperation();
             return;

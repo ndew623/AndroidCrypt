@@ -12,17 +12,9 @@ import java.io.File;
  */
 
 public class FileDeleteOperator extends FileOperator {
-    private boolean done=false;
+
     public FileDeleteOperator(File file, Bundle args, FileModifierService fileModifierService) {
         super(file, args, fileModifierService);
-    }
-
-    @Override
-    public int getProgress() {
-        if (done) {
-            return 100;
-        }
-        return 0;
     }
 
     @Override
@@ -48,7 +40,7 @@ public class FileDeleteOperator extends FileOperator {
     @Override
     public void doOperation() {
         file.delete();
-        done=true;
+        fileModifierService.updateNotification(100);
     }
 
     @Override

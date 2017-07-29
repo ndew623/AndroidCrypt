@@ -8,13 +8,12 @@ import com.dewdrop623.androidaescrypt.R;
 import java.io.File;
 
 /**
- * moves files
+ * moves files (also used when renaming a file)
  */
 
 public class FileMoveOperator extends FileOperator {
     public static final String FILE_MOVE_DESTINATION_ARG = "com.dewdrop623.androidaescrypt.FileOperations.operator.FileMoveOperator.FILE_MOVE_DESTINATION_ARG";
 
-    private boolean done = false;
     private boolean conflict = false;
     private File outputFile;
 
@@ -47,17 +46,9 @@ public class FileMoveOperator extends FileOperator {
     }
 
     @Override
-    public int getProgress() {
-        if (done) {//TODO real progress updates
-            return 100;
-        }
-        return 0;
-    }
-
-    @Override
     protected void doOperation() {
         file.renameTo(outputFile);
-        done = true;
+        fileModifierService.updateNotification(100);
     }
 
     @Override

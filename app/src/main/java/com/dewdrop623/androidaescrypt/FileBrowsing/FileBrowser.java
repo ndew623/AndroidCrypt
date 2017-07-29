@@ -24,6 +24,7 @@ public class FileBrowser {
 
     public static final File parentDirectory = new File("..");
     public static final File topLevelInternal = new File(Environment.getExternalStorageDirectory().toString());
+    public static File[] externalFilesDirs;
 
     public FileBrowser() {
         //TODO get path from settings, for now just use default external storage path
