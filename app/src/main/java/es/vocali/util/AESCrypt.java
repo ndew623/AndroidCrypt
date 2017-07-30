@@ -15,6 +15,10 @@
  */
 package es.vocali.util;
 
+import com.dewdrop623.androidaescrypt.FileOperations.operator.AESCryptDecryptFileOperator;
+import com.dewdrop623.androidaescrypt.FileOperations.operator.AESCryptEncryptFileOperator;
+import com.dewdrop623.androidaescrypt.FileOperations.operator.FileOperator;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -76,7 +80,11 @@ public class AESCrypt {
 	private SecretKeySpec aesKey1;
 	private IvParameterSpec ivSpec2;
 	private SecretKeySpec aesKey2;
-	
+
+	//for progress update
+	public FileOperator fileOperator = null;
+	private int bytesRead = 0;
+
 	
 	/*******************
 	 * PRIVATE METHODS *
@@ -252,6 +260,9 @@ public class AESCrypt {
 			digest = MessageDigest.getInstance(DIGEST_ALG);
 			cipher = Cipher.getInstance(CRYPT_TRANS);
 			hmac = Mac.getInstance(HMAC_ALG);
+
+			this.fileOperator = fileOperator;
+
 		} catch (GeneralSecurityException e) {
 			throw new GeneralSecurityException(JCE_EXCEPTION_MESSAGE, e);
 		}
@@ -306,6 +317,13 @@ public class AESCrypt {
 	 */
 	public void encrypt(int version, InputStream in, OutputStream out)
 	throws IOException, GeneralSecurityException {
+
+		//for progress update
+		AESCryptEncryptFileOperator aesCryptEncryptFileOperator = null;
+		if (fileOperator != null) {
+			aesCryptEncryptFileOperator = (AESCryptEncryptFileOperator) fileOperator;
+		}
+
 		try {
 			byte[] text = null;
 
@@ -348,6 +366,11 @@ public class AESCrypt {
 				hmac.update(text);
 				out.write(text);	// Crypted file data block.
 				last = len;
+				//for progress update
+				if (aesCryptEncryptFileOperator != null) {
+					bytesRead += len;
+					aesCryptEncryptFileOperator.updateProgress(bytesRead);
+				}
 			}
 			last &= 0x0f;
 			out.write(last);	// Last block size mod 16.
@@ -402,6 +425,11 @@ public class AESCrypt {
 	 */
 	public void decrypt(long inSize, InputStream in, OutputStream out)
 	throws IOException, GeneralSecurityException {
+		//for progress update
+		AESCryptDecryptFileOperator aesCryptDecryptFileOperator= null;
+		if (fileOperator != null) {
+			aesCryptDecryptFileOperator = (AESCryptDecryptFileOperator) fileOperator;
+		}
 		try {
 			byte[] text = null, backup = null;
 			long total = 3 + 1 + 1 + BLOCK_SIZE + BLOCK_SIZE + KEY_SIZE + SHA_SIZE + 1 + SHA_SIZE;
@@ -487,6 +515,12 @@ public class AESCrypt {
 					len = (last > 0 ? last : BLOCK_SIZE);
 				}
 				out.write(text, 0, len);
+
+				//for progress update
+				if (aesCryptDecryptFileOperator != null) {
+					bytesRead += len;
+					aesCryptDecryptFileOperator.updateProgress(bytesRead);
+				}
 			}
 			out.write(cipher.doFinal());
 			

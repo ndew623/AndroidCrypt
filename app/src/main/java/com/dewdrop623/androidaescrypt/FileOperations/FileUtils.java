@@ -98,8 +98,11 @@ public class FileUtils {
         return true;
     }
     public static void notificationUpdate(int workDone, int workToDo, FileModifierService fileModifierService) {
+        notificationUpdate((long)workDone, (long)workToDo, fileModifierService);
+    }
+    public static void notificationUpdate(long workDone, long workToDo, FileModifierService fileModifierService) {
         if (workToDo>0) {
-            fileModifierService.updateNotification((workDone * 100) / workToDo);
+            fileModifierService.updateNotification((int)((workDone * 100) / workToDo));
         } else {
             fileModifierService.updateNotification(0);
         }

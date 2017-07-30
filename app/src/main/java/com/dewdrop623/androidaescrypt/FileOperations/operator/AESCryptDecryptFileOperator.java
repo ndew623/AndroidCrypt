@@ -3,6 +3,7 @@ package com.dewdrop623.androidaescrypt.FileOperations.operator;
 import android.os.Bundle;
 
 import com.dewdrop623.androidaescrypt.FileOperations.FileModifierService;
+import com.dewdrop623.androidaescrypt.FileOperations.FileUtils;
 import com.dewdrop623.androidaescrypt.R;
 
 import java.io.File;
@@ -22,11 +23,21 @@ public class AESCryptDecryptFileOperator extends FileOperator {
     public static final String AESCRYPT_FILE_OPERATOR_FILENAME_ARGUMENT = "com.dewdrop623.androidaescrypt.FileOperations.operator.AESCryptDecryptFileOperator.AESCRYPT_FILE_OPERATOR_FILENAME_ARGUMENT";
 
     private File outputFile;
+    private long totalBytesSize = 0;
+    private long lastUpdate = 0;
+    private long fivepercentoffilesize = 0;
     private boolean conflict = false;
     private boolean validFilename = true;
 
     public AESCryptDecryptFileOperator(File file, Bundle args, FileModifierService fileModifierService) {
         super(file, args, fileModifierService);
+    }
+
+    public void updateProgress(int bytesRead) {
+        if ((bytesRead - lastUpdate) > fivepercentoffilesize) {
+            FileUtils.notificationUpdate(bytesRead, totalBytesSize, fileModifierService);
+            lastUpdate = bytesRead;
+        }
     }
 
     @Override
@@ -61,7 +72,10 @@ public class AESCryptDecryptFileOperator extends FileOperator {
     @Override
     public void doOperation() {
         try {
+            totalBytesSize = file.length();
+            fivepercentoffilesize = (long) (totalBytesSize * 0.05);
             AESCrypt aesCrypt = new AESCrypt(args.getString(AESCRYPT_FILE_OPERATOR_KEY_ARGUMENT));
+            aesCrypt.fileOperator = this;
             aesCrypt.decrypt(file.getAbsolutePath(), outputFile.getAbsolutePath());
             fileModifierService.updateNotification(100);
         }  catch (GeneralSecurityException gse) {
@@ -69,7 +83,7 @@ public class AESCryptDecryptFileOperator extends FileOperator {
         } catch (UnsupportedEncodingException uee) {
             fileModifierService.showToast(fileModifierService.getString(R.string.unsupported_encoding_exception));
         } catch (IOException ioe) {
-            fileModifierService.showToast(fileModifierService.getString(R.string.ioexception));
+            fileModifierService.showToast(fileModifierService.getString(R.string.ioexception)+": "+fileModifierService.getString(R.string.wrong_password_question));
         }
     }
 
