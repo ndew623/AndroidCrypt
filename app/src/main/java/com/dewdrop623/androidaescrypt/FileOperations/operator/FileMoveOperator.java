@@ -16,6 +16,8 @@ public class FileMoveOperator extends FileOperator {
     public static final String FILE_MOVE_DESTINATION_ARG = "com.dewdrop623.androidaescrypt.FileOperations.operator.FileMoveOperator.FILE_MOVE_DESTINATION_ARG";
     public static final String FILE_NEW_NAME_ARG = "com.dewdrop623.androidaescrypt.FileOperations.operator.FileMoveOperator.FILE_NEW_NAME_ARG";
 
+    private String outputFileName;
+    private boolean validFilename = false;
     private boolean conflict = false;
     private File outputFile;
 
@@ -25,7 +27,8 @@ public class FileMoveOperator extends FileOperator {
 
     @Override
     protected void initMemVarFromArgs() {
-        outputFile = new File(args.getString(FILE_MOVE_DESTINATION_ARG)+"/"+args.getString(FILE_NEW_NAME_ARG, file.getName()));
+        outputFileName = args.getString(FILE_NEW_NAME_ARG, file.getName());
+        outputFile = new File(args.getString(FILE_MOVE_DESTINATION_ARG)+"/"+outputFileName);
     }
 
     @Override
@@ -44,7 +47,16 @@ public class FileMoveOperator extends FileOperator {
 
     @Override
     protected void handleTextOrCancelResponse(String response) {
-
+        if (response == null) {
+            cancelOperation();
+            return;
+        }
+        validFilename = FileUtils.validFilename(response, fileModifierService);
+        if (validFilename) {
+            outputFile = new File(args.getString(FILE_MOVE_DESTINATION_ARG)+"/"+response);
+            conflict = outputFile.exists();
+        }
+        getInfoFromUser();
     }
 
     @Override
@@ -54,16 +66,21 @@ public class FileMoveOperator extends FileOperator {
     }
 
     @Override
-    protected void prepareAndValidate() {
-        if (FileUtils.fileMoveAndCopyValidationAndErrorToasts(file, outputFile.getParentFile(), fileModifierService)) {
-            cancelOperation();
+    protected boolean prepareAndValidate() {
+        if (!FileUtils.fileMoveAndCopyValidationAndErrorToasts(file, outputFile.getParentFile(), fileModifierService)) {
+            return false;
         }
+        validFilename = FileUtils.validFilename(outputFileName, fileModifierService);
         conflict = outputFile.exists();
+        return true;
     }
 
     @Override
     protected void getInfoFromUser() {
-        if (conflict) {
+        if (!validFilename) {
+            askForTextOrCancel(fileModifierService.getString(R.string.invalid_filename)+". "+fileModifierService.getString(R.string.try_again)+"?");
+        }
+        else if (conflict) {
             askYesNo(fileModifierService.getString(R.string.overwrite)+" "+outputFile.getName()+"?");
         } else {
             finishTakingInput();

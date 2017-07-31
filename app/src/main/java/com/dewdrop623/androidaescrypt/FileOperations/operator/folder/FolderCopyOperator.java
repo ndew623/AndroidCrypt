@@ -35,18 +35,18 @@ public class FolderCopyOperator extends FileOperator{
     @Override
     public void doOperation() {
         FileUtils.moveOrCopyFolder(toBeCopied, destination, dontOverwrite, FileCopyOperator.FILE_COPY_DESTINATION_ARG, FileCopyOperator.class, sourceParentDirectoryCharLength, fileModifierService);
-
         fileModifierService.updateNotification(100);
     }
 
     @Override
-    protected void prepareAndValidate() {
+    protected boolean prepareAndValidate() {
         if (!FileUtils.folderMoveAndCopyValidationAndErrorToasts(file, destination, fileModifierService))
         {
-            cancelOperation();
+            return false;
         }
         toBeCopied = FileUtils.createListWithSubdirectories(file);
         dontOverwrite = FileUtils.conflictsList(toBeCopied, destination, sourceParentDirectoryCharLength);
+        return true;
     }
 
     @Override

@@ -79,11 +79,12 @@ public class FileCopyOperator extends FileOperator {
     }
 
     @Override
-    protected void prepareAndValidate() {
+    protected boolean prepareAndValidate() {
         if(!FileUtils.fileMoveAndCopyValidationAndErrorToasts(file, outputFile.getParentFile(), fileModifierService)) {
-            cancelOperation();
+            return false;
         }
         conflict = outputFile.exists();
+        return true;
     }
 
     @Override

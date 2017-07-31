@@ -44,17 +44,16 @@ public class FileDeleteOperator extends FileOperator {
     }
 
     @Override
-    protected void prepareAndValidate() {
+    protected boolean prepareAndValidate() {
         if (!file.exists()) {
             fileModifierService.showToast(fileModifierService.getString(R.string.file_does_not_exist)+": "+file.getName());
-            cancelOperation();
-            return;
+            return false;
         }
         if (!file.canWrite()) {
             fileModifierService.showToast(fileModifierService.getString(R.string.file_not_writable)+": "+file.getName());
-            cancelOperation();
-            return;
+            return false;
         }
+        return true;
     }
 
     @Override

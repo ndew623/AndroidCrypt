@@ -1,11 +1,13 @@
 package com.dewdrop623.androidaescrypt.FileOperations;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileOperator;
 import com.dewdrop623.androidaescrypt.R;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -15,6 +17,7 @@ import java.util.ArrayList;
  */
 
 public class FileUtils {
+    private static final char[] ILLEGAL_CHARACTERS = { '/', '\n', '\r', '\t', '\0', '\f'};
     public static int countFilesInFolder(File folder) {
         int count = 0;
         for(File file : folder.listFiles()) {
@@ -97,6 +100,21 @@ public class FileUtils {
         }
         return true;
     }
+    public static boolean encryptionDecryptionValidationAndErrorToasts(File sourceFile, File outputFile, FileModifierService fileModifierService) {
+        if(!sourceFile.exists()) {
+            fileModifierService.showToast(fileModifierService.getString(R.string.file_does_not_exist)+": "+sourceFile.getName());
+            return false;
+        }
+        if(!sourceFile.canRead()) {
+            fileModifierService.showToast(fileModifierService.getString(R.string.file_not_readable)+": "+sourceFile.getName());
+            return false;
+        }
+        if(!outputFile.getParentFile().canWrite()) {
+            fileModifierService.showToast(fileModifierService.getString(R.string.directory_not_writable)+": "+outputFile.getParentFile().getName());
+            return false;
+        }
+        return true;
+    }
     public static void notificationUpdate(int workDone, int workToDo, FileModifierService fileModifierService) {
         notificationUpdate((long)workDone, (long)workToDo, fileModifierService);
     }
@@ -140,5 +158,26 @@ public class FileUtils {
                 }
             }
         }
+    }
+    public static boolean validFilename(String name, Context context) {
+        if (name==null || name.getBytes().length>100 || name.length()==0 || name.equals("..") || name.equals(".")) {
+            return false;
+        }
+        for (char c : ILLEGAL_CHARACTERS) {
+            for (char name_c : name.toCharArray()) {
+                if (c == name_c) {
+                    return false;
+                }
+            }
+        }
+        File testFile = new File(context.getApplicationInfo().dataDir+"/"+name);
+        try {
+            if (testFile.createNewFile()) {
+                testFile.delete();
+            }
+        } catch (IOException ioe) {
+            return false;
+        }
+        return true;
     }
 }

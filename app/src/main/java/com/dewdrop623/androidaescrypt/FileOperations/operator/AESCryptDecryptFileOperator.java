@@ -65,7 +65,11 @@ public class AESCryptDecryptFileOperator extends FileOperator {
             cancelOperation();
             return;
         }
-        validFilename = validFilename(response);
+        validFilename = FileUtils.validFilename(response, fileModifierService);
+        if (validFilename) {
+            outputFile = new File(file.getParent()+"/"+response);
+            conflict = outputFile.exists();
+        }
         getInfoFromUser();
     }
 
@@ -88,24 +92,13 @@ public class AESCryptDecryptFileOperator extends FileOperator {
     }
 
     @Override
-    protected void prepareAndValidate() {
-        if(!file.exists()) {
-            fileModifierService.showToast(fileModifierService.getString(R.string.file_does_not_exist)+": "+file.getName());
-            cancelOperation();
-            return;
+    protected boolean prepareAndValidate() {
+        if (!FileUtils.encryptionDecryptionValidationAndErrorToasts(file, outputFile, fileModifierService)) {
+            return false;
         }
-        if(!file.canRead()) {
-            fileModifierService.showToast(fileModifierService.getString(R.string.file_not_readable)+": "+file.getName());
-            cancelOperation();
-            return;
-        }
-        if(!outputFile.getParentFile().canWrite()) {
-            fileModifierService.showToast(fileModifierService.getString(R.string.directory_not_writable)+": "+outputFile.getParentFile().getName());
-            cancelOperation();
-            return;
-        }
-        validFilename = validFilename(args.getString(AESCRYPT_FILE_OPERATOR_FILENAME_ARGUMENT));
+        validFilename = FileUtils.validFilename(args.getString(AESCRYPT_FILE_OPERATOR_FILENAME_ARGUMENT), fileModifierService);
         conflict = outputFile.exists();
+        return true;
     }
 
     @Override

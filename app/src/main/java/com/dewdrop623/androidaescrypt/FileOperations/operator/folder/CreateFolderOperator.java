@@ -3,6 +3,7 @@ package com.dewdrop623.androidaescrypt.FileOperations.operator.folder;
 import android.os.Bundle;
 
 import com.dewdrop623.androidaescrypt.FileOperations.FileModifierService;
+import com.dewdrop623.androidaescrypt.FileOperations.FileUtils;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileOperator;
 import com.dewdrop623.androidaescrypt.R;
 
@@ -41,18 +42,17 @@ public class CreateFolderOperator extends FileOperator {
         }
     }
     @Override
-    protected void prepareAndValidate() {
+    protected boolean prepareAndValidate() {
         if(!file.exists()) {
             fileModifierService.showToast(fileModifierService.getString(R.string.could_not_find_directory)+" "+file.getName());
-            cancelOperation();
-            return;
+            return false;
         }
-        if(file.canWrite()) {
+        if(!file.canWrite()) {
             fileModifierService.showToast(fileModifierService.getString(R.string.directory_not_writable)+": "+file.getName());
-            cancelOperation();
-            return;
+            return false;
         }
-        validFilename = validFilename(args.getString(CREATE_FOLDER_OPERATOR_FOLDER_NAME));
+        validFilename = FileUtils.validFilename(args.getString(CREATE_FOLDER_OPERATOR_FOLDER_NAME), fileModifierService);
+        return true;
     }
     @Override
     protected void handleYesNoResponse(boolean yes) {
@@ -70,7 +70,7 @@ public class CreateFolderOperator extends FileOperator {
             cancelOperation();
             return;
         }
-        if (validFilename(response)) {
+        if (FileUtils.validFilename(response, fileModifierService)) {
             outputFile = new File(file.getAbsolutePath()+"/"+response);
             finishTakingInput();
         } else {

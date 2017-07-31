@@ -63,17 +63,16 @@ public class FolderDeleteOperator extends FileOperator{
     }
 
     @Override
-    protected void prepareAndValidate() {
+    protected boolean prepareAndValidate() {
         if (!file.exists()) {
             fileModifierService.showToast(fileModifierService.getString(R.string.could_not_find_directory)+" "+file.getName());
-            cancelOperation();
-            return;
+            return false;
         }
         if (!file.canWrite()) {
             fileModifierService.showToast(fileModifierService.getString(R.string.directory_not_writable)+": "+file.getName());
-            cancelOperation();
-            return;
+            return false;
         }
+        return true;
     }
 
     @Override
