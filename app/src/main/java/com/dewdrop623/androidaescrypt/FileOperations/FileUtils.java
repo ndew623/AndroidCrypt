@@ -6,8 +6,10 @@ import android.os.Bundle;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileOperator;
 import com.dewdrop623.androidaescrypt.R;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -76,7 +78,7 @@ public class FileUtils {
             return false;
         }
         if (!destinationFolder.canWrite()) {
-            fileModifierService.showToast(fileModifierService.getString(R.string.directory_not_readable)+": "+destinationFolder.getName());
+            fileModifierService.showToast(fileModifierService.getString(R.string.directory_not_writable)+": "+destinationFolder.getName());
             return false;
         }
         return true;
@@ -179,5 +181,54 @@ public class FileUtils {
             return false;
         }
         return true;
+    }
+    public static ArrayList<String> getMountPoints() {
+        Runtime runtime = Runtime.getRuntime();
+        String command = "mount";
+        String rawOutput = "";
+        try {
+            Process process = runtime.exec(command);
+            BufferedReader standardInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            //BufferedReader standardError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+            String inputLine = "";
+            while ((inputLine = standardInput.readLine()) != null) {
+                rawOutput += inputLine;
+            }
+            //while ((inputLine = standardError.readLine()) != null) {
+              //  rawOutput += inputLine;
+            //}
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+            return null;
+        }
+        ArrayList<String> parsedOutput = new ArrayList<>();
+        String precedingString = " on ";
+        String followingString = " type ";
+        int fromIndex = 0;
+        int startIndex = rawOutput.indexOf(precedingString)+precedingString.length();
+        int endIndex = rawOutput.indexOf(followingString);
+        while (startIndex != -1 && endIndex != -1) {
+            parsedOutput.add(rawOutput.substring(startIndex, endIndex));
+            fromIndex = endIndex+1;
+            startIndex = rawOutput.indexOf(precedingString, fromIndex)+precedingString.length();
+            endIndex = rawOutput.indexOf(followingString, fromIndex);
+        }
+        return parsedOutput;
+    }
+    public static File getMountPointContainingFile(File file) {
+        ArrayList<String> mountPoints = getMountPoints();
+        int mountPointNumber = -1;
+        String path = file.getAbsolutePath();
+        for (int i = 0; i < mountPoints.size(); i++) {
+            if (path.startsWith(mountPoints.get(i))) {
+                if (mountPointNumber==-1 || mountPoints.get(mountPointNumber).length() < mountPoints.get(i).length()) {
+                    mountPointNumber = i;
+                }
+            }
+        }
+        return new File(mountPoints.get(mountPointNumber));
+    }
+    public static boolean onSameMountpoint(File file1, File file2) {
+        return getMountPointContainingFile(file1).equals(getMountPointContainingFile(file2));
     }
 }

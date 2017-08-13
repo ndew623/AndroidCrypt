@@ -81,6 +81,7 @@ public class FolderDeleteOperator extends FileOperator{
     }
     public void doOperationWithoutThreadOrUserQuestions() {
         initMemVarFromArgs();
+        prepareAndValidate();
         doOperation();
     }
 }

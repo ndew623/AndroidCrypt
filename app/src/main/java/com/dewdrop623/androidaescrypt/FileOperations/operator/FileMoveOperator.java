@@ -1,6 +1,7 @@
 package com.dewdrop623.androidaescrypt.FileOperations.operator;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import com.dewdrop623.androidaescrypt.FileOperations.FileModifierService;
 import com.dewdrop623.androidaescrypt.FileOperations.FileUtils;
@@ -61,7 +62,21 @@ public class FileMoveOperator extends FileOperator {
 
     @Override
     protected void doOperation() {
-        file.renameTo(outputFile);
+        if (FileUtils.onSameMountpoint(file, outputFile)) {
+            file.renameTo(outputFile);
+        } else {
+            //file copy
+            Bundle args = new Bundle();
+            args.putString(FileCopyOperator.FILE_COPY_DESTINATION_ARG, outputFile.getParent());
+            new FileCopyOperator(file, args, fileModifierService).doOperationWithoutThreadOrUserQuestions();
+            //validate copy success
+            if (outputFile.exists() && (outputFile.length() == file.length())) {
+                //file delete
+                new FileDeleteOperator(file, null, fileModifierService).doOperationWithoutThreadOrUserQuestions();
+            } else {
+                fileModifierService.showToast(fileModifierService.getString(R.string.error_moving_file)+": "+file.getName());
+            }
+        }
         fileModifierService.updateNotification(100);
     }
 
@@ -89,6 +104,7 @@ public class FileMoveOperator extends FileOperator {
     @Override
     public void doOperationWithoutThreadOrUserQuestions() {
         initMemVarFromArgs();
+        prepareAndValidate();
         doOperation();
     }
 }

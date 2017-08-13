@@ -40,4 +40,6 @@
     <string name="ioexception">IO Exception</string>
     <string name="wrong">Wrong</string>
     <string name="wrong_password_question">Wrong password?</string>
+    <string name="home">Home</string>
+    <string name="error_moving_file">Error moving file</string>
 </resources>

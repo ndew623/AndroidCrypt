@@ -1,9 +1,12 @@
 package com.dewdrop623.androidaescrypt.FileBrowsing.ui;
 
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 
 import com.dewdrop623.androidaescrypt.FileBrowsing.FileBrowser;
+import com.dewdrop623.androidaescrypt.FileOperations.FileUtils;
 
 import java.io.File;
 
@@ -14,6 +17,12 @@ import java.io.File;
 public abstract class FileViewer extends Fragment{
     protected File[] fileList;
     protected FileBrowser fileBrowser;
+    protected void onMoveOrCopy(File file) {
+
+    }
+    protected void goToHomeDirectory () {
+        fileBrowser.changePath(FileBrowser.topLevelInternal);
+    }
     public void setFileList(File[] fileList) {
         this.fileList=fileList;
     }
@@ -28,8 +37,5 @@ public abstract class FileViewer extends Fragment{
     }
     public void copyFile(File file) {
         onMoveOrCopy(file);
-    }
-    protected void onMoveOrCopy(File file) {
-
     }
 }

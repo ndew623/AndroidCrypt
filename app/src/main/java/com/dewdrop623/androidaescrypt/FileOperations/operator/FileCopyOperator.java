@@ -99,6 +99,7 @@ public class FileCopyOperator extends FileOperator {
     @Override
     public void doOperationWithoutThreadOrUserQuestions() {
         initMemVarFromArgs();
+        prepareAndValidate();
         doOperation();
     }
 }

@@ -60,4 +60,11 @@ public class FileDeleteOperator extends FileOperator {
     protected void getInfoFromUser() {
         finishTakingInput();
     }
+
+    @Override
+    public void doOperationWithoutThreadOrUserQuestions() {
+        initMemVarFromArgs();
+        prepareAndValidate();
+        doOperation();
+    }
 }
