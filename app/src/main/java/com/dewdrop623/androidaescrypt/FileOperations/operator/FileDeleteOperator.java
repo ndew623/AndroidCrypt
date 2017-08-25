@@ -40,7 +40,9 @@ public class FileDeleteOperator extends FileOperator {
     @Override
     public void doOperation() {
         file.delete();
-        fileModifierService.updateNotification(100);
+        if (!silent) {
+            fileModifierService.updateNotification(100);
+        }
     }
 
     @Override
@@ -62,7 +64,7 @@ public class FileDeleteOperator extends FileOperator {
     }
 
     @Override
-    public void doOperationWithoutThreadOrUserQuestions() {
+    public void runSilentNoThread() {
         initMemVarFromArgs();
         prepareAndValidate();
         doOperation();

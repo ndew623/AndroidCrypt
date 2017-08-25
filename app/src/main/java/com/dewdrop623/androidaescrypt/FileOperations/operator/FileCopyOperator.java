@@ -75,7 +75,9 @@ public class FileCopyOperator extends FileOperator {
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
-        fileModifierService.updateNotification(100);
+        if (!silent) {
+            fileModifierService.updateNotification(100);
+        }
     }
 
     @Override
@@ -97,7 +99,7 @@ public class FileCopyOperator extends FileOperator {
     }
 
     @Override
-    public void doOperationWithoutThreadOrUserQuestions() {
+    public void runSilentNoThread() {
         initMemVarFromArgs();
         prepareAndValidate();
         doOperation();

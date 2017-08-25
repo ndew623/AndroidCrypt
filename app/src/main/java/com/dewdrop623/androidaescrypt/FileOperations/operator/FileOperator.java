@@ -15,6 +15,7 @@ import java.util.Stack;
 public abstract class FileOperator{
     protected File file;
     protected Bundle args;
+    protected boolean silent = false;
     protected FileModifierService fileModifierService;
     private static Stack<FileOperator> waitingForYesNoResponse = new Stack<>();
     private static Stack<FileOperator> waitingForYesNoRememberAnswerResponse = new Stack<>();
@@ -46,8 +47,9 @@ public abstract class FileOperator{
         fileModifierService.stopSelf();
     }
 
-    public void doOperationWithoutThreadOrUserQuestions() {
+    public void runSilentNoThread() {
         //optional override
+        silent = true;
     }
 
     protected abstract void initMemVarFromArgs();

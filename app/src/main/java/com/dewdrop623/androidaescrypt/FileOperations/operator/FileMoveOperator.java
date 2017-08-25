@@ -1,13 +1,13 @@
 package com.dewdrop623.androidaescrypt.FileOperations.operator;
 
 import android.os.Bundle;
-import android.util.Log;
 
 import com.dewdrop623.androidaescrypt.FileOperations.FileModifierService;
 import com.dewdrop623.androidaescrypt.FileOperations.FileUtils;
 import com.dewdrop623.androidaescrypt.R;
 
 import java.io.File;
+import java.util.Arrays;
 
 /**
  * moves files (also used when renaming a file)
@@ -65,19 +65,23 @@ public class FileMoveOperator extends FileOperator {
         if (FileUtils.onSameMountpoint(file, outputFile)) {
             file.renameTo(outputFile);
         } else {
+            //get initial file checksum
+            byte[] initialChecksum = FileUtils.getMD5Checksum(file);
             //file copy
             Bundle args = new Bundle();
             args.putString(FileCopyOperator.FILE_COPY_DESTINATION_ARG, outputFile.getParent());
-            new FileCopyOperator(file, args, fileModifierService).doOperationWithoutThreadOrUserQuestions();
+            new FileCopyOperator(file, args, fileModifierService).runSilentNoThread();
             //validate copy success
-            if (outputFile.exists() && (outputFile.length() == file.length())) {
+            if (outputFile.exists() && (outputFile.length() == file.length()) && Arrays.equals(initialChecksum, FileUtils.getMD5Checksum(outputFile))) {
                 //file delete
-                new FileDeleteOperator(file, null, fileModifierService).doOperationWithoutThreadOrUserQuestions();
+                new FileDeleteOperator(file, null, fileModifierService).runSilentNoThread();
             } else {
-                fileModifierService.showToast(fileModifierService.getString(R.string.error_moving_file)+": "+file.getName());
+                fileModifierService.showToast(fileModifierService.getString(R.string.error_moving_file)+": "+file.getName()+". "+fileModifierService.getString(R.string.output_could_not_be_validated));
             }
         }
-        fileModifierService.updateNotification(100);
+        if (!silent) {
+            fileModifierService.updateNotification(100);
+        }
     }
 
     @Override
@@ -102,7 +106,7 @@ public class FileMoveOperator extends FileOperator {
         }
     }
     @Override
-    public void doOperationWithoutThreadOrUserQuestions() {
+    public void runSilentNoThread() {
         initMemVarFromArgs();
         prepareAndValidate();
         doOperation();

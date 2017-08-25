@@ -20,6 +20,7 @@ import com.dewdrop623.androidaescrypt.FileBrowsing.ui.FileViewer;
 import com.dewdrop623.androidaescrypt.FileOperations.FileUtils;
 
 import java.io.File;
+import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
     private static final String FRAGMENT_TAG = "file_dialog";
@@ -31,9 +32,9 @@ public class MainActivity extends AppCompatActivity {
 
         //TODO put sdcard directory somewhere in ui
         ///first item in array is /storage/emulated (no 0), other items are sdcard/usb/stuff
-        for (File file : getExternalFilesDirs(null)) {
-            Log.e("EFD", FileUtils.getMountPointContainingFile(file).getAbsolutePath());
-        }
+        //for (File file : getExternalFilesDirs(null)) {
+        //    Log.e("EFD", FileUtils.getMountPointContainingFile(file).getAbsolutePath());
+        //}
 
         setContentView(R.layout.activity_main);
         checkPermissions();

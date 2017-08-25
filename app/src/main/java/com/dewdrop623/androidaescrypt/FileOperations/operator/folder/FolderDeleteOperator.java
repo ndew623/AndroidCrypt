@@ -44,9 +44,13 @@ public class FolderDeleteOperator extends FileOperator{
     @Override
     protected void doOperation() {
         filesToBeDeleted = FileUtils.countFilesInFolder(file);
-        fileModifierService.updateNotification(0);
+        if (!silent) {
+            fileModifierService.updateNotification(0);
+        }
         deleteFolder(file);
-        fileModifierService.updateNotification(100);
+        if (!silent) {
+            fileModifierService.updateNotification(100);
+        }
     }
     private void deleteFolder(File file) {
         File[] subfiles = file.listFiles();
@@ -79,7 +83,7 @@ public class FolderDeleteOperator extends FileOperator{
     protected void getInfoFromUser() {
         finishTakingInput();
     }
-    public void doOperationWithoutThreadOrUserQuestions() {
+    public void runSilentNoThread() {
         initMemVarFromArgs();
         prepareAndValidate();
         doOperation();

@@ -6,19 +6,27 @@ import android.os.Bundle;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileOperator;
 import com.dewdrop623.androidaescrypt.R;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
 /**
  * common functionality for fileoperators
  */
 
-public class FileUtils {
+public final class FileUtils {
+    private FileUtils(){}
     private static final char[] ILLEGAL_CHARACTERS = { '/', '\n', '\r', '\t', '\0', '\f'};
     public static int countFilesInFolder(File folder) {
         int count = 0;
@@ -147,7 +155,7 @@ public class FileUtils {
                 if (!file.isDirectory() && !ignoredFiles.contains(file)) {
                     args.putString(argsKey, newFolder.getAbsolutePath());
                     try {
-                        constructor.newInstance(file, args, fileModifierService).doOperationWithoutThreadOrUserQuestions();
+                        constructor.newInstance(file, args, fileModifierService).runSilentNoThread();
                     } catch (InstantiationException e) {
                         fileModifierService.showToast(e.getMessage());
                     } catch (IllegalAccessException e) {
@@ -230,5 +238,26 @@ public class FileUtils {
     }
     public static boolean onSameMountpoint(File file1, File file2) {
         return getMountPointContainingFile(file1).equals(getMountPointContainingFile(file2));
+    }
+    public static byte[] getMD5Checksum(File file) {
+        byte[] digest = new byte[]{};
+        try {
+            MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+            InputStream inputStream = new FileInputStream(file);
+            //DigestInputStream digestInputStream = new DigestInputStream(inputStream, messageDigest);
+            byte[] buffer = new byte[8192];
+            int length;
+            while ((length = inputStream.read(buffer)) > 0) {
+                messageDigest.update(buffer, 0, length);
+            }
+            digest = messageDigest.digest();
+        } catch (FileNotFoundException fnfe) {
+            fnfe.printStackTrace();
+        } catch (NoSuchAlgorithmException nsae) {
+            nsae.printStackTrace();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+        return digest;
     }
 }

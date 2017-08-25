@@ -42,4 +42,5 @@
     <string name="wrong_password_question">Wrong password?</string>
     <string name="home">Home</string>
     <string name="error_moving_file">Error moving file</string>
+    <string name="output_could_not_be_validated">Output could not be validated.</string>
 </resources>
