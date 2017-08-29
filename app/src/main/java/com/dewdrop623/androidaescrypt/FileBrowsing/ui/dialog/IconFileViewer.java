@@ -10,9 +10,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.ListView;
+import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.dewdrop623.androidaescrypt.FileBrowsing.FileBrowser;
@@ -20,14 +21,16 @@ import com.dewdrop623.androidaescrypt.FileBrowsing.ui.FileViewer;
 import com.dewdrop623.androidaescrypt.R;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * A subclass of FileViewer that displays filesystem with icons in a grid
  */
 
 public class IconFileViewer extends FileViewer {
-    private ListView fileListView;
-    private FileArrayAdapter fileArrayAdapter;
+    private GridView fileGridView;
+    private FileGridAdapter fileGridAdapter;
 
 
     @Override
@@ -61,11 +64,11 @@ public class IconFileViewer extends FileViewer {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_debug_file_viewer, container, false);
-        fileListView = (ListView) view.findViewById(R.id.fileListView);
-        fileArrayAdapter = new FileArrayAdapter(getContext(),0);
-        fileListView.setAdapter(fileArrayAdapter);
-        fileListView.setOnItemClickListener(onItemClickListener);
-        fileListView.setOnItemLongClickListener(onItemLongClickListener);
+        fileGridView = (GridView) view.findViewById(R.id.fileGridView);
+        fileGridAdapter = new FileGridAdapter(getContext());
+        fileGridView.setAdapter(fileGridAdapter);
+        fileGridView.setOnItemClickListener(onItemClickListener);
+        fileGridView.setOnItemLongClickListener(onItemLongClickListener);
 
         createFolderButton = (Button) view.findViewById(R.id.createFolderButton);
         moveCopyButton = (Button) view.findViewById(R.id.moveCopyButton);
@@ -143,22 +146,50 @@ public class IconFileViewer extends FileViewer {
         }
     };
 
-    private class FileArrayAdapter extends ArrayAdapter<File> {
-        public FileArrayAdapter(Context context, int resource) {
-            super(context, resource);
+    private class FileGridAdapter extends BaseAdapter {
+        private Context context;
+        private ArrayList<File> files = new ArrayList();
+        public FileGridAdapter(Context context) {
+            this.context = context;
+        }
+
+        public void add(File file) {
+            files.add(file);
+        }
+
+        public void addAll(Collection<File> collection) {
+            files.addAll(collection);
+        }
+
+        public void clear() {
+            files.clear();
+        }
+
+        @Override
+        public int getCount() {
+            return files.size();
+        }
+
+        @Override
+        public File getItem(int i) {
+            return files.get(i);
+        }
+
+        @Override
+        public long getItemId(int i) {
+            return files.get(i).hashCode();
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
-                convertView = new TextView(getContext());
+                File file = getItem(position);
+                convertView = LayoutInflater.from(context).inflate(R.layout.view_icon, parent, false);
+                ImageView fileIconImageView = (ImageView) convertView.findViewById(R.id.fileIconImageView);
+                TextView fileNameTextView = (TextView) convertView.findViewById(R.id.fileNameTextView);
+                //TODO set image view based on .isDirectory
+                fileNameTextView.setText(file.getName());
             }
-            File file = getItem(position);
-            String displayString = file.getAbsolutePath();
-            if(file.isDirectory()) {
-                displayString=displayString.concat("/");
-            }
-            ((TextView)convertView).setText(displayString);
             return convertView;
         }
     }
