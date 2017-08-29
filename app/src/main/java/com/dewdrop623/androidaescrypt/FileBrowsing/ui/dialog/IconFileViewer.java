@@ -1,4 +1,4 @@
-package com.dewdrop623.androidaescrypt.FileBrowsing.ui;
+package com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -16,18 +16,16 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.dewdrop623.androidaescrypt.FileBrowsing.FileBrowser;
+import com.dewdrop623.androidaescrypt.FileBrowsing.ui.FileViewer;
 import com.dewdrop623.androidaescrypt.R;
 
 import java.io.File;
 
 /**
- * a simple fragment for displaying files and test functionality
+ * A subclass of FileViewer that displays filesystem with icons in a grid
  */
 
-public class DebugFileViewer extends FileViewer {
-
-
-
+public class IconFileViewer extends FileViewer {
     private ListView fileListView;
     private FileArrayAdapter fileArrayAdapter;
 
@@ -164,7 +162,4 @@ public class DebugFileViewer extends FileViewer {
             return convertView;
         }
     }
-
-
-
 }

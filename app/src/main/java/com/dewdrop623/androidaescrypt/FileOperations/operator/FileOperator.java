@@ -5,7 +5,6 @@ import android.os.Bundle;
 import com.dewdrop623.androidaescrypt.FileOperations.FileModifierService;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Stack;
 
 /**
