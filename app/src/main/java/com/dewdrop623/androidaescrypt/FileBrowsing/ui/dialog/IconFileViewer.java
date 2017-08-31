@@ -3,6 +3,7 @@ package com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.res.ResourcesCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -63,7 +64,7 @@ public class IconFileViewer extends FileViewer {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_debug_file_viewer, container, false);
+        View view = inflater.inflate(R.layout.fragment_icon_file_viewer, container, false);
         fileGridView = (GridView) view.findViewById(R.id.fileGridView);
         fileGridAdapter = new FileGridAdapter(getContext());
         fileGridView.setAdapter(fileGridAdapter);
@@ -101,33 +102,35 @@ public class IconFileViewer extends FileViewer {
         cancelMoveCopyButton.setVisibility(View.VISIBLE);
         String cancelMCBText = "";
         if (moveState == MoveState.COPY) {
-            cancelMCBText = getString(R.string.cancel)+" "+getString(R.string.copy);
+            cancelMCBText = getString(R.string.cancel) + " " + getString(R.string.copy);
         } else if (moveState == MoveState.MOVE) {
-            cancelMCBText = getString(R.string.cancel)+" "+getString(R.string.move);
+            cancelMCBText = getString(R.string.cancel) + " " + getString(R.string.move);
         }
         cancelMoveCopyButton.setText(cancelMCBText);
     }
 
     private void updateFileArrayAdapterFileList() {
-        if (fileArrayAdapter == null) { //file viewer has not been displayed yet
+        if (fileGridAdapter == null) { //file viewer has not been displayed yet
             return;
         }
-        fileArrayAdapter.clear();
+        fileGridAdapter.clear();
         if (!fileBrowser.getCurrentPath().equals(new File("/")) /* || ! fileBrowser.getCurrentPath().getAbsolutePath().equals(FileBrowser.topLevelInternal.getAbsolutePath())*/) { //uncomment to prevent navigating from /sdcard to root
-            fileArrayAdapter.add(FileBrowser.parentDirectory);
+            fileGridAdapter.add(FileBrowser.parentDirectory);
         }
-        fileArrayAdapter.addAll(fileList);
-        fileArrayAdapter.notifyDataSetChanged();
+        fileGridAdapter.addAll(fileList);
+        fileGridAdapter.notifyDataSetChanged();
     }
+
     protected void moveCopyReset() {
         super.moveCopyReset();
         moveCopyButton.setVisibility(View.GONE);
         cancelMoveCopyButton.setVisibility(View.GONE);
     }
+
     private AdapterView.OnItemClickListener onItemClickListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            File clickedFile = fileArrayAdapter.getItem(position);
+            File clickedFile = fileGridAdapter.getItem(position);
             if (clickedFile.isDirectory()) {
                 fileBrowser.changePath(clickedFile);
             } else {
@@ -138,8 +141,8 @@ public class IconFileViewer extends FileViewer {
     private AdapterView.OnItemLongClickListener onItemLongClickListener = new AdapterView.OnItemLongClickListener() {
         @Override
         public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-            File clickedFile = fileArrayAdapter.getItem(position);
-            if (clickedFile!=FileBrowser.parentDirectory) {
+            File clickedFile = fileGridAdapter.getItem(position);
+            if (clickedFile != FileBrowser.parentDirectory) {
                 openOptionsDialog(clickedFile);
             }
             return true;
@@ -149,6 +152,7 @@ public class IconFileViewer extends FileViewer {
     private class FileGridAdapter extends BaseAdapter {
         private Context context;
         private ArrayList<File> files = new ArrayList();
+
         public FileGridAdapter(Context context) {
             this.context = context;
         }
@@ -159,6 +163,12 @@ public class IconFileViewer extends FileViewer {
 
         public void addAll(Collection<File> collection) {
             files.addAll(collection);
+        }
+
+        public void addAll(File[] fileArray) {
+            for (File file : fileArray) {
+                files.add(file);
+            }
         }
 
         public void clear() {
@@ -183,13 +193,17 @@ public class IconFileViewer extends FileViewer {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
-                File file = getItem(position);
                 convertView = LayoutInflater.from(context).inflate(R.layout.view_icon, parent, false);
-                ImageView fileIconImageView = (ImageView) convertView.findViewById(R.id.fileIconImageView);
-                TextView fileNameTextView = (TextView) convertView.findViewById(R.id.fileNameTextView);
-                //TODO set image view based on .isDirectory
-                fileNameTextView.setText(file.getName());
             }
+            File file = getItem(position);
+            ImageView fileIconImageView = (ImageView) convertView.findViewById(R.id.fileIconImageView);
+            TextView fileNameTextView = (TextView) convertView.findViewById(R.id.fileNameTextView);
+            if (file.isDirectory()) {
+                fileIconImageView.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_folder, null));
+            } else {
+                fileIconImageView.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_file, null));
+            }
+            fileNameTextView.setText(file.getName());
             return convertView;
         }
     }
