@@ -14,7 +14,7 @@ import android.widget.Toast;
 
 import com.dewdrop623.androidaescrypt.FileBrowsing.FileBrowser;
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.FileViewer;
-import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.IconFileViewer;
+import com.dewdrop623.androidaescrypt.FileBrowsing.ui.IconFileViewer;
 
 public class MainActivity extends AppCompatActivity {
     private static final String FRAGMENT_TAG = "file_dialog";

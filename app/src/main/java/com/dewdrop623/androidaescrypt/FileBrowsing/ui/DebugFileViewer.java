@@ -69,9 +69,9 @@ public class DebugFileViewer extends FileViewer {
         fileListView.setOnItemClickListener(onItemClickListener);
         fileListView.setOnItemLongClickListener(onItemLongClickListener);
 
-        createFolderButton = (Button) view.findViewById(R.id.createFolderButton);
-        moveCopyButton = (Button) view.findViewById(R.id.moveCopyButton);
-        cancelMoveCopyButton = (Button) view.findViewById(R.id.cancelMoveCopyButton);
+        //createFolderButton = (Button) view.findViewById(R.id.createFolderButton);
+      //  moveCopyButton = (Button) view.findViewById(R.id.moveCopyButton);
+      //  cancelMoveCopyButton = (Button) view.findViewById(R.id.cancelMoveCopyButton);
 
 
         updateFileArrayAdapterFileList();
@@ -83,13 +83,13 @@ public class DebugFileViewer extends FileViewer {
     @Override
     public void moveFile(File file) {
         super.moveFile(file);
-        moveCopyButton.setText(getString(R.string.move_here));
+       // moveCopyButton.setText(getString(R.string.move_here));
     }
 
     @Override
     public void copyFile(File file) {
         super.copyFile(file);
-        moveCopyButton.setText(getString(R.string.copy_here));
+       // moveCopyButton.setText(getString(R.string.copy_here));
     }
 
     @Override
@@ -104,7 +104,7 @@ public class DebugFileViewer extends FileViewer {
         } else if (moveState == MoveState.MOVE) {
             cancelMCBText = getString(R.string.cancel)+" "+getString(R.string.move);
         }
-        cancelMoveCopyButton.setText(cancelMCBText);
+       // cancelMoveCopyButton.setText(cancelMCBText);
     }
 
     private void updateFileArrayAdapterFileList() {

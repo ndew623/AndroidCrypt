@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 import com.dewdrop623.androidaescrypt.FileBrowsing.FileBrowser;
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.filedialog.DebugCreateDirectoryDialog;
@@ -28,24 +29,20 @@ public abstract class FileViewer extends Fragment{
     private File moveCopyFile;
     protected MoveState moveState = MoveState.NONE;
 
-    protected Button createFolderButton;
-    protected Button moveCopyButton;
-    protected Button cancelMoveCopyButton;
+    protected ImageButton moveCopyButton;
+    protected ImageButton cancelMoveCopyButton;
 
     protected File[] fileList;
     protected FileBrowser fileBrowser;
 
-    private View.OnClickListener createFolderButtonOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            DebugCreateDirectoryDialog debugCreateDirectoryDialog = new DebugCreateDirectoryDialog();
-            Bundle args = new Bundle();
-            args.putString(FileDialog.PATH_ARGUMENT, fileBrowser.getCurrentPath().getAbsolutePath());
-            debugCreateDirectoryDialog.setArguments(args);
-            debugCreateDirectoryDialog.setFileViewer(getSelfForButtonListeners());
-            ((MainActivity)getActivity()).showDialogFragment(debugCreateDirectoryDialog);
-        }
-    };
+    protected void createFolder() {
+        DebugCreateDirectoryDialog debugCreateDirectoryDialog = new DebugCreateDirectoryDialog();
+        Bundle args = new Bundle();
+        args.putString(FileDialog.PATH_ARGUMENT, fileBrowser.getCurrentPath().getAbsolutePath());
+        debugCreateDirectoryDialog.setArguments(args);
+        debugCreateDirectoryDialog.setFileViewer(getSelfForButtonListeners());
+        ((MainActivity)getActivity()).showDialogFragment(debugCreateDirectoryDialog);
+    }
     private View.OnClickListener moveCopyButtonOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -92,7 +89,6 @@ public abstract class FileViewer extends Fragment{
         ((MainActivity)getActivity()).showDialogFragment(debugFileOptionsDialog);
     }
     final protected void setButtonListeners() {
-        createFolderButton.setOnClickListener(createFolderButtonOnClickListener);
         moveCopyButton.setOnClickListener(moveCopyButtonOnClickListener);
         cancelMoveCopyButton.setOnClickListener(cancelMoveCopyButtonOnClickListener);
     }

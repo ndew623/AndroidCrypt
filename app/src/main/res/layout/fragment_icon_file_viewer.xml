@@ -22,20 +22,19 @@
             android:layout_margin="16dp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true">
-            <Button
+            <ImageButton
                 android:id="@+id/cancelMoveCopyButton"
                 android:visibility="gone"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-            <Button
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/ic_cancel"
+                android:background="@drawable/circle_button_selecter"
+                android:layout_marginRight="8dp"/>
+            <ImageButton
                 android:id="@+id/moveCopyButton"
                 android:visibility="gone"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-            <Button
-                android:id="@+id/createFolderButton"
-                android:text="@string/create_folder"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="@drawable/circle_button_selecter"/>
         </LinearLayout>
 </RelativeLayout>

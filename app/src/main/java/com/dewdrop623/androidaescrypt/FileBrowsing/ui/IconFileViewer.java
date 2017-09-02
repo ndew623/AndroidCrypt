@@ -1,4 +1,4 @@
-package com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog;
+package com.dewdrop623.androidaescrypt.FileBrowsing.ui;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -14,6 +14,7 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.GridView;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -57,6 +58,9 @@ public class IconFileViewer extends FileViewer {
             case R.id.home_button:
                 goToHomeDirectory();
                 return true;
+            case R.id.createFolderButton:
+                createFolder();
+                return true;
         }
         return false;
     }
@@ -71,9 +75,8 @@ public class IconFileViewer extends FileViewer {
         fileGridView.setOnItemClickListener(onItemClickListener);
         fileGridView.setOnItemLongClickListener(onItemLongClickListener);
 
-        createFolderButton = (Button) view.findViewById(R.id.createFolderButton);
-        moveCopyButton = (Button) view.findViewById(R.id.moveCopyButton);
-        cancelMoveCopyButton = (Button) view.findViewById(R.id.cancelMoveCopyButton);
+        moveCopyButton = (ImageButton) view.findViewById(R.id.moveCopyButton);
+        cancelMoveCopyButton = (ImageButton) view.findViewById(R.id.cancelMoveCopyButton);
 
 
         updateFileArrayAdapterFileList();
@@ -85,28 +88,20 @@ public class IconFileViewer extends FileViewer {
     @Override
     public void moveFile(File file) {
         super.moveFile(file);
-        moveCopyButton.setText(getString(R.string.move_here));
+        moveCopyButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.ic_move,null));
     }
 
     @Override
     public void copyFile(File file) {
         super.copyFile(file);
-        moveCopyButton.setText(getString(R.string.copy_here));
+        moveCopyButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.ic_copy,null));
     }
 
     @Override
     protected void onMoveOrCopy(File file) {
         super.onMoveOrCopy(file);
-
         moveCopyButton.setVisibility(View.VISIBLE);
         cancelMoveCopyButton.setVisibility(View.VISIBLE);
-        String cancelMCBText = "";
-        if (moveState == MoveState.COPY) {
-            cancelMCBText = getString(R.string.cancel) + " " + getString(R.string.copy);
-        } else if (moveState == MoveState.MOVE) {
-            cancelMCBText = getString(R.string.cancel) + " " + getString(R.string.move);
-        }
-        cancelMoveCopyButton.setText(cancelMCBText);
     }
 
     private void updateFileArrayAdapterFileList() {
