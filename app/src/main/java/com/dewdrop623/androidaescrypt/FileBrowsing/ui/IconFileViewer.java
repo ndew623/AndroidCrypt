@@ -82,6 +82,20 @@ public class IconFileViewer extends FileViewer {
         updateFileArrayAdapterFileList();
         setButtonListeners();
 
+        if (savedInstanceState != null) {
+            int prevMoveState = savedInstanceState.getInt(MOVE_STATE_KEY, 0);
+            if (prevMoveState != 0) {
+                String prevMoveCopyFile = savedInstanceState.getString(MOVE_COPY_FILE_KEY, MOVE_COPY_FILE_KEY);
+                if (!prevMoveCopyFile.equals(MOVE_COPY_FILE_KEY)) {
+                    if (prevMoveState == COPY) {
+                        copyFile(new File(prevMoveCopyFile));
+                    } else if (prevMoveState == MOVE) {
+                        moveFile(new File(prevMoveCopyFile));
+                    }
+                }
+            }
+        }
+
         return view;
     }
 

@@ -1,6 +1,7 @@
 package com.dewdrop623.androidaescrypt.FileBrowsing.ui;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.View;
 import android.widget.Button;
@@ -23,11 +24,19 @@ import java.io.File;
  */
 
 public abstract class FileViewer extends Fragment{
-    protected enum MoveState {
-        MOVE, COPY, NONE
-    }
+
+    protected static final String MOVE_STATE_KEY = "com.dewdrop623.androidaescrypt.FileBrowsing.ui.FileViewer.MOVE_STATE_KEY";
+    protected static final String MOVE_COPY_FILE_KEY = "com.dewdrop623.androidaescrypt.FileBrowsing.ui.FileViewer.MOVE_COPY_FILE_KEY";
+    protected static final String CURRENT_DIRECTORY_KEY = "com.dewdrop623.androidaescrypt.FileBrowsing.ui.FileViewer.CURRENT_DIRECTORY_KEY";
+
+    protected Bundle savedInstanceState = null;
+
+    protected final int MOVE = 2;
+    protected final int COPY = 1;
+    protected final int NONE = 0;
+
     private File moveCopyFile;
-    protected MoveState moveState = MoveState.NONE;
+    protected int moveState = NONE;
 
     protected ImageButton moveCopyButton;
     protected ImageButton cancelMoveCopyButton;
@@ -46,15 +55,15 @@ public abstract class FileViewer extends Fragment{
     private View.OnClickListener moveCopyButtonOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if(moveState == MoveState.NONE) {
+            if(moveState == NONE) {
                 return;
             }
             Bundle args = new Bundle();
             int fileOperationType = -1;
-            if(moveState == MoveState.MOVE) {
+            if(moveState == MOVE) {
                 args.putString(FileMoveOperator.FILE_MOVE_DESTINATION_ARG, fileBrowser.getCurrentPath().getAbsolutePath());
                 fileOperationType = FileOperationType.MOVE;
-            } else if (moveState == MoveState.COPY) {
+            } else if (moveState == COPY) {
                 args.putString(FileCopyOperator.FILE_COPY_DESTINATION_ARG, fileBrowser.getCurrentPath().getAbsolutePath());
                 fileOperationType = FileOperationType.COPY;
             }
@@ -70,6 +79,27 @@ public abstract class FileViewer extends Fragment{
             moveCopyReset();
         }
     };
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        FileBrowser fileBrowser = new FileBrowser();
+        fileBrowser.setFileViewer(this);
+        this.savedInstanceState = savedInstanceState;
+        if (savedInstanceState != null) {
+            fileBrowser.changePath(new File(savedInstanceState.getString(CURRENT_DIRECTORY_KEY,"/")));
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putInt(MOVE_STATE_KEY, moveState);
+        outState.putString(MOVE_COPY_FILE_KEY, (moveCopyFile==null)?"":moveCopyFile.getAbsolutePath());
+        outState.putString(CURRENT_DIRECTORY_KEY, fileBrowser.getCurrentPath().getAbsolutePath());
+        super.onSaveInstanceState(outState);
+
+    }
+
     //methods that the subclass cannot override
     final public void setFileBrowser(FileBrowser fileBrowser) {
         this.fileBrowser=fileBrowser;
@@ -100,18 +130,19 @@ public abstract class FileViewer extends Fragment{
         this.fileList=fileList;
     }
     public void moveFile(File file) {
-        moveState = MoveState.MOVE;
+        moveState = MOVE;
         onMoveOrCopy(file);
     }
     public void copyFile(File file) {
-        moveState = MoveState.COPY;
+        moveState = COPY;
         onMoveOrCopy(file);
     }
     protected void onMoveOrCopy(File file) {
         moveCopyFile=file;
     }
     protected void moveCopyReset() {
-        moveState = MoveState.NONE;
+        moveState = NONE;
         moveCopyFile = null;
     }
+
 }

@@ -16,6 +16,8 @@ import com.dewdrop623.androidaescrypt.FileBrowsing.FileBrowser;
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.FileViewer;
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.IconFileViewer;
 
+import java.io.File;
+
 public class MainActivity extends AppCompatActivity {
     private static final String FRAGMENT_TAG = "file_dialog";
     private static final int WRITE_FILE_PERMISSION_REQUEST_CODE = 654;
@@ -23,7 +25,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         //TODO put sdcard directory somewhere in ui
         ///first item in array is /storage/emulated (no 0), other items are sdcard/usb/stuff
         //for (File file : getExternalFilesDirs(null)) {
@@ -32,13 +33,16 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
         checkPermissions();
-        FileViewer fileViewer = new IconFileViewer();
-        FileBrowser fileBrowser = new FileBrowser();
-        fileBrowser.setFileViewer(fileViewer);
         FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.add(R.id.mainActivityFrameLayout, fileViewer);
-        fragmentTransaction.commit();
+        FileViewer fileViewer;
+        if (savedInstanceState == null) {
+            fileViewer = new IconFileViewer();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.add(R.id.mainActivityFrameLayout, fileViewer);
+            fragmentTransaction.commit();
+        } else {
+            fileViewer = (FileViewer) fragmentManager.findFragmentById(R.id.mainActivityFrameLayout);
+        }
     }
     public void checkPermissions() {
         if(ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED ) {

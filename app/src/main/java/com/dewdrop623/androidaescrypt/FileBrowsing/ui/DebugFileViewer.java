@@ -99,9 +99,9 @@ public class DebugFileViewer extends FileViewer {
         moveCopyButton.setVisibility(View.VISIBLE);
         cancelMoveCopyButton.setVisibility(View.VISIBLE);
         String cancelMCBText = "";
-        if (moveState == MoveState.COPY) {
+        if (moveState == COPY) {
             cancelMCBText = getString(R.string.cancel)+" "+getString(R.string.copy);
-        } else if (moveState == MoveState.MOVE) {
+        } else if (moveState == MOVE) {
             cancelMCBText = getString(R.string.cancel)+" "+getString(R.string.move);
         }
        // cancelMoveCopyButton.setText(cancelMCBText);
