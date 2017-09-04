@@ -49,7 +49,7 @@ public abstract class FileViewer extends Fragment{
         Bundle args = new Bundle();
         args.putString(FileDialog.PATH_ARGUMENT, fileBrowser.getCurrentPath().getAbsolutePath());
         debugCreateDirectoryDialog.setArguments(args);
-        debugCreateDirectoryDialog.setFileViewer(getSelfForButtonListeners());
+        debugCreateDirectoryDialog.setFileViewer(this);
         ((MainActivity)getActivity()).showDialogFragment(debugCreateDirectoryDialog);
     }
     private View.OnClickListener moveCopyButtonOnClickListener = new View.OnClickListener() {
@@ -79,7 +79,7 @@ public abstract class FileViewer extends Fragment{
             moveCopyReset();
         }
     };
-
+    protected final FileViewer getSelfForButtonListeners() {return this;}
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -110,20 +110,9 @@ public abstract class FileViewer extends Fragment{
     final protected void goToHomeDirectory () {
         fileBrowser.changePath(FileBrowser.topLevelInternal);
     }
-    final protected void openOptionsDialog(File clickedFile) {
-        DebugFileOptionsDialog debugFileOptionsDialog = new DebugFileOptionsDialog();
-        Bundle args = new Bundle();
-        args.putString(FileDialog.PATH_ARGUMENT, clickedFile.getAbsolutePath());
-        debugFileOptionsDialog.setArguments(args);
-        debugFileOptionsDialog.setFileViewer(getSelfForButtonListeners());
-        ((MainActivity)getActivity()).showDialogFragment(debugFileOptionsDialog);
-    }
     final protected void setButtonListeners() {
         moveCopyButton.setOnClickListener(moveCopyButtonOnClickListener);
         cancelMoveCopyButton.setOnClickListener(cancelMoveCopyButtonOnClickListener);
-    }
-    private FileViewer getSelfForButtonListeners() {
-        return this;
     }
     //methods that sublass can override, but should call super
     public void setFileList(File[] fileList) {
@@ -136,6 +125,9 @@ public abstract class FileViewer extends Fragment{
     public void copyFile(File file) {
         moveState = COPY;
         onMoveOrCopy(file);
+    }
+    public void changePath(File newPath) {
+        fileBrowser.changePath(newPath);
     }
     protected void onMoveOrCopy(File file) {
         moveCopyFile=file;

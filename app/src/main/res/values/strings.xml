@@ -43,4 +43,8 @@
     <string name="home">Home</string>
     <string name="error_moving_file">Error moving file</string>
     <string name="output_could_not_be_validated">Output could not be validated.</string>
+    <string name="add_favorite">Add Favorite</string>
+    <string name="favorites">Favorites</string>
+    <string name="close_favorites">Close favorites</string>
+    <string name="remove_favorite">Remove Favorite</string>
 </resources>

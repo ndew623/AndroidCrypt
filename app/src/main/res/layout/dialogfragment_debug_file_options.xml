@@ -36,4 +36,14 @@
         android:text="@string/decrypt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
+    <Button
+        android:id="@+id/addFavoriteButton"
+        android:text="@string/add_favorite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <Button
+        android:id="@+id/removeFavoriteButton"
+        android:text="@string/remove_favorite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 </GridLayout>

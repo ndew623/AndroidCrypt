@@ -130,7 +130,7 @@ public class DebugFileViewer extends FileViewer {
             if (clickedFile.isDirectory()) {
                 fileBrowser.changePath(clickedFile);
             } else {
-                openOptionsDialog(clickedFile);
+        //        openOptionsDialog(clickedFile);
             }
         }
     };
@@ -139,7 +139,7 @@ public class DebugFileViewer extends FileViewer {
         public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
             File clickedFile = fileArrayAdapter.getItem(position);
             if (clickedFile!=FileBrowser.parentDirectory) {
-                openOptionsDialog(clickedFile);
+           //     openOptionsDialog(clickedFile);
             }
             return true;
         }

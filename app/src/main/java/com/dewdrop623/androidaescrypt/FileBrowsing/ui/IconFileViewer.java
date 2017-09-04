@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import com.dewdrop623.androidaescrypt.FileBrowsing.FileBrowser;
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.FileViewer;
+import com.dewdrop623.androidaescrypt.MainActivity;
 import com.dewdrop623.androidaescrypt.R;
 
 import java.io.File;
@@ -143,7 +144,7 @@ public class IconFileViewer extends FileViewer {
             if (clickedFile.isDirectory()) {
                 fileBrowser.changePath(clickedFile);
             } else {
-                openOptionsDialog(clickedFile);
+                ((MainActivity)getActivity()).openOptionsDialog(clickedFile, getSelfForButtonListeners());
             }
         }
     };
@@ -152,7 +153,7 @@ public class IconFileViewer extends FileViewer {
         public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
             File clickedFile = fileGridAdapter.getItem(position);
             if (clickedFile != FileBrowser.parentDirectory) {
-                openOptionsDialog(clickedFile);
+                ((MainActivity)getActivity()).openOptionsDialog(clickedFile, getSelfForButtonListeners());
             }
             return true;
         }

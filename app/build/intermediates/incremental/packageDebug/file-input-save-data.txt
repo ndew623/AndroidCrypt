@@ -1,5 +1,5 @@
 #Internal package file, do not edit.
-#Sat Sep 02 14:30:43 EDT 2017
+#Sun Sep 03 15:32:17 EDT 2017
 210.set=ANDROID_RESOURCE
 282.file=/home/nick/Android/projects/AndroidAESCrypt/app/build/intermediates/res/resources-debug.ap_/res/drawable-xxxhdpi-v4/abc_ic_star_half_black_16dp.png
 14.set=ANDROID_RESOURCE
