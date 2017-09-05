@@ -1,10 +1,14 @@
 package com.dewdrop623.androidaescrypt;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.LayoutRes;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
@@ -12,15 +16,20 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.util.ArraySet;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dewdrop623.androidaescrypt.FileBrowsing.FileBrowser;
@@ -30,6 +39,9 @@ import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.filedialog.DebugFil
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.filedialog.FileDialog;
 
 import java.io.File;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
@@ -40,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
 
     /*TODO more stuff from favorites drawer to clean*/
     private ActionBarDrawerToggle drawerToggle;
+    private FavoritesDrawerArrayAdapter arrayAdapter;
     /*-----------------------------------------------*/
     private FileViewer fileViewer;
 
@@ -57,10 +70,10 @@ public class MainActivity extends AppCompatActivity {
         checkPermissions();
 
         /*TODO gonna need to probably refactor the shit out of this mess*/
-        String[] favorites = getFavoritesSet(getSharedPreferencesFavoritesFile()).toArray(new String[]{});
         DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         ListView drawerList = (ListView) findViewById(R.id.left_drawer);
-        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, favorites);
+        arrayAdapter = new FavoritesDrawerArrayAdapter(this, R.layout.favorites_list_item);
+        refreshFavoritesDrawerData();
         drawerList.setAdapter(arrayAdapter);
 
         drawerList.setOnItemClickListener(new ListView.OnItemClickListener() {
@@ -137,6 +150,12 @@ public class MainActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+    private void refreshFavoritesDrawerData() {
+        String[] favorites = getFavoritesSet(getSharedPreferencesFavoritesFile()).toArray(new String[]{});
+        arrayAdapter.clear();
+        arrayAdapter.addAll(favorites);
+        arrayAdapter.notifyDataSetChanged();
+    }
     /*------------------*/
 
     public void checkPermissions() {
@@ -190,6 +209,89 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putStringSet(SHARED_PREFERENCES_FAVORITE_STRING_SET, favorites);
         editor.commit();
+        refreshFavoritesDrawerData();
+    }
+    private class FavoritesDrawerArrayAdapter extends ArrayAdapter<String> {
+        private Context context;
+        private int listItemResource;
+        private ArrayList<String> files = new ArrayList<>();
+
+        public FavoritesDrawerArrayAdapter(Context context, int resource) {
+            super(context, resource);
+            this.context = context;
+            listItemResource = resource;
+        }
+
+        @Override
+        public void add(@Nullable String object) {
+            files.add(object);
+        }
+
+        @Override
+        public void addAll(@NonNull Collection<? extends String> collection) {
+            files.addAll(collection);
+        }
+
+        @Override
+        public void addAll(String... items) {
+            for (String s : items) {
+                files.add(s);
+            }
+        }
+
+        @Override
+        public void remove(@Nullable String object) {
+            files.remove(object);
+        }
+
+        public void remove(int i) {
+            files.remove(i);
+        }
+
+        @Override
+        public void clear() {
+            files.clear();
+        }
+
+        @Override
+        public int getCount() {
+            return files.size();
+        }
+
+        @Nullable
+        @Override
+        public String getItem(int position) {
+            return files.get(position);
+        }
+
+        @NonNull
+        @Override
+        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+            if (convertView == null) {
+                convertView = ((LayoutInflater)context.getSystemService(LAYOUT_INFLATER_SERVICE)).inflate(listItemResource, parent, false);
+            }
+
+            File file = new File(getItem(position));
+            ImageView favoritesListItemImageView = (ImageView) convertView.findViewById(R.id.favoritesListItemImageView);
+            TextView favoritesListItemTextView = (TextView) convertView.findViewById(R.id.favoritesListItemTextView);
+            Drawable fileDrawable = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_file, null);
+            Drawable folderDrawable = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_folder, null);
+
+
+            if (!file.exists()) {
+                favoritesListItemTextView.setText(R.string.file_does_not_exist);
+            } else {
+                favoritesListItemTextView.setText(file.getName());
+            }
+
+            if (file.isDirectory()) {
+                favoritesListItemImageView.setImageDrawable(folderDrawable);
+            } else {
+                favoritesListItemImageView.setImageDrawable(fileDrawable);
+            }
+
+            return convertView;
+        }
     }
 
 }

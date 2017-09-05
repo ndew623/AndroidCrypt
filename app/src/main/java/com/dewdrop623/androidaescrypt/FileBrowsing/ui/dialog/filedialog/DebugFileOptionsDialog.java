@@ -49,7 +49,10 @@ public class DebugFileOptionsDialog extends FileDialog {
             decryptButton.setVisibility(View.GONE);
         }
 
-        removeFavoriteButton.setVisibility(((MainActivity)getActivity()).isInFavorites(file)?View.VISIBLE:View.GONE);
+        if (((MainActivity)getActivity()).isInFavorites(file)){
+            removeFavoriteButton.setVisibility(View.VISIBLE);
+            addFavoriteButton.setVisibility(View.GONE);
+        }
 
         return createDialog(file.getName(), view, null);
     }
