@@ -1,4 +1,4 @@
-#Tue Sep 05 17:33:19 EDT 2017
+#Wed Sep 06 21:57:40 EDT 2017
 base.0=/home/nick/Android/projects/AndroidAESCrypt/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run-bootstrap_b42acc17500ebf9889b6cd0e2641e750ac04a3eb
 renamed.1=classes.dex
 renamed.0=classes2.dex
