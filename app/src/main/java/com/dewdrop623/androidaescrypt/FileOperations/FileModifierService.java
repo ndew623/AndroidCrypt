@@ -25,7 +25,7 @@ import com.dewdrop623.androidaescrypt.FileOperations.operator.folder.CreateFolde
 import com.dewdrop623.androidaescrypt.FileOperations.operator.folder.FolderCopyOperator;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.folder.FolderDeleteOperator;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.folder.FolderMoveOperator;
-import com.dewdrop623.androidaescrypt.MainActivity;
+import com.dewdrop623.androidaescrypt.FileBrowsing.ui.MainActivity;
 import com.dewdrop623.androidaescrypt.R;
 
 import java.io.File;

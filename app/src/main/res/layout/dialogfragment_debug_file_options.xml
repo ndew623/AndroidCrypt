@@ -1,49 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent"
-    android:columnCount="3">
-    <Button
-        android:id="@+id/copyButton"
-        android:text="@string/copy"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        />
-    <Button
-        android:id="@+id/moveButton"
-        android:text="@string/move"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        />
-    <Button
-        android:id="@+id/renameButton"
-        android:text="@string/rename"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        />
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/deleteButton"
-        android:text="@string/delete"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-    <Button
-        android:id="@+id/encryptButton"
-        android:text="@string/encrypt"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-    <Button
-        android:id="@+id/decryptButton"
-        android:text="@string/decrypt"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-    <Button
-        android:id="@+id/addFavoriteButton"
-        android:text="@string/add_favorite"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-    <Button
-        android:id="@+id/removeFavoriteButton"
-        android:text="@string/remove_favorite"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-</GridLayout>
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:columnCount="3">
+        <LinearLayout
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:layout_gravity="center">
+        <ImageButton
+            android:id="@+id/copyButton"
+            android:background="@drawable/circle_button_selecter"
+            android:src="@drawable/ic_copy"
+            android:layout_width="40dp"
+            android:layout_height="40dp"/>
+            <TextView
+                android:text="@string/copy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/moveButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/move" />
+
+        <Button
+            android:id="@+id/renameButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/rename" />
+
+        <Button
+            android:id="@+id/deleteButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/delete" />
+
+        <Button
+            android:id="@+id/encryptButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/encrypt" />
+
+        <Button
+            android:id="@+id/decryptButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/decrypt" />
+
+        <Button
+            android:id="@+id/addFavoriteButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/add_favorite" />
+
+        <Button
+            android:id="@+id/removeFavoriteButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/remove_favorite" />
+    </GridLayout>
+</ScrollView>

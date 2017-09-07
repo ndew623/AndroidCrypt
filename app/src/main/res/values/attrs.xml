@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="CaptionedImageButton">
+        <attr name="caption" format="string"/>
+        <attr name="img_src" format="string"/>
+        <attr name="img_background" format="string"/>
+        <attr name="img_width_dp" format="integer"></attr>
+        <attr name="img_height_dp" format="integer"></attr>
+    </declare-styleable>
+</resources>

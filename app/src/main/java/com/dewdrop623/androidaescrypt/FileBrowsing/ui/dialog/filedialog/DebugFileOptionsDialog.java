@@ -6,8 +6,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 
-import com.dewdrop623.androidaescrypt.MainActivity;
+import com.dewdrop623.androidaescrypt.FileBrowsing.ui.MainActivity;
 import com.dewdrop623.androidaescrypt.R;
 
 /**
@@ -17,7 +18,7 @@ import com.dewdrop623.androidaescrypt.R;
 public class DebugFileOptionsDialog extends FileDialog {
     Button encryptButton;
     Button decryptButton;
-    Button copyButton;
+    ImageButton copyButton;
     Button moveButton;
     Button renameButton;
     Button deleteButton;
@@ -28,7 +29,7 @@ public class DebugFileOptionsDialog extends FileDialog {
         View view = inflateLayout(R.layout.dialogfragment_debug_file_options);
         encryptButton = (Button) view.findViewById(R.id.encryptButton);
         decryptButton = (Button) view.findViewById(R.id.decryptButton);
-        copyButton = (Button) view.findViewById(R.id.copyButton);
+        copyButton = (ImageButton) view.findViewById(R.id.copyButton);
         moveButton = (Button) view.findViewById(R.id.moveButton);
         renameButton = (Button) view.findViewById(R.id.renameButton);
         deleteButton = (Button) view.findViewById(R.id.deleteButton);
@@ -50,8 +51,9 @@ public class DebugFileOptionsDialog extends FileDialog {
         }
 
         if (((MainActivity)getActivity()).isInFavorites(file)){
-            removeFavoriteButton.setVisibility(View.VISIBLE);
             addFavoriteButton.setVisibility(View.GONE);
+        } else {
+            removeFavoriteButton.setVisibility(View.GONE);
         }
 
         return createDialog(file.getName(), view, null);

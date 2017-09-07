@@ -4,18 +4,15 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 
 import com.dewdrop623.androidaescrypt.FileBrowsing.FileBrowser;
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.filedialog.DebugCreateDirectoryDialog;
-import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.filedialog.DebugFileOptionsDialog;
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.filedialog.FileDialog;
 import com.dewdrop623.androidaescrypt.FileOperations.FileModifierService;
 import com.dewdrop623.androidaescrypt.FileOperations.FileOperationType;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileCopyOperator;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileMoveOperator;
-import com.dewdrop623.androidaescrypt.MainActivity;
 
 import java.io.File;
 

@@ -1,4 +1,4 @@
-package com.dewdrop623.androidaescrypt;
+package com.dewdrop623.androidaescrypt.FileBrowsing.ui;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -35,6 +35,7 @@ import com.dewdrop623.androidaescrypt.FileBrowsing.ui.FileViewer;
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.IconFileViewer;
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.filedialog.DebugFileOptionsDialog;
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.filedialog.FileDialog;
+import com.dewdrop623.androidaescrypt.R;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -44,7 +45,7 @@ import java.util.Set;
 public class MainActivity extends AppCompatActivity {
     private static final String DIALOG_FRAGMENT_TAG = "file_dialog";
     private static final String SHARED_PREFERENCES_FAVORITE_FILE = "favorite";
-    private static final String SHARED_PREFERENCES_FAVORITE_STRING_SET = "com.dewdrop623.androidaescrypt.MainActivity.SHARED_PREFERENCES_FAVORITE_STRING_SET";
+    private static final String SHARED_PREFERENCES_FAVORITE_STRING_SET = "com.dewdrop623.androidaescrypt.FileBrowsing.ui.MainActivity.SHARED_PREFERENCES_FAVORITE_STRING_SET";
     private static final int WRITE_FILE_PERMISSION_REQUEST_CODE = 654;
 
     private ActionBarDrawerToggle drawerToggle;

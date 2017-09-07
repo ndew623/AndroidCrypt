@@ -12,15 +12,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.dewdrop623.androidaescrypt.FileBrowsing.FileBrowser;
-import com.dewdrop623.androidaescrypt.FileBrowsing.ui.FileViewer;
-import com.dewdrop623.androidaescrypt.MainActivity;
 import com.dewdrop623.androidaescrypt.R;
 
 import java.io.File;
