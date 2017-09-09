@@ -19,7 +19,7 @@ public class DebugFileOptionsDialog extends FileDialog {
     Button encryptButton;
     Button decryptButton;
     ImageButton copyButton;
-    Button moveButton;
+    //Button moveButton;
     Button renameButton;
     Button deleteButton;
     Button addFavoriteButton;
@@ -30,7 +30,7 @@ public class DebugFileOptionsDialog extends FileDialog {
         encryptButton = (Button) view.findViewById(R.id.encryptButton);
         decryptButton = (Button) view.findViewById(R.id.decryptButton);
         copyButton = (ImageButton) view.findViewById(R.id.copyButton);
-        moveButton = (Button) view.findViewById(R.id.moveButton);
+        //moveButton = (Button) view.findViewById(R.id.moveButton);
         renameButton = (Button) view.findViewById(R.id.renameButton);
         deleteButton = (Button) view.findViewById(R.id.deleteButton);
         addFavoriteButton = (Button) view.findViewById(R.id.addFavoriteButton);
@@ -39,7 +39,7 @@ public class DebugFileOptionsDialog extends FileDialog {
         encryptButton.setOnClickListener(buttonOnClickListener);
         decryptButton.setOnClickListener(buttonOnClickListener);
         copyButton.setOnClickListener(buttonOnClickListener);
-        moveButton.setOnClickListener(buttonOnClickListener);
+       // moveButton.setOnClickListener(buttonOnClickListener);
         renameButton.setOnClickListener(buttonOnClickListener);
         deleteButton.setOnClickListener(buttonOnClickListener);
         addFavoriteButton.setOnClickListener(buttonOnClickListener);
@@ -76,10 +76,10 @@ public class DebugFileOptionsDialog extends FileDialog {
             } else if (v.getId() == copyButton.getId()) {
                 fileViewer.copyFile(file);
                 dismiss();
-            } else if (v.getId() == moveButton.getId()) {
+            }/* else if (v.getId() == moveButton.getId()) {
                 fileViewer.moveFile(file);
                 dismiss();
-            } else if (v.getId() == addFavoriteButton.getId()) {
+            } */else if (v.getId() == addFavoriteButton.getId()) {
                 ((MainActivity)getActivity()).addFavorite(file.getAbsolutePath());
                 dismiss();
             } else if (v.getId() == removeFavoriteButton.getId()) {

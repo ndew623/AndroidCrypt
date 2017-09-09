@@ -31,8 +31,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.dewdrop623.androidaescrypt.FileBrowsing.ui.FileViewer;
-import com.dewdrop623.androidaescrypt.FileBrowsing.ui.IconFileViewer;
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.filedialog.DebugFileOptionsDialog;
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.filedialog.FileDialog;
 import com.dewdrop623.androidaescrypt.R;

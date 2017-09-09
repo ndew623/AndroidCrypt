@@ -12,6 +12,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.widget.Toast;
 
+import com.dewdrop623.androidaescrypt.FileBrowsing.ui.MainActivity;
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.questiondialog.QuestionDialog;
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.questiondialog.TextOrCancelQuestionDialog;
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.questiondialog.YesNoQuestionDialog;
@@ -25,7 +26,6 @@ import com.dewdrop623.androidaescrypt.FileOperations.operator.folder.CreateFolde
 import com.dewdrop623.androidaescrypt.FileOperations.operator.folder.FolderCopyOperator;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.folder.FolderDeleteOperator;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.folder.FolderMoveOperator;
-import com.dewdrop623.androidaescrypt.FileBrowsing.ui.MainActivity;
 import com.dewdrop623.androidaescrypt.R;
 
 import java.io.File;

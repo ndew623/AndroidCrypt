@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:captionedimageview="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -26,11 +27,22 @@
                 />
         </LinearLayout>
 
+        <com.dewdrop623.androidaescrypt.FileBrowsing.ui.view.CaptionedImageButton
+            android:id="@+id/moveButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            captionedimageview:caption="@string/move"
+            captionedimageview:img_background="@drawable/circle_button_selecter"
+            captionedimageview:img_height_dp="40dp"
+            captionedimageview:img_src="@drawable/ic_move"
+            captionedimageview:img_width_dp="40dp"
+            />
+<!--
         <Button
             android:id="@+id/moveButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/move" />
+            android:text="@string/move" /> -->
 
         <Button
             android:id="@+id/renameButton"
