@@ -2,23 +2,33 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
-    <ImageView
-        android:id="@+id/captionedImageButtonBackImageView"
+
+    <RelativeLayout
+        android:id="@+id/captionedImageButtonImageViewsLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"/>
-    <ImageView
-        android:id="@+id/captionedImageButtonFrontImageView"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:layout_centerInParent="true"/>
+        android:layout_centerHorizontal="true">
+
+        <ImageView
+            android:id="@+id/captionedImageButtonBackImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+             />
+
+        <ImageView
+            android:id="@+id/captionedImageButtonFrontImageView"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_centerInParent="true"/>
+    </RelativeLayout>
+
     <TextView
         android:id="@+id/captionedImageButtonTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_below="@id/captionedImageButtonBackImageView"
-        android:layout_marginTop="4dp"
-        />
+        android:layout_below="@id/captionedImageButtonImageViewsLayout"
+        android:paddingTop=".3dp" />
 
 </RelativeLayout>

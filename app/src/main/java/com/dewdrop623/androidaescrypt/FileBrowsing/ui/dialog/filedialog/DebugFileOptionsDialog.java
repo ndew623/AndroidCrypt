@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.MainActivity;
+import com.dewdrop623.androidaescrypt.FileBrowsing.ui.view.CaptionedImageButton;
 import com.dewdrop623.androidaescrypt.R;
 
 /**
@@ -16,30 +17,30 @@ import com.dewdrop623.androidaescrypt.R;
  */
 
 public class DebugFileOptionsDialog extends FileDialog {
-    Button encryptButton;
-    Button decryptButton;
-    ImageButton copyButton;
-    //Button moveButton;
-    Button renameButton;
-    Button deleteButton;
-    Button addFavoriteButton;
-    Button removeFavoriteButton;
+    CaptionedImageButton encryptButton;
+    CaptionedImageButton decryptButton;
+    CaptionedImageButton copyButton;
+    CaptionedImageButton moveButton;
+    CaptionedImageButton renameButton;
+    CaptionedImageButton deleteButton;
+    CaptionedImageButton addFavoriteButton;
+    CaptionedImageButton removeFavoriteButton;
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         View view = inflateLayout(R.layout.dialogfragment_debug_file_options);
-        encryptButton = (Button) view.findViewById(R.id.encryptButton);
-        decryptButton = (Button) view.findViewById(R.id.decryptButton);
-        copyButton = (ImageButton) view.findViewById(R.id.copyButton);
-        //moveButton = (Button) view.findViewById(R.id.moveButton);
-        renameButton = (Button) view.findViewById(R.id.renameButton);
-        deleteButton = (Button) view.findViewById(R.id.deleteButton);
-        addFavoriteButton = (Button) view.findViewById(R.id.addFavoriteButton);
-        removeFavoriteButton = (Button) view.findViewById(R.id.removeFavoriteButton);
+        encryptButton = (CaptionedImageButton) view.findViewById(R.id.encryptButton);
+        decryptButton = (CaptionedImageButton) view.findViewById(R.id.decryptButton);
+        copyButton = (CaptionedImageButton) view.findViewById(R.id.copyButton);
+        moveButton = (CaptionedImageButton) view.findViewById(R.id.moveButton);
+        renameButton = (CaptionedImageButton) view.findViewById(R.id.renameButton);
+        deleteButton = (CaptionedImageButton) view.findViewById(R.id.deleteButton);
+        addFavoriteButton = (CaptionedImageButton) view.findViewById(R.id.addFavoriteButton);
+        removeFavoriteButton = (CaptionedImageButton) view.findViewById(R.id.removeFavoriteButton);
 
         encryptButton.setOnClickListener(buttonOnClickListener);
         decryptButton.setOnClickListener(buttonOnClickListener);
         copyButton.setOnClickListener(buttonOnClickListener);
-       // moveButton.setOnClickListener(buttonOnClickListener);
+        moveButton.setOnClickListener(buttonOnClickListener);
         renameButton.setOnClickListener(buttonOnClickListener);
         deleteButton.setOnClickListener(buttonOnClickListener);
         addFavoriteButton.setOnClickListener(buttonOnClickListener);
@@ -76,10 +77,10 @@ public class DebugFileOptionsDialog extends FileDialog {
             } else if (v.getId() == copyButton.getId()) {
                 fileViewer.copyFile(file);
                 dismiss();
-            }/* else if (v.getId() == moveButton.getId()) {
+            } else if (v.getId() == moveButton.getId()) {
                 fileViewer.moveFile(file);
                 dismiss();
-            } */else if (v.getId() == addFavoriteButton.getId()) {
+            } else if (v.getId() == addFavoriteButton.getId()) {
                 ((MainActivity)getActivity()).addFavorite(file.getAbsolutePath());
                 dismiss();
             } else if (v.getId() == removeFavoriteButton.getId()) {

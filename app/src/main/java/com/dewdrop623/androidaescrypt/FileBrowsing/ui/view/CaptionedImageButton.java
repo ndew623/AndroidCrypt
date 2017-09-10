@@ -15,6 +15,7 @@ import com.dewdrop623.androidaescrypt.R;
  */
 
 public class CaptionedImageButton extends RelativeLayout{
+    private static final float ICON_SCALE_FACTOR = 0.6f;
     private TextView textView;
     private ImageView frontImageView;
     private ImageView backImageView;
@@ -51,8 +52,8 @@ public class CaptionedImageButton extends RelativeLayout{
             textView.setText(attrArray.getString(R.styleable.CaptionedImageButton_caption));
 
             frontImageView.setImageDrawable(attrArray.getDrawable(R.styleable.CaptionedImageButton_img_src));
-            frontImageView.getLayoutParams().height = attrArray.getLayoutDimension(R.styleable.CaptionedImageButton_img_height_dp, ViewGroup.LayoutParams.WRAP_CONTENT);
-            frontImageView.getLayoutParams().width = attrArray.getLayoutDimension(R.styleable.CaptionedImageButton_img_width_dp, ViewGroup.LayoutParams.WRAP_CONTENT);
+            frontImageView.getLayoutParams().height = (int) (attrArray.getLayoutDimension(R.styleable.CaptionedImageButton_img_height_dp, ViewGroup.LayoutParams.WRAP_CONTENT)*ICON_SCALE_FACTOR);
+            frontImageView.getLayoutParams().width = (int) (attrArray.getLayoutDimension(R.styleable.CaptionedImageButton_img_width_dp, ViewGroup.LayoutParams.WRAP_CONTENT)*ICON_SCALE_FACTOR);
 
             backImageView.setImageDrawable(attrArray.getDrawable(R.styleable.CaptionedImageButton_img_background));
             backImageView.getLayoutParams().height = attrArray.getLayoutDimension(R.styleable.CaptionedImageButton_img_height_dp, ViewGroup.LayoutParams.WRAP_CONTENT);

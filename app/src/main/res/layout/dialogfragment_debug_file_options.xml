@@ -5,79 +5,64 @@
     android:layout_height="match_parent">
 
     <GridLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:columnCount="3">
-        <LinearLayout
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center_horizontal"
-            android:layout_gravity="center">
-        <ImageButton
+
+        <com.dewdrop623.androidaescrypt.FileBrowsing.ui.view.CaptionedImageButton
             android:id="@+id/copyButton"
-            android:background="@drawable/circle_button_selecter"
-            android:src="@drawable/ic_copy"
-            android:layout_width="40dp"
-            android:layout_height="40dp"/>
-            <TextView
-                android:text="@string/copy"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                />
-        </LinearLayout>
+            captionedimageview:caption="@string/copy"
+            captionedimageview:img_src="@drawable/ic_copy"
+            style="@style/FileOptionsCaptionedImageButton"
+            />
 
         <com.dewdrop623.androidaescrypt.FileBrowsing.ui.view.CaptionedImageButton
             android:id="@+id/moveButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             captionedimageview:caption="@string/move"
-            captionedimageview:img_background="@drawable/circle_button_selecter"
-            captionedimageview:img_height_dp="40dp"
             captionedimageview:img_src="@drawable/ic_move"
-            captionedimageview:img_width_dp="40dp"
+            style="@style/FileOptionsCaptionedImageButton"
             />
-<!--
-        <Button
-            android:id="@+id/moveButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/move" /> -->
 
-        <Button
-            android:id="@+id/renameButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/rename" />
-
-        <Button
+        <com.dewdrop623.androidaescrypt.FileBrowsing.ui.view.CaptionedImageButton
             android:id="@+id/deleteButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/delete" />
+            captionedimageview:caption="@string/delete"
+            captionedimageview:img_src="@drawable/ic_trash"
+            style="@style/FileOptionsCaptionedImageButton"
+            />
 
-        <Button
+        <com.dewdrop623.androidaescrypt.FileBrowsing.ui.view.CaptionedImageButton
+            android:id="@+id/renameButton"
+            captionedimageview:caption="@string/rename"
+            captionedimageview:img_src="@drawable/ic_cursor"
+            style="@style/FileOptionsCaptionedImageButton"
+            />
+
+        <com.dewdrop623.androidaescrypt.FileBrowsing.ui.view.CaptionedImageButton
             android:id="@+id/encryptButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/encrypt" />
+            captionedimageview:caption="@string/encrypt"
+            captionedimageview:img_src="@drawable/ic_lock"
+            style="@style/FileOptionsCaptionedImageButton"
+            />
 
-        <Button
+        <com.dewdrop623.androidaescrypt.FileBrowsing.ui.view.CaptionedImageButton
             android:id="@+id/decryptButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/decrypt" />
+            captionedimageview:caption="@string/decrypt"
+            captionedimageview:img_src="@drawable/ic_unlock"
+            style="@style/FileOptionsCaptionedImageButton"
+            />
 
-        <Button
+        <com.dewdrop623.androidaescrypt.FileBrowsing.ui.view.CaptionedImageButton
             android:id="@+id/addFavoriteButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/add_favorite" />
+            captionedimageview:caption="@string/add_favorite"
+            captionedimageview:img_src="@drawable/ic_star"
+            style="@style/FileOptionsCaptionedImageButton"
+            />
 
-        <Button
+        <com.dewdrop623.androidaescrypt.FileBrowsing.ui.view.CaptionedImageButton
             android:id="@+id/removeFavoriteButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/remove_favorite" />
+            captionedimageview:caption="@string/remove_favorite"
+            captionedimageview:img_src="@drawable/ic_star"
+            style="@style/FileOptionsCaptionedImageButton"
+            />
     </GridLayout>
 </ScrollView>
