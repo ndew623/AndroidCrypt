@@ -48,4 +48,6 @@
     <string name="close_favorites">Close favorites</string>
     <string name="remove_favorite">Remove Favorite</string>
     <string name="preappend_filename_does_not_exist">does not exist</string>
+    <string name="favorite">Favorite</string>
+    <string name="unfavorite">Unfavorite</string>
 </resources>
