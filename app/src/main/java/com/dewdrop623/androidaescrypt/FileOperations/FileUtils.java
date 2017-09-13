@@ -1,6 +1,7 @@
 package com.dewdrop623.androidaescrypt.FileOperations;
 
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileOperator;
@@ -188,6 +189,20 @@ public final class FileUtils {
         }
         return true;
     }
+
+    //get paths to external storage like sdcard and usb TODO only works above KITKAT right now. Also depends on app specific folders, may not find usb
+    public static ArrayList<String> getMountExternalStorageMountPoints(Context context) {
+        ArrayList<String> result = new ArrayList<>();
+        ///first item in array is /storage/emulated (no 0), other items are sdcard/usb/stuff
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            File[] externalFilesDirs = context.getExternalFilesDirs(null);
+            for (int i = 1; i < externalFilesDirs.length; i++) {
+                result.add(FileUtils.getMountPointContainingFile(externalFilesDirs[i]).getAbsolutePath());
+            }
+        }
+        return result;
+    }
+
     public static ArrayList<String> getMountPoints() {
         Runtime runtime = Runtime.getRuntime();
         String command = "mount";

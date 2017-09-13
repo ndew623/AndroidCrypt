@@ -50,4 +50,5 @@
     <string name="preappend_filename_does_not_exist">does not exist</string>
     <string name="favorite">Favorite</string>
     <string name="unfavorite">Unfavorite</string>
+    <string name="mountpoints">Mountpoints</string>
 </resources>

@@ -20,6 +20,7 @@ import android.support.v4.util.ArraySet;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,11 +29,13 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.filedialog.DebugFileOptionsDialog;
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.filedialog.FileDialog;
+import com.dewdrop623.androidaescrypt.FileOperations.FileUtils;
 import com.dewdrop623.androidaescrypt.R;
 
 import java.io.File;
@@ -46,6 +49,10 @@ public class MainActivity extends AppCompatActivity {
     private static final String SHARED_PREFERENCES_FAVORITE_STRING_SET = "com.dewdrop623.androidaescrypt.FileBrowsing.ui.MainActivity.SHARED_PREFERENCES_FAVORITE_STRING_SET";
     private static final int WRITE_FILE_PERMISSION_REQUEST_CODE = 654;
 
+    //pass these into the FavoritesDrawerArrayAdapter to get titles in the list
+    private static final String MOUNT_POINTS_TITLE_MAGIC_VALUE = "com.dewdrop623.androidaescrypt.FileBrowsing.ui.MainActivity.MOUNT_POINTS_TITLE_MAGIC_VALUE.DKixODTLz\"ABSans('pCQ`udAaJFTcRl6`/*:l>X`;,oIQy75{#U+38o=qR%8)\"";
+    private static final String FAVORITES_TITLE_MAGIC_VALUE = "com.dewdrop623.androidaescrypt.FileBrowsing.ui.MainActivity.FAVORITES_TITLE_MAGIC_VALUE.T6g#eG?ZvfeS]F:cFhe5[:d{zg@o$N|f)i)SV`.5@)_$z=--b8epNmaw!DWg$e;";
+
     private ActionBarDrawerToggle drawerToggle;
     private FavoritesDrawerArrayAdapter arrayAdapter;
 
@@ -55,11 +62,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //TODO put sdcard directory somewhere in ui
-        ///first item in array is /storage/emulated (no 0), other items are sdcard/usb/stuff
-        //for (File file : getExternalFilesDirs(null)) {
-        //    Log.e("EFD", FileUtils.getMountPointContainingFile(file).getAbsolutePath());
-        //}
 
         setContentView(R.layout.activity_main);
         checkPermissions();
@@ -117,20 +119,25 @@ public class MainActivity extends AppCompatActivity {
     ListView.OnItemClickListener favoritesDrawerOnItemClickListener = new ListView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
-            File file = new File(arrayAdapter.getItem(i));
-            if (file.isDirectory()) {
-                fileViewer.changePath(file);
-            } else {
-                openOptionsDialog(file, fileViewer);
+            String item = arrayAdapter.getItem(i);
+            if (!(item.equals(MOUNT_POINTS_TITLE_MAGIC_VALUE) || item.equals(FAVORITES_TITLE_MAGIC_VALUE))) {
+                File file = new File(item);
+                if (file.isDirectory()) {
+                    fileViewer.changePath(file);
+                } else {
+                    openOptionsDialog(file, fileViewer);
+                }
             }
         }
     };
     ListView.OnItemLongClickListener favoritesDrawerOnItemLongClickListener = new ListView.OnItemLongClickListener() {
         @Override
         public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-            File file = new File(arrayAdapter.getItem(i));
-            openOptionsDialog(file, fileViewer);
+            String item = arrayAdapter.getItem(i);
+            if (!(item.equals(MOUNT_POINTS_TITLE_MAGIC_VALUE) || item.equals(FAVORITES_TITLE_MAGIC_VALUE))) {
+                File file = new File(item);
+                openOptionsDialog(file, fileViewer);
+            }
             return true;
         }
     };
@@ -227,10 +234,18 @@ public class MainActivity extends AppCompatActivity {
     /*
      * PRIVATE METHODS
      * */
+
     //refresh the favorites drawer to display the current favorites
     private void refreshFavoritesDrawerData() {
+        ArrayList<String> mountpoints = FileUtils.getMountExternalStorageMountPoints(this);
         String[] favorites = getFavoritesSet(getSharedPreferencesFavoritesFile()).toArray(new String[]{});
+
         arrayAdapter.clear();
+        if (!mountpoints.isEmpty()) {
+            arrayAdapter.add(MOUNT_POINTS_TITLE_MAGIC_VALUE);
+            arrayAdapter.addAll(mountpoints);
+            arrayAdapter.add(FAVORITES_TITLE_MAGIC_VALUE);
+        }
         arrayAdapter.addAll(favorites);
         arrayAdapter.notifyDataSetChanged();
     }
@@ -308,11 +323,24 @@ public class MainActivity extends AppCompatActivity {
         @NonNull
         @Override
         public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-            if (convertView == null) {
+
+            ///Magic value passed in, return a title in the list
+            String item = getItem(position);
+            if (item.equals(MOUNT_POINTS_TITLE_MAGIC_VALUE) || item.equals(FAVORITES_TITLE_MAGIC_VALUE)) {
+                TextView title = new TextView(context);
+                if (item.equals(MOUNT_POINTS_TITLE_MAGIC_VALUE)) {
+                    title.setText(R.string.mountpoints);
+                } else if (item.equals(FAVORITES_TITLE_MAGIC_VALUE)) {
+                    title.setText(R.string.favorites);
+                }
+                return title;
+            }
+
+            if (convertView == null || convertView instanceof TextView) {
                 convertView = ((LayoutInflater)context.getSystemService(LAYOUT_INFLATER_SERVICE)).inflate(listItemResource, parent, false);
             }
 
-            File file = new File(getItem(position));
+            File file = new File(item);
             ImageView favoritesListItemImageView = (ImageView) convertView.findViewById(R.id.favoritesListItemImageView);
             TextView favoritesListItemTextView = (TextView) convertView.findViewById(R.id.favoritesListItemTextView);
 
