@@ -53,12 +53,20 @@ public class FileModifierService extends Service {
         stackBuilder.addNextIntent(resultIntent);
         PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(operationProgressId, PendingIntent.FLAG_UPDATE_CURRENT);
 
+        //TODO unfinished code to put a cancel button in intent
+        Intent cancelIntent = new Intent(this, FileModifierService.class);
+        PendingIntent cancelPendingIntent = PendingIntent.getService(this, operationProgressId, cancelIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        ///////////////////////////
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this).setSmallIcon(android.R.drawable.ic_menu_info_details)
                 .setContentTitle(getString(R.string.app_name))
                 .setContentText(getString(R.string.operation_in_progress))
-                .setContentIntent(resultPendingIntent);
+                .setContentIntent(resultPendingIntent)
+                .addAction(R.drawable.ic_cancel, getString(R.string.cancel), cancelPendingIntent);//TODO unfinished code to put a cancel button in intent
         startForeground(operationProgressId, builder.build());
     }
+
+
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -160,4 +168,5 @@ public class FileModifierService extends Service {
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(operationProgressId, builder.build());
     }
+
 }

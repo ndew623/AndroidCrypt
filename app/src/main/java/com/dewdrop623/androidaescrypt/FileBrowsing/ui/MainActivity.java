@@ -107,9 +107,9 @@ public class MainActivity extends AppCompatActivity {
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.add(R.id.mainActivityFrameLayout, fileViewer);
             fragmentTransaction.commit();
-        } else {
+        } else if (fileViewer == null) {
             //the fragment is not new. the screen probably just rotated. find the old fragment from the stack from the id in its layout and update our member variable reference to it
-            fileViewer = (FileViewer) fragmentManager.findFragmentById(R.id.mainActivityFrameLayout);
+            refreshFileViewerReferenceWithLayoutID(fragmentManager);
         }
     }
 
@@ -167,6 +167,15 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, new String[] {android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_FILE_PERMISSION_REQUEST_CODE);
             recreate();
         }
+    }
+
+    //return a reference to the current FileViewer fragment
+    public FileViewer getFileViewer() {
+        //check if fileView is null. if it is, try to get it with its layout id from fragment manager (usually used after a screen rotation)
+        if (fileViewer == null) {
+            refreshFileViewerReferenceWithLayoutID(getSupportFragmentManager());
+        }
+        return fileViewer;
     }
 
     //show the given dialog fragment
@@ -235,6 +244,12 @@ public class MainActivity extends AppCompatActivity {
      * PRIVATE METHODS
      * */
 
+
+    //reset the fileViewer member variable (e.g. after a screen rotation)
+    private void refreshFileViewerReferenceWithLayoutID(FragmentManager fragmentManager) {
+        fileViewer = (FileViewer) fragmentManager.findFragmentById(R.id.mainActivityFrameLayout);
+    }
+
     //refresh the favorites drawer to display the current favorites
     private void refreshFavoritesDrawerData() {
         ArrayList<String> mountpoints = FileUtils.getMountExternalStorageMountPoints(this);
@@ -259,7 +274,7 @@ public class MainActivity extends AppCompatActivity {
     private void setFavoritesStringSet(Set<String> favorites, SharedPreferences sharedPreferences) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putStringSet(SHARED_PREFERENCES_FAVORITE_STRING_SET, favorites);
-        editor.commit();
+        editor.apply();
         refreshFavoritesDrawerData();
     }
 

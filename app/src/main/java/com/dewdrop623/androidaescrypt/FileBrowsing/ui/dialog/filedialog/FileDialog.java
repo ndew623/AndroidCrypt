@@ -30,6 +30,11 @@ public class FileDialog extends DialogFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initFromArguments();
+
+        //FileDialog was recreated (probably a screen rotation) so we need to get the reference to fileViewer back
+        if (savedInstanceState!=null) {
+            fileViewer = ((MainActivity)getActivity()).getFileViewer();
+        }
     }
 
     private void initFromArguments() {
