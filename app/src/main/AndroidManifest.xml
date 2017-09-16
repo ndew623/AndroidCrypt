@@ -41,6 +41,8 @@
             android:name=".FileBrowsing.ui.dialog.questiondialog.TextOrCancelQuestionDialog"
             android:label="TextOrCancelQuestionDialog"
             android:theme="@style/DialogTheme"/>
+        <activity android:name=".FileBrowsing.ui.dialog.FileOperationDialog"
+            android:theme="@style/DialogTheme" />
     </application>
 
 </manifest>

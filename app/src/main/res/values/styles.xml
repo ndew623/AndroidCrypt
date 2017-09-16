@@ -12,13 +12,9 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
-    <style name="DialogButton" parent="Widget.AppCompat.Button">
+    <style name = "DialogButton" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
         <item name = "android:layout_width">wrap_content</item>
         <item name = "android:layout_height">wrap_content</item>
-        <item name = "android:padding">3dp</item>
-        <item name = "android:background">@android:color/white</item>
-        <item name = "android:textColor">@color/colorAccent</item>
-        <item name = "android:shadowRadius">0</item>
     </style>
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>

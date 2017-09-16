@@ -1,4 +1,4 @@
-package com.dewdrop623.androidaescrypt.FileBrowsing.ui;
+package com.dewdrop623.androidaescrypt.FileBrowsing.ui.fileviewer;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.ImageButton;
 
 import com.dewdrop623.androidaescrypt.FileBrowsing.FileBrowser;
+import com.dewdrop623.androidaescrypt.FileBrowsing.ui.MainActivity;
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.filedialog.DebugCreateDirectoryDialog;
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.filedialog.FileDialog;
 import com.dewdrop623.androidaescrypt.FileOperations.FileModifierService;
@@ -22,9 +23,9 @@ import java.io.File;
 
 public abstract class FileViewer extends Fragment{
 
-    protected static final String MOVE_STATE_KEY = "com.dewdrop623.androidaescrypt.FileBrowsing.ui.FileViewer.MOVE_STATE_KEY";
-    protected static final String MOVE_COPY_FILE_KEY = "com.dewdrop623.androidaescrypt.FileBrowsing.ui.FileViewer.MOVE_COPY_FILE_KEY";
-    protected static final String CURRENT_DIRECTORY_KEY = "com.dewdrop623.androidaescrypt.FileBrowsing.ui.FileViewer.CURRENT_DIRECTORY_KEY";
+    protected static final String MOVE_STATE_KEY = "com.dewdrop623.androidaescrypt.FileBrowsing.ui.fileviewer.FileViewer.MOVE_STATE_KEY";
+    protected static final String MOVE_COPY_FILE_KEY = "com.dewdrop623.androidaescrypt.FileBrowsing.ui.fileviewer.FileViewer.MOVE_COPY_FILE_KEY";
+    protected static final String CURRENT_DIRECTORY_KEY = "com.dewdrop623.androidaescrypt.FileBrowsing.ui.fileviewer.FileViewer.CURRENT_DIRECTORY_KEY";
 
     protected Bundle savedInstanceState = null;
 

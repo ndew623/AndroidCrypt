@@ -7,7 +7,7 @@ import android.os.FileObserver;
 import android.os.Handler;
 import android.os.Looper;
 
-import com.dewdrop623.androidaescrypt.FileBrowsing.ui.FileViewer;
+import com.dewdrop623.androidaescrypt.FileBrowsing.ui.fileviewer.FileViewer;
 import com.dewdrop623.androidaescrypt.FileOperations.FileModifierService;
 
 import java.io.File;

@@ -11,7 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 
-import com.dewdrop623.androidaescrypt.FileBrowsing.ui.FileViewer;
+import com.dewdrop623.androidaescrypt.FileBrowsing.ui.fileviewer.FileViewer;
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.MainActivity;
 import com.dewdrop623.androidaescrypt.R;
 

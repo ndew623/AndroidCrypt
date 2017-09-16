@@ -1,4 +1,4 @@
-package com.dewdrop623.androidaescrypt.FileBrowsing.ui;
+package com.dewdrop623.androidaescrypt.FileBrowsing.ui.fileviewer;
 
 import android.content.Context;
 import android.os.Bundle;

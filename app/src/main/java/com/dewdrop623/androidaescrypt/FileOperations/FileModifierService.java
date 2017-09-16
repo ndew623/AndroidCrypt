@@ -1,5 +1,6 @@
 package com.dewdrop623.androidaescrypt.FileOperations;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -12,7 +13,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.widget.Toast;
 
-import com.dewdrop623.androidaescrypt.FileBrowsing.ui.MainActivity;
+import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.FileOperationDialog;
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.questiondialog.QuestionDialog;
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.questiondialog.TextOrCancelQuestionDialog;
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.questiondialog.YesNoQuestionDialog;
@@ -22,6 +23,7 @@ import com.dewdrop623.androidaescrypt.FileOperations.operator.AESCryptEncryptFil
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileCopyOperator;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileDeleteOperator;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileMoveOperator;
+import com.dewdrop623.androidaescrypt.FileOperations.operator.FileOperator;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.folder.CreateFolderOperator;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.folder.FolderCopyOperator;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.folder.FolderDeleteOperator;
@@ -29,55 +31,43 @@ import com.dewdrop623.androidaescrypt.FileOperations.operator.folder.FolderMoveO
 import com.dewdrop623.androidaescrypt.R;
 
 import java.io.File;
+import java.util.HashMap;
 
 public class FileModifierService extends Service {
 
     public static final String FILEMODIFIERSERVICE_ARGS = "com.dewdrop623.androidaescrypt.FileOperations.FileModifierService.FILEMODIFIERSERVICE_ARGS";
     public static final String FILEMODIFIERSERVICE_FILE = "com.dewdrop623.androidaescrypt.FileOperations.FileModifierService.FILEMODIFIERSERVICE_FILE";
     public static final String FILEMODIFIERSERVICE_OPERATIONTYPE = "com.dewdrop623.androidaescrypt.FileOperations.FileModifierService.FILEMODIFIERSERVICE_OPERATIONTYPE";
-    public static int nextOperationProgressId = 1;
+    public static final String OPERATION_ID_ARG = "com.dewdrop623.androidaescrypt.FileOperations.FileModifierService.OPERATION_ID_ARG";
+    public static int nextOperationId = 1;
+    private static HashMap<Integer, FileOperator> currentFileOperators = new HashMap<>();
     private int fileOperationType = -1;
     private Bundle args;
     private File file;
-    private int operationProgressId;
+    private int operationId;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        operationProgressId = nextOperationProgressId;
-        nextOperationProgressId++;
+        operationId = nextOperationId;
+        nextOperationId++;
         //do in foreground so Android doesn't stop this service
-        Intent resultIntent = new Intent(this, MainActivity.class);
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-        stackBuilder.addParentStack(MainActivity.class);
-        stackBuilder.addNextIntent(resultIntent);
-        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(operationProgressId, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        //TODO unfinished code to put a cancel button in intent
-        Intent cancelIntent = new Intent(this, FileModifierService.class);
-        PendingIntent cancelPendingIntent = PendingIntent.getService(this, operationProgressId, cancelIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        ///////////////////////////
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this).setSmallIcon(android.R.drawable.ic_menu_info_details)
-                .setContentTitle(getString(R.string.app_name))
-                .setContentText(getString(R.string.operation_in_progress))
-                .setContentIntent(resultPendingIntent)
-                .addAction(R.drawable.ic_cancel, getString(R.string.cancel), cancelPendingIntent);//TODO unfinished code to put a cancel button in intent
-        startForeground(operationProgressId, builder.build());
+        startForeground(operationId, buildNotification(false, 0));
     }
-
-
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         args = intent.getBundleExtra(FILEMODIFIERSERVICE_ARGS);
-        file = new File(args.getString(FILEMODIFIERSERVICE_FILE));
+        file = new File(args.getString(FILEMODIFIERSERVICE_FILE,""));
         fileOperationType = args.getInt(FILEMODIFIERSERVICE_OPERATIONTYPE);
+        FileOperator fileOperator;
         if (file.isDirectory()) {
-            folderOperation();
+            fileOperator = folderOperation();
         } else {
-            fileOperation();
+            fileOperator = fileOperation();
         }
+        currentFileOperators.put(operationId, fileOperator);
+        fileOperator.run();
         return START_STICKY;
     }
 
@@ -86,44 +76,56 @@ public class FileModifierService extends Service {
         // TODO: Return the communication channel to the service.
         throw new UnsupportedOperationException("Not yet implemented");
     }
-    private void fileOperation() {
+    //cancels the operator with the given id. return value is whether or not the operation still existed to be canceled
+    public static boolean cancelOperator(int operationId) {
+        boolean exists = currentFileOperators.containsKey(operationId);
+        if (exists) {
+            currentFileOperators.get(operationId).cancelOperation();
+        }
+        return exists;
+    }
+    private FileOperator fileOperation() {
+        FileOperator result = null;
         switch (fileOperationType) {
             case FileOperationType.DELETE:
-                new FileDeleteOperator(file, args, this).run();
+                result = new FileDeleteOperator(file, args, this);
                 break;
             case FileOperationType.ENCRYPT:
-                new AESCryptEncryptFileOperator(file, args, this).run();
+                result = new AESCryptEncryptFileOperator(file, args, this);
                 break;
             case FileOperationType.DECRYPT:
-                new AESCryptDecryptFileOperator(file, args, this).run();
+                result = new AESCryptDecryptFileOperator(file, args, this);
                 break;
             case FileOperationType.MOVE:
-                new FileMoveOperator(file, args, this).run();
+                result = new FileMoveOperator(file, args, this);
                 break;
             case FileOperationType.COPY:
-                new FileCopyOperator(file, args, this).run();
+                result = new FileCopyOperator(file, args, this);
                 break;
             default:
                 break;
         }
+        return result;
     }
-    private void folderOperation() {
+    private FileOperator folderOperation() {
+        FileOperator result = null;
         switch (fileOperationType) {
             case FileOperationType.CREATE_FOLDER:
-                new CreateFolderOperator(file, args, this).run();
+                result = new CreateFolderOperator(file, args, this);
                 break;
             case FileOperationType.DELETE:
-                new FolderDeleteOperator(file, args, this).run();
+                result = new FolderDeleteOperator(file, args, this);
                 break;
             case FileOperationType.MOVE:
-                new FolderMoveOperator(file, args, this).run();
+                result = new FolderMoveOperator(file, args, this);
                 break;
             case FileOperationType.COPY:
-                new FolderCopyOperator(file, args, this).run();
+                result = new FolderCopyOperator(file, args, this);
                 break;
             default:
                 break;
         }
+        return result;
     }
     public void askYesNo(String question) {
         Intent intent = new Intent(this, YesNoQuestionDialog.class);
@@ -152,21 +154,34 @@ public class FileModifierService extends Service {
         });
     }
     public void updateNotification(int progress) {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this).setSmallIcon(android.R.drawable.ic_menu_edit)
-                .setContentTitle(getString(R.string.progress));
-        if (progress == 100) {
-            builder.setContentText(getString(R.string.done));
-        } else {
-            builder.setProgress(100, progress, false);
-        }
-        Intent resultIntent = new Intent(this, MainActivity.class);
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-        stackBuilder.addParentStack(MainActivity.class);
-        stackBuilder.addNextIntent(resultIntent);
-        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(operationProgressId, PendingIntent.FLAG_UPDATE_CURRENT);
-        builder.setContentIntent(resultPendingIntent);
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(operationProgressId, builder.build());
+        notificationManager.notify(operationId, buildNotification(true, progress));
+    }
+    private Notification buildNotification(boolean hasProgress, int progress) {
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+
+        Intent resultIntent = new Intent(this, FileOperationDialog.class);
+        resultIntent.putExtra(FileModifierService.OPERATION_ID_ARG, operationId);
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        stackBuilder.addParentStack(FileOperationDialog.class);
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(operationId, PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(resultPendingIntent);
+
+        if (hasProgress) {
+            builder.setSmallIcon(android.R.drawable.ic_menu_edit)
+                    .setContentTitle(getString(R.string.progress));
+            if (progress == 100) {
+                builder.setContentText(getString(R.string.done));
+            } else {
+                builder.setProgress(100, progress, false);
+            }
+        } else {
+            builder.setContentTitle(getString(R.string.app_name))
+                    .setContentText(getString(R.string.operation_in_progress));
+        }
+        return builder.build();
     }
 
 }

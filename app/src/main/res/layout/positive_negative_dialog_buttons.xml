@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:gravity="right"
+    android:gravity="end"
     android:padding="16dp"
     tools:context="com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.questiondialog.QuestionDialog">
     <Button
@@ -13,5 +13,6 @@
     <Button
         android:id="@+id/positiveButton"
         style="@style/DialogButton"
-        android:layout_marginRight="6dp"/>
+        android:layout_marginRight="6dp"
+        android:layout_marginEnd="6dp"/>
 </LinearLayout>
