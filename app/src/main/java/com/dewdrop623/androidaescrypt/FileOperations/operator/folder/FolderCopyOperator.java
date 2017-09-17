@@ -6,6 +6,7 @@ import com.dewdrop623.androidaescrypt.FileOperations.FileModifierService;
 import com.dewdrop623.androidaescrypt.FileOperations.FileUtils;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileCopyOperator;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileOperator;
+import com.dewdrop623.androidaescrypt.R;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -24,6 +25,11 @@ public class FolderCopyOperator extends FileOperator{
 
     public FolderCopyOperator(File file, Bundle args, FileModifierService fileModifierService) {
         super(file, args, fileModifierService);
+    }
+
+    @Override
+    public String getOperationName() {
+        return fileModifierService.getString(R.string.copying)+" "+file.getName();
     }
 
     @Override

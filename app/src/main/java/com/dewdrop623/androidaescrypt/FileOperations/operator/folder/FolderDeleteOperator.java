@@ -22,6 +22,11 @@ public class FolderDeleteOperator extends FileOperator{
     }
 
     @Override
+    public String getOperationName() {
+        return fileModifierService.getString(R.string.deleting)+" "+file.getName();
+    }
+
+    @Override
     protected void initMemVarFromArgs() {
 
     }

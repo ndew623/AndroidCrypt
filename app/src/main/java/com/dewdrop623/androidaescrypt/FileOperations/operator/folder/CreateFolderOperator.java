@@ -24,6 +24,11 @@ public class CreateFolderOperator extends FileOperator {
     }
 
     @Override
+    public String getOperationName() {
+        return fileModifierService.getString(R.string.creating_folder)+" "+file.getName();
+    }
+
+    @Override
     public void doOperation() {
         outputFile.mkdir();
         fileModifierService.updateNotification(100);

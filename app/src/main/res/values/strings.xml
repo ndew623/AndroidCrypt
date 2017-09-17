@@ -1,10 +1,13 @@
 <resources>
     <string name="app_name">Android AESCrypt</string>
     <string name="delete">Delete</string>
+    <string name="deleting">Deleting</string>
     <string name="cancel">Cancel</string>
     <string name="create_folder">Create Folder</string>
+    <string name="creating_folder">Creating Folder</string>
     <string name="create">Create</string>
     <string name="encrypt">Encrypt</string>
+    <string name="encrypting">Encrypting</string>
     <string name="ok">Ok</string>
     <string name="enter_password">Enter password</string>
     <string name="confirm_password">Confirm password</string>
@@ -14,11 +17,15 @@
     <string name="file_name">File name</string>
     <string name="password">Password</string>
     <string name="decrypt">Decrypt</string>
+    <string name="decrypting">Decrypting</string>
     <string name="move_here">Move Here</string>
     <string name="copy_here">Copy Here</string>
     <string name="copy">Copy</string>
     <string name="move">Move</string>
     <string name="rename">Rename</string>
+    <string name="copying">Copying</string>
+    <string name="moving">Moving</string>
+    <string name="renaming">Renaming</string>
     <string name="title_activity_question_dialog">QuestionDialog</string>
     <string name="no">No</string>
     <string name="yes">Yes</string>
@@ -51,4 +58,6 @@
     <string name="favorite">Favorite</string>
     <string name="unfavorite">Unfavorite</string>
     <string name="mountpoints">Mountpoints</string>
+    <string name="file_operation">File operation</string>
+    <string name="stop">Stop</string>
 </resources>

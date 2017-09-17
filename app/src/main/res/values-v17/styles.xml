@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="DefaultDialogTitle" parent="TextAppearance.AppCompat.Title">
+        <item name="android:layout_marginTop">6dip</item>
+        <item name="android:layout_marginBottom">9dip</item>
+        <item name="android:layout_marginRight">10dip</item>
+        <item name="android:layout_marginStart">10dip</item>
+        <item name="android:layout_marginLeft">10dip</item>
+        <item name="android:layout_marginEnd">10dip</item>
+    </style>
+</resources>

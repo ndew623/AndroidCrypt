@@ -27,6 +27,11 @@ public class FileMoveOperator extends FileOperator {
     }
 
     @Override
+    public String getOperationName() {
+        return fileModifierService.getString(R.string.moving)+" "+file.getName();
+    }
+
+    @Override
     protected void initMemVarFromArgs() {
         outputFileName = args.getString(FILE_NEW_NAME_ARG, file.getName());
         outputFile = new File(args.getString(FILE_MOVE_DESTINATION_ARG)+"/"+outputFileName);

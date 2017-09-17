@@ -3,6 +3,7 @@ package com.dewdrop623.androidaescrypt.FileOperations.operator;
 import android.os.Bundle;
 
 import com.dewdrop623.androidaescrypt.FileOperations.FileModifierService;
+import com.dewdrop623.androidaescrypt.R;
 
 import java.io.File;
 import java.util.Stack;
@@ -24,6 +25,10 @@ public abstract class FileOperator{
         this.file = file;
         this.args = args;
         this.fileModifierService = fileModifierService;
+    }
+
+    public String getOperationName() {
+        return fileModifierService.getString(R.string.file_operation);
     }
 
     public void run() {

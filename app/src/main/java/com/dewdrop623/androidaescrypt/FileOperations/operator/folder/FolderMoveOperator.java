@@ -30,6 +30,11 @@ public class FolderMoveOperator extends FileOperator {
     }
 
     @Override
+    public String getOperationName() {
+        return fileModifierService.getString(R.string.moving)+" "+file.getName();
+    }
+
+    @Override
     protected void initMemVarFromArgs() {
         destinationName = args.getString(FileMoveOperator.FILE_NEW_NAME_ARG, file.getName());
         destination = new File(args.getString(FileMoveOperator.FILE_MOVE_DESTINATION_ARG)+"/"+destinationName);

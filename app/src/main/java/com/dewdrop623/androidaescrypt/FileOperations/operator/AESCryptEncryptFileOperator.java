@@ -41,6 +41,11 @@ public class AESCryptEncryptFileOperator extends FileOperator {
     }
 
     @Override
+    public String getOperationName() {
+        return fileModifierService.getString(R.string.encrypting)+" "+file.getName();
+    }
+
+    @Override
     protected void initMemVarFromArgs() {
         outputFile = new File(file.getParent()+"/"+args.getString(AESCRYPT_FILE_OPERATOR_FILENAME_ARGUMENT));
     }

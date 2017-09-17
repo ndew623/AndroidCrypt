@@ -39,6 +39,7 @@ public class FileModifierService extends Service {
     public static final String FILEMODIFIERSERVICE_FILE = "com.dewdrop623.androidaescrypt.FileOperations.FileModifierService.FILEMODIFIERSERVICE_FILE";
     public static final String FILEMODIFIERSERVICE_OPERATIONTYPE = "com.dewdrop623.androidaescrypt.FileOperations.FileModifierService.FILEMODIFIERSERVICE_OPERATIONTYPE";
     public static final String OPERATION_ID_ARG = "com.dewdrop623.androidaescrypt.FileOperations.FileModifierService.OPERATION_ID_ARG";
+    public static final String OPERATION_NAME_ARG = "com.dewdrop623.androidaescrypt.FileOperations.FileModifierService.OPERATION_NAME_ARG";
     public static int nextOperationId = 1;
     private static HashMap<Integer, FileOperator> currentFileOperators = new HashMap<>();
     private int fileOperationType = -1;
@@ -162,7 +163,12 @@ public class FileModifierService extends Service {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
 
         Intent resultIntent = new Intent(this, FileOperationDialog.class);
+
         resultIntent.putExtra(FileModifierService.OPERATION_ID_ARG, operationId);
+        if (currentFileOperators.containsKey(operationId)) {
+            resultIntent.putExtra(FileModifierService.OPERATION_NAME_ARG, currentFileOperators.get(operationId).getOperationName());
+        }
+
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
         stackBuilder.addParentStack(FileOperationDialog.class);
         stackBuilder.addNextIntent(resultIntent);

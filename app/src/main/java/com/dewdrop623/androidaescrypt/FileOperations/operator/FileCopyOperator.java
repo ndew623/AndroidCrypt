@@ -27,6 +27,11 @@ public class FileCopyOperator extends FileOperator {
     }
 
     @Override
+    public String getOperationName() {
+        return fileModifierService.getString(R.string.copying)+" "+file.getName();
+    }
+
+    @Override
     protected void initMemVarFromArgs() {
         outputFile = new File(args.getString(FILE_COPY_DESTINATION_ARG) + "/" + file.getName());
     }
