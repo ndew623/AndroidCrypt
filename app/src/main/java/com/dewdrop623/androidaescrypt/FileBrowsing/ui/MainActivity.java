@@ -40,7 +40,10 @@ import com.dewdrop623.androidaescrypt.R;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
@@ -116,7 +119,13 @@ public class MainActivity extends AppCompatActivity {
     /*
     * ANONYMOUS CLASSES
     * */
-    ListView.OnItemClickListener favoritesDrawerOnItemClickListener = new ListView.OnItemClickListener() {
+    private Comparator<String> fileStringAlphabeticalComparator = new Comparator<String>() {
+        @Override
+        public int compare(String s, String t1) {
+            return new File(s).getName().toLowerCase().compareTo(new File(t1).getName().toLowerCase());
+        }
+    };
+    private ListView.OnItemClickListener favoritesDrawerOnItemClickListener = new ListView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
             String item = arrayAdapter.getItem(i);
@@ -130,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
-    ListView.OnItemLongClickListener favoritesDrawerOnItemLongClickListener = new ListView.OnItemLongClickListener() {
+    private ListView.OnItemLongClickListener favoritesDrawerOnItemLongClickListener = new ListView.OnItemLongClickListener() {
         @Override
         public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
             String item = arrayAdapter.getItem(i);
@@ -253,7 +262,10 @@ public class MainActivity extends AppCompatActivity {
     //refresh the favorites drawer to display the current favorites
     private void refreshFavoritesDrawerData() {
         ArrayList<String> mountpoints = FileUtils.getMountExternalStorageMountPoints(this);
-        String[] favorites = getFavoritesSet(getSharedPreferencesFavoritesFile()).toArray(new String[]{});
+        ArrayList<String> favorites = new ArrayList<>(Arrays.asList(getFavoritesSet(getSharedPreferencesFavoritesFile()).toArray(new String[]{})));
+
+        Collections.sort(mountpoints, fileStringAlphabeticalComparator);
+        Collections.sort(favorites, fileStringAlphabeticalComparator);
 
         arrayAdapter.clear();
         if (!mountpoints.isEmpty()) {
@@ -261,6 +273,7 @@ public class MainActivity extends AppCompatActivity {
             arrayAdapter.addAll(mountpoints);
             arrayAdapter.add(FAVORITES_TITLE_MAGIC_VALUE);
         }
+
         arrayAdapter.addAll(favorites);
         arrayAdapter.notifyDataSetChanged();
     }
@@ -379,5 +392,4 @@ public class MainActivity extends AppCompatActivity {
             return ResourcesCompat.getDrawable(getResources(), id, null);
         }
     }
-
 }

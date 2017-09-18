@@ -16,6 +16,11 @@ import com.dewdrop623.androidaescrypt.FileOperations.operator.FileCopyOperator;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileMoveOperator;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * intended to be extended by other file viewers, each with a different UI for file browsing
@@ -41,6 +46,12 @@ public abstract class FileViewer extends Fragment{
 
     protected File[] fileList;
     protected FileBrowser fileBrowser;
+    private Comparator<File> fileObjectAlphabeticalComparator = new Comparator<File>() {
+        @Override
+        public int compare(File file, File t1) {
+            return file.getName().toLowerCase().compareTo(t1.getName().toLowerCase());
+        }
+    };
 
     protected void createFolder() {
         DebugCreateDirectoryDialog debugCreateDirectoryDialog = new DebugCreateDirectoryDialog();
@@ -111,6 +122,13 @@ public abstract class FileViewer extends Fragment{
     final protected void setButtonListeners() {
         moveCopyButton.setOnClickListener(moveCopyButtonOnClickListener);
         cancelMoveCopyButton.setOnClickListener(cancelMoveCopyButtonOnClickListener);
+    }
+
+    //sort the fileList member variable alphabetically
+    final protected void sortFileList() {
+        List<File> fileListObjects=Arrays.asList(fileList);
+        Collections.sort(fileListObjects, fileObjectAlphabeticalComparator);
+        fileList= (File[]) fileListObjects.toArray();
     }
     //methods that sublass can override, but should call super
     public void setFileList(File[] fileList) {

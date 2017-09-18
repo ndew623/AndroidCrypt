@@ -125,6 +125,7 @@ public class IconFileViewer extends FileViewer {
         if (!fileBrowser.getCurrentPath().equals(new File("/")) /* || ! fileBrowser.getCurrentPath().getAbsolutePath().equals(FileBrowser.topLevelInternal.getAbsolutePath())*/) { //uncomment to prevent navigating from /sdcard to root
             fileGridAdapter.add(FileBrowser.parentDirectory);
         }
+        sortFileList();
         fileGridAdapter.addAll(fileList);
         fileGridAdapter.notifyDataSetChanged();
     }
