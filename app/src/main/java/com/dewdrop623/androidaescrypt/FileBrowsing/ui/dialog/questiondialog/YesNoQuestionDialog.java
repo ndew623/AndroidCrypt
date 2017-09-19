@@ -1,6 +1,7 @@
 package com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.questiondialog;
 
 import android.os.Bundle;
+import android.view.Window;
 
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileOperator;
 import com.dewdrop623.androidaescrypt.R;
@@ -12,8 +13,8 @@ import com.dewdrop623.androidaescrypt.R;
 public class YesNoQuestionDialog extends QuestionDialog {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         setContentView(R.layout.positive_negative_dialog_buttons);
+        super.onCreate(savedInstanceState);
         initButtons(R.string.yes, R.string.no);
     }
 

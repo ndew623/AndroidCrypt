@@ -60,4 +60,5 @@
     <string name="mountpoints">Mountpoints</string>
     <string name="file_operation">File operation</string>
     <string name="stop">Stop</string>
+    <string name="show_password">Show password</string>
 </resources>

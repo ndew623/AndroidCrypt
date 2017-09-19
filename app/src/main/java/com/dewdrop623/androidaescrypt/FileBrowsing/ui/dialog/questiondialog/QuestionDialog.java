@@ -3,7 +3,9 @@ package com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.questiondialog;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileOperator;
 import com.dewdrop623.androidaescrypt.R;
@@ -20,7 +22,7 @@ public class QuestionDialog extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTitle(getIntent().getStringExtra(QUESTION_ARG));
+        ((TextView)findViewById(R.id.questionTitleTextView)).setText(getIntent().getStringExtra(QUESTION_ARG));
     }
 
     protected void onPositiveButtonClick() {
