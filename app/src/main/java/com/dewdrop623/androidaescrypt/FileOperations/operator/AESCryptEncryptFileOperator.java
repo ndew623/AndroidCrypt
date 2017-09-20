@@ -20,7 +20,7 @@ import es.vocali.util.AESCrypt;
 public class AESCryptEncryptFileOperator extends FileOperator {
 
     public static final String AESCRYPT_FILE_OPERATOR_KEY_ARGUMENT = "com.dewdrop623.androidaescrypt.FileOperations.operator.AESCryptEncryptFileOperator.AESCRYPT_FILE_OPERATOR_KEY_ARGUMENT";
-    public static final String AESCRYPT_FILE_OPERATOR_FILENAME_ARGUMENT = "com.dewdrop623.androidaescrypt.FileOperations.operator.AESCryptEncryptFileOperator.AESCRYPT_FILE_OPERATOR_FILENAME_ARGUMENT";
+    public static final String AESCRYPT_FILE_OPERATOR_OUTPUT_FILE_ARGUMENT = "com.dewdrop623.androidaescrypt.FileOperations.operator.AESCryptEncryptFileOperator.AESCRYPT_FILE_OPERATOR_OUTPUT_FILE_ARGUMENT";
 
     private File outputFile;
     private long totalBytesSize = 0;
@@ -47,7 +47,7 @@ public class AESCryptEncryptFileOperator extends FileOperator {
 
     @Override
     protected void initMemVarFromArgs() {
-        outputFile = new File(file.getParent()+"/"+args.getString(AESCRYPT_FILE_OPERATOR_FILENAME_ARGUMENT));
+        outputFile = new File(args.getString(AESCRYPT_FILE_OPERATOR_OUTPUT_FILE_ARGUMENT));
     }
 
     @Override
@@ -72,7 +72,7 @@ public class AESCryptEncryptFileOperator extends FileOperator {
         }
         validFilename = FileUtils.validFilename(response, fileModifierService);
         if (validFilename) {
-            outputFile = new File(file.getParent() + "/" + response);
+            outputFile = new File(outputFile.getParent() + "/" + response);
             conflict = outputFile.exists();
         }
         getInfoFromUser();
@@ -101,7 +101,7 @@ public class AESCryptEncryptFileOperator extends FileOperator {
         if (!FileUtils.encryptionDecryptionValidationAndErrorToasts(file, outputFile, fileModifierService)) {
             return false;
         }
-        validFilename = FileUtils.validFilename(args.getString(AESCRYPT_FILE_OPERATOR_FILENAME_ARGUMENT), fileModifierService);
+        validFilename = FileUtils.validFilename(outputFile.getName(), fileModifierService);
         conflict = outputFile.exists();
         return true;
     }

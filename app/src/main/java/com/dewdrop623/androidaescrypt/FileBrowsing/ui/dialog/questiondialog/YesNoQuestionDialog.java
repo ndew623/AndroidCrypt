@@ -13,7 +13,7 @@ import com.dewdrop623.androidaescrypt.R;
 public class YesNoQuestionDialog extends QuestionDialog {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setContentView(R.layout.positive_negative_dialog_buttons);
+        setContentView(R.layout.activity_yesno_question_dialog);
         super.onCreate(savedInstanceState);
         initButtons(R.string.yes, R.string.no);
     }

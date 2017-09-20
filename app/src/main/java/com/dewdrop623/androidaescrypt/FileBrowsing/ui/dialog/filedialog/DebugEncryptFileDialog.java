@@ -16,6 +16,8 @@ import com.dewdrop623.androidaescrypt.FileOperations.FileOperationType;
 import com.dewdrop623.androidaescrypt.FileOperations.operator.AESCryptEncryptFileOperator;
 import com.dewdrop623.androidaescrypt.R;
 
+import java.io.File;
+
 /**
  * get password and filename from user to encrypt file
  */
@@ -25,8 +27,11 @@ public class DebugEncryptFileDialog extends FileDialog {
     private EditText passwordEditText;
     private EditText confirmPasswordEditText;
     private CheckBox showPasswordCheckbox;
+    private EditText fileDestinationDirectoryEditText;
     private EditText fileNameEditText;
     private Button encryptButton;
+
+    private File fileDesinationDirectory;
 
     @NonNull
     @Override
@@ -35,6 +40,7 @@ public class DebugEncryptFileDialog extends FileDialog {
         passwordEditText = (EditText) view.findViewById(R.id.passwordEditText);
         confirmPasswordEditText = (EditText) view.findViewById(R.id.confirmPasswordEditText);
         showPasswordCheckbox = (CheckBox) view.findViewById(R.id.showPasswordCheckbox);
+        fileDestinationDirectoryEditText = (EditText) view.findViewById(R.id.fileDestinationDirectoryEditText);
         fileNameEditText = (EditText) view.findViewById(R.id.fileNameEditText);
         encryptButton = (Button) view.findViewById(R.id.encryptButton);
         encryptButton.setOnClickListener(new View.OnClickListener() {
@@ -44,6 +50,7 @@ public class DebugEncryptFileDialog extends FileDialog {
             }
         });
 
+        fileDestinationDirectoryEditText.setText(file.getParent());
         fileNameEditText.setText(file.getName()+".aes");
         setShowPassword(false);
         showPasswordCheckbox.setOnCheckedChangeListener(showPasswordCheckBoxOnCheckedChangeListener);
@@ -72,8 +79,11 @@ public class DebugEncryptFileDialog extends FileDialog {
     @Override
     protected void positiveButtonOnClick() {
         super.positiveButtonOnClick();
+
+        //check passwords and directories
         String password1 = passwordEditText.getText().toString();
         String password2 = confirmPasswordEditText.getText().toString();
+        fileDesinationDirectory = new File(fileDestinationDirectoryEditText.getText().toString());
         if (!password1.equals(password2)) {
             ((MainActivity)getActivity()).showToast(getString(R.string.no_match));
             return;
@@ -87,9 +97,18 @@ public class DebugEncryptFileDialog extends FileDialog {
             ((MainActivity)getActivity()).showToast(getString(R.string.file_name)+" "+getString(R.string.cannot_be_empty));
             return;
         }
+        if (!fileDesinationDirectory.exists()) {
+            ((MainActivity) getActivity()).showToast(getString(R.string.destination_does_not_exist));
+            return;
+        }
+        if (!fileDesinationDirectory.isDirectory()) {
+            ((MainActivity)getActivity()).showToast(getString(R.string.destination_is_not_a_directory));
+            return;
+        }
+        //send command
         Bundle args = new Bundle();
         args.putString(AESCryptEncryptFileOperator.AESCRYPT_FILE_OPERATOR_KEY_ARGUMENT,password1);
-        args.putString(AESCryptEncryptFileOperator.AESCRYPT_FILE_OPERATOR_FILENAME_ARGUMENT, fileName);
+        args.putString(AESCryptEncryptFileOperator.AESCRYPT_FILE_OPERATOR_OUTPUT_FILE_ARGUMENT, fileDesinationDirectory.getAbsolutePath()+"/"+fileName);
         args.putString(FileModifierService.FILEMODIFIERSERVICE_FILE, file.getAbsolutePath());
         args.putInt(FileModifierService.FILEMODIFIERSERVICE_OPERATIONTYPE, FileOperationType.ENCRYPT);
         fileViewer.sendFileCommandToFileBrowser(args);
