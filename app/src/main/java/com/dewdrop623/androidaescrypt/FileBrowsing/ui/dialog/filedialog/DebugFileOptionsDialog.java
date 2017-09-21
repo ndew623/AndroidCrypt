@@ -67,9 +67,11 @@ public class DebugFileOptionsDialog extends FileDialog {
             if (v.getId() == deleteButton.getId()) {
                 showNewDialogAndDismiss(new DebugDeleteFileDialog());
             } else if (v.getId() == encryptButton.getId()) {
-                showNewDialogAndDismiss(new DebugEncryptFileDialog());
+                showNewDialogAndDismiss(new EncryptDecryptFileDialog());
             } else if (v.getId() == decryptButton.getId()) {
-                showNewDialogAndDismiss(new DebugDecryptFileDialog());
+                Bundle decryptArgs = new Bundle();
+                decryptArgs.putBoolean(EncryptDecryptFileDialog.DECRYPT_MODE_KEY, true);
+                showNewDialogAndDismiss(new EncryptDecryptFileDialog(), decryptArgs);
             } else if (v.getId() == renameButton.getId()) {
                 showNewDialogAndDismiss(new DebugRenameFileDialog());
             } else if (v.getId() == copyButton.getId()) {

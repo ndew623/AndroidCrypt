@@ -13,14 +13,14 @@ import java.security.GeneralSecurityException;
 
 import es.vocali.util.AESCrypt;
 
+import static com.dewdrop623.androidaescrypt.FileOperations.operator.AESCryptEncryptFileOperator.AESCRYPT_FILE_OPERATOR_KEY_ARGUMENT;
+import static com.dewdrop623.androidaescrypt.FileOperations.operator.AESCryptEncryptFileOperator.AESCRYPT_FILE_OPERATOR_OUTPUT_FILE_ARGUMENT;
+
 /**
  * decrypt files using aescrypt
  */
 
 public class AESCryptDecryptFileOperator extends FileOperator {
-
-    public static final String AESCRYPT_FILE_OPERATOR_KEY_ARGUMENT = "com.dewdrop623.androidaescrypt.FileOperations.operator.AESCryptDecryptFileOperator.AESCRYPT_FILE_OPERATOR_KEY_ARGUMENT";
-    public static final String AESCRYPT_FILE_OPERATOR_OUTPUT_FILE_ARGUMENT = "com.dewdrop623.androidaescrypt.FileOperations.operator.AESCryptDecryptFileOperator.AESCRYPT_FILE_OPERATOR_OUTPUT_FILE_ARGUMENT";
 
     private File outputFile;
     private long totalBytesSize = 0;
@@ -101,7 +101,7 @@ public class AESCryptDecryptFileOperator extends FileOperator {
         if (!FileUtils.encryptionDecryptionValidationAndErrorToasts(file, outputFile, fileModifierService)) {
             return false;
         }
-        validFilename = FileUtils.validFilename(args.getString(AESCRYPT_FILE_OPERATOR_OUTPUT_FILE_ARGUMENT), fileModifierService);
+        validFilename = FileUtils.validFilename(outputFile.getName(), fileModifierService);
         conflict = outputFile.exists();
         return true;
     }

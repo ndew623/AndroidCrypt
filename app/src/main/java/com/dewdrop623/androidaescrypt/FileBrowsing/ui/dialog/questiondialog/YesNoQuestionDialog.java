@@ -1,7 +1,6 @@
 package com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.questiondialog;
 
 import android.os.Bundle;
-import android.view.Window;
 
 import com.dewdrop623.androidaescrypt.FileOperations.operator.FileOperator;
 import com.dewdrop623.androidaescrypt.R;

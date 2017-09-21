@@ -77,7 +77,11 @@ public class FileDialog extends DialogFragment {
         return;
     }
     protected void showNewDialogAndDismiss(FileDialog fileDialog) {
-        fileDialog.setArguments(getArguments());
+        showNewDialogAndDismiss(fileDialog, new Bundle());
+    }
+    protected void showNewDialogAndDismiss(FileDialog fileDialog, Bundle newArguments) {
+        newArguments.putAll(getArguments());
+        fileDialog.setArguments(newArguments);
         fileDialog.setFileViewer(fileViewer);
         ((MainActivity)getActivity()).showDialogFragment(fileDialog);
         dismiss();
