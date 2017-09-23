@@ -9,6 +9,7 @@ import android.widget.ImageButton;
 import com.dewdrop623.androidaescrypt.FileBrowsing.FileBrowser;
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.MainActivity;
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.filedialog.DebugCreateDirectoryDialog;
+import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.filedialog.EncryptDecryptFileDialog;
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.filedialog.FileDialog;
 import com.dewdrop623.androidaescrypt.FileOperations.FileModifierService;
 import com.dewdrop623.androidaescrypt.FileOperations.FileOperationType;
@@ -41,7 +42,8 @@ public abstract class FileViewer extends Fragment{
     protected int moveState = NONE;
 
     protected ImageButton moveCopyButton;
-    protected ImageButton cancelMoveCopyButton;
+    protected ImageButton cancelButton;
+    protected ImageButton selectDirectoryButton;
 
     protected File[] fileList;
     protected FileBrowser fileBrowser;
@@ -51,6 +53,8 @@ public abstract class FileViewer extends Fragment{
             return file.getName().toLowerCase().compareTo(t1.getName().toLowerCase());
         }
     };
+    private boolean isSelectingEncryptDecryptOutputDirectory = false;
+    private Bundle encryptDecryptDialogStateBundle = null;
 
     protected void createFolder() {
         DebugCreateDirectoryDialog debugCreateDirectoryDialog = new DebugCreateDirectoryDialog();
@@ -78,15 +82,31 @@ public abstract class FileViewer extends Fragment{
             args.putInt(FileModifierService.FILEMODIFIERSERVICE_OPERATIONTYPE, fileOperationType);
             args.putString(FileModifierService.FILEMODIFIERSERVICE_FILE, moveCopyFile.getAbsolutePath());
             sendFileCommandToFileBrowser(args);
-            moveCopyReset();
+            resetDirectorySelectOperations();
         }
     };
     private View.OnClickListener cancelMoveCopyButtonOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            moveCopyReset();
+            resetDirectorySelectOperations();
         }
     };
+    private View.OnClickListener selectDirectoryButtonOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+
+            selectDirectoryOnClick();
+            resetDirectorySelectOperations();
+        }
+    };
+    //called by the on click listener by the directory select button. needs to be in a method to reference FileViewer using "this"
+    private void selectDirectoryOnClick() {
+        EncryptDecryptFileDialog encryptDecryptFileDialog = new EncryptDecryptFileDialog();
+        encryptDecryptDialogStateBundle.putString(EncryptDecryptFileDialog.OUTPUT_DIRECTORY_KEY, fileBrowser.getCurrentPath().getAbsolutePath());
+        encryptDecryptFileDialog.setArguments(encryptDecryptDialogStateBundle);
+        encryptDecryptFileDialog.setFileViewer(this);
+        ((MainActivity)getActivity()).showDialogFragment(encryptDecryptFileDialog);
+    }
     protected final FileViewer getSelfForButtonListeners() {return this;}
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -120,7 +140,8 @@ public abstract class FileViewer extends Fragment{
     }
     final protected void setButtonListeners() {
         moveCopyButton.setOnClickListener(moveCopyButtonOnClickListener);
-        cancelMoveCopyButton.setOnClickListener(cancelMoveCopyButtonOnClickListener);
+        cancelButton.setOnClickListener(cancelMoveCopyButtonOnClickListener);
+        selectDirectoryButton.setOnClickListener(selectDirectoryButtonOnClickListener);
     }
 
     //sort the fileList member variable alphabetically
@@ -144,12 +165,36 @@ public abstract class FileViewer extends Fragment{
     public void changePath(File newPath) {
         fileBrowser.changePath(newPath);
     }
+
+    /*
+        allows user to select a directory to output from the encrypt/decrypt operation. puts that directory into dialogState.
+        EncryptDecryptFileDialog must put all necessary state information into the bundle
+        it will be sent to a new EncryptDecryptFileDialog as arguments with a true boolean argument to indicate that there is state information in the bundle
+     */
+    public final void selectEncryptDecryptOutputDirectory(Bundle dialogState) {
+        encryptDecryptDialogStateBundle = dialogState;
+        isSelectingEncryptDecryptOutputDirectory = true;
+        onSelectEncryptDecryptOutputDirectory();
+    }
+
+    //gets called when EncryptDecryptFileDialog asks to select an output directory. Can be overridden by child class
+    protected void onSelectEncryptDecryptOutputDirectory() {
+
+    }
+
     protected void onMoveOrCopy(File file) {
         moveCopyFile=file;
     }
-    protected void moveCopyReset() {
+
+    /*
+      called by the click listener for the cancel button. can be overidden by child classes
+      should reset the state for move/copy and encrypt/decrypt directory select operations
+     */
+    protected void resetDirectorySelectOperations() {
         moveState = NONE;
         moveCopyFile = null;
+        encryptDecryptDialogStateBundle = null;
+        isSelectingEncryptDecryptOutputDirectory = false;
     }
 
 }

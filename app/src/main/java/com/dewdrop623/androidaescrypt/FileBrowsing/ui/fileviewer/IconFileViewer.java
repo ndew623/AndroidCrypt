@@ -75,7 +75,8 @@ public class IconFileViewer extends FileViewer {
         fileGridView.setOnItemLongClickListener(onItemLongClickListener);
 
         moveCopyButton = (ImageButton) view.findViewById(R.id.moveCopyButton);
-        cancelMoveCopyButton = (ImageButton) view.findViewById(R.id.cancelMoveCopyButton);
+        cancelButton = (ImageButton) view.findViewById(R.id.cancelMoveCopyButton);
+        selectDirectoryButton = (ImageButton) view.findViewById(R.id.selectDirectoryButton);
 
 
         updateFileArrayAdapterFileList();
@@ -114,7 +115,14 @@ public class IconFileViewer extends FileViewer {
     protected void onMoveOrCopy(File file) {
         super.onMoveOrCopy(file);
         moveCopyButton.setVisibility(View.VISIBLE);
-        cancelMoveCopyButton.setVisibility(View.VISIBLE);
+        cancelButton.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    protected void onSelectEncryptDecryptOutputDirectory() {
+        super.onSelectEncryptDecryptOutputDirectory();
+        selectDirectoryButton.setVisibility(View.VISIBLE);
+        cancelButton.setVisibility(View.VISIBLE);
     }
 
     private void updateFileArrayAdapterFileList() {
@@ -130,10 +138,11 @@ public class IconFileViewer extends FileViewer {
         fileGridAdapter.notifyDataSetChanged();
     }
 
-    protected void moveCopyReset() {
-        super.moveCopyReset();
+    protected void resetDirectorySelectOperations() {
+        super.resetDirectorySelectOperations();
         moveCopyButton.setVisibility(View.GONE);
-        cancelMoveCopyButton.setVisibility(View.GONE);
+        cancelButton.setVisibility(View.GONE);
+        selectDirectoryButton.setVisibility(View.GONE);
     }
 
     private AdapterView.OnItemClickListener onItemClickListener = new AdapterView.OnItemClickListener() {

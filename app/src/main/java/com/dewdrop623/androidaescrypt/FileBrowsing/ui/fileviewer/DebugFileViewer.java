@@ -70,7 +70,7 @@ public class DebugFileViewer extends FileViewer {
 
         //createFolderButton = (Button) view.findViewById(R.id.createFolderButton);
       //  moveCopyButton = (Button) view.findViewById(R.id.moveCopyButton);
-      //  cancelMoveCopyButton = (Button) view.findViewById(R.id.cancelMoveCopyButton);
+      //  cancelButton = (Button) view.findViewById(R.id.cancelButton);
 
 
         updateFileArrayAdapterFileList();
@@ -96,14 +96,14 @@ public class DebugFileViewer extends FileViewer {
         super.onMoveOrCopy(file);
 
         moveCopyButton.setVisibility(View.VISIBLE);
-        cancelMoveCopyButton.setVisibility(View.VISIBLE);
+        cancelButton.setVisibility(View.VISIBLE);
         String cancelMCBText = "";
         if (moveState == COPY) {
             cancelMCBText = getString(R.string.cancel)+" "+getString(R.string.copy);
         } else if (moveState == MOVE) {
             cancelMCBText = getString(R.string.cancel)+" "+getString(R.string.move);
         }
-       // cancelMoveCopyButton.setText(cancelMCBText);
+       // cancelButton.setText(cancelMCBText);
     }
 
     private void updateFileArrayAdapterFileList() {
@@ -117,10 +117,10 @@ public class DebugFileViewer extends FileViewer {
         fileArrayAdapter.addAll(fileList);
         fileArrayAdapter.notifyDataSetChanged();
     }
-    protected void moveCopyReset() {
-        super.moveCopyReset();
+    protected void resetDirectorySelectOperations() {
+        super.resetDirectorySelectOperations();
         moveCopyButton.setVisibility(View.GONE);
-        cancelMoveCopyButton.setVisibility(View.GONE);
+        cancelButton.setVisibility(View.GONE);
     }
     private AdapterView.OnItemClickListener onItemClickListener = new AdapterView.OnItemClickListener() {
         @Override

@@ -41,5 +41,13 @@
                 android:layout_height="50dp"
                 android:background="@drawable/circle_button_selecter"
                 android:elevation="4dp"/>
+            <ImageButton
+                android:id="@+id/selectDirectoryButton"
+                android:visibility="gone"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/ic_select_folder"
+                android:background="@drawable/circle_button_selecter"/>
+                android:elevation="4dp"/>
         </LinearLayout>
 </RelativeLayout>

@@ -39,10 +39,29 @@
             android:layout_height="wrap_content"
             android:text="@string/enter_desination_directory" />
 
-        <EditText
-            android:id="@+id/fileDestinationDirectoryEditText"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/fileDestinationDirectoryEditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+
+            <ImageButton
+                android:id="@+id/selectDirectoryButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginLeft="4dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/circle_button_selecter"
+                android:src="@drawable/ic_select_folder"
+                android:layout_gravity="center_vertical"/>
+        </LinearLayout>
 
         <TextView
             android:layout_width="match_parent"
