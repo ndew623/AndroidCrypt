@@ -1,71 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
-<HorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:captionedimageview="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fadeScrollbars="false"
-    android:paddingTop="16dp"
-    android:paddingBottom="16dp">
-
-    <LinearLayout
-        android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    <TextView
+        android:id="@+id/fileAttributesTextView"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp">
+        android:padding="8dp" />
+    </ScrollView>
 
-        <com.dewdrop623.androidaescrypt.FileBrowsing.ui.view.CaptionedImageButton
-            android:id="@+id/encryptButton"
-            captionedimageview:caption="@string/encrypt"
-            captionedimageview:img_src="@drawable/ic_lock"
-            style="@style/FileOptionsCaptionedImageButton"
-            />
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fadeScrollbars="false"
+        android:paddingBottom="16dp"
+        android:paddingTop="16dp">
 
-        <com.dewdrop623.androidaescrypt.FileBrowsing.ui.view.CaptionedImageButton
-            android:id="@+id/decryptButton"
-            captionedimageview:caption="@string/decrypt"
-            captionedimageview:img_src="@drawable/ic_unlock"
-            style="@style/FileOptionsCaptionedImageButton"
-            />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp">
 
-        <com.dewdrop623.androidaescrypt.FileBrowsing.ui.view.CaptionedImageButton
-            android:id="@+id/copyButton"
-            captionedimageview:caption="@string/copy"
-            captionedimageview:img_src="@drawable/ic_copy"
-            style="@style/FileOptionsCaptionedImageButton"
-            />
+            <com.dewdrop623.androidaescrypt.FileBrowsing.ui.view.CaptionedImageButton
+                android:id="@+id/encryptButton"
+                style="@style/FileOptionsCaptionedImageButton"
+                captionedimageview:caption="@string/encrypt"
+                captionedimageview:img_src="@drawable/ic_lock" />
 
-        <com.dewdrop623.androidaescrypt.FileBrowsing.ui.view.CaptionedImageButton
-            android:id="@+id/moveButton"
-            captionedimageview:caption="@string/move"
-            captionedimageview:img_src="@drawable/ic_move"
-            style="@style/FileOptionsCaptionedImageButton"
-            />
+            <com.dewdrop623.androidaescrypt.FileBrowsing.ui.view.CaptionedImageButton
+                android:id="@+id/decryptButton"
+                style="@style/FileOptionsCaptionedImageButton"
+                captionedimageview:caption="@string/decrypt"
+                captionedimageview:img_src="@drawable/ic_unlock" />
 
-        <com.dewdrop623.androidaescrypt.FileBrowsing.ui.view.CaptionedImageButton
-            android:id="@+id/deleteButton"
-            captionedimageview:caption="@string/delete"
-            captionedimageview:img_src="@drawable/ic_trash"
-            style="@style/FileOptionsCaptionedImageButton"
-            />
+            <com.dewdrop623.androidaescrypt.FileBrowsing.ui.view.CaptionedImageButton
+                android:id="@+id/copyButton"
+                style="@style/FileOptionsCaptionedImageButton"
+                captionedimageview:caption="@string/copy"
+                captionedimageview:img_src="@drawable/ic_copy" />
 
-        <com.dewdrop623.androidaescrypt.FileBrowsing.ui.view.CaptionedImageButton
-            android:id="@+id/renameButton"
-            captionedimageview:caption="@string/rename"
-            captionedimageview:img_src="@drawable/ic_cursor"
-            style="@style/FileOptionsCaptionedImageButton"
-            />
+            <com.dewdrop623.androidaescrypt.FileBrowsing.ui.view.CaptionedImageButton
+                android:id="@+id/moveButton"
+                style="@style/FileOptionsCaptionedImageButton"
+                captionedimageview:caption="@string/move"
+                captionedimageview:img_src="@drawable/ic_move" />
 
-        <com.dewdrop623.androidaescrypt.FileBrowsing.ui.view.CaptionedImageButton
-            android:id="@+id/favoriteButton"
-            captionedimageview:caption="@string/favorite"
-            captionedimageview:img_src="@drawable/ic_star"
-            style="@style/FileOptionsCaptionedImageButton"
-            />
+            <com.dewdrop623.androidaescrypt.FileBrowsing.ui.view.CaptionedImageButton
+                android:id="@+id/deleteButton"
+                style="@style/FileOptionsCaptionedImageButton"
+                captionedimageview:caption="@string/delete"
+                captionedimageview:img_src="@drawable/ic_trash" />
 
-        <com.dewdrop623.androidaescrypt.FileBrowsing.ui.view.CaptionedImageButton
-            android:id="@+id/unfavoriteButton"
-            captionedimageview:caption="@string/unfavorite"
-            captionedimageview:img_src="@drawable/ic_star"
-            style="@style/FileOptionsCaptionedImageButton"
-            />
-    </LinearLayout>
-</HorizontalScrollView>
+            <com.dewdrop623.androidaescrypt.FileBrowsing.ui.view.CaptionedImageButton
+                android:id="@+id/renameButton"
+                style="@style/FileOptionsCaptionedImageButton"
+                captionedimageview:caption="@string/rename"
+                captionedimageview:img_src="@drawable/ic_cursor" />
+
+            <com.dewdrop623.androidaescrypt.FileBrowsing.ui.view.CaptionedImageButton
+                android:id="@+id/favoriteButton"
+                style="@style/FileOptionsCaptionedImageButton"
+                captionedimageview:caption="@string/favorite"
+                captionedimageview:img_src="@drawable/ic_star" />
+
+            <com.dewdrop623.androidaescrypt.FileBrowsing.ui.view.CaptionedImageButton
+                android:id="@+id/unfavoriteButton"
+                style="@style/FileOptionsCaptionedImageButton"
+                captionedimageview:caption="@string/unfavorite"
+                captionedimageview:img_src="@drawable/ic_star" />
+        </LinearLayout>
+    </HorizontalScrollView>
+</LinearLayout>

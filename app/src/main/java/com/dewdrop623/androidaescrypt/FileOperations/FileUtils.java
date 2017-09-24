@@ -25,6 +25,7 @@ import java.util.ArrayList;
  */
 
 public final class FileUtils {
+
     private FileUtils(){}
     private static final char[] ILLEGAL_CHARACTERS = { '/', '\n', '\r', '\t', '\0', '\f'};
     public static int countFilesInFolder(File folder) {
@@ -272,5 +273,32 @@ public final class FileUtils {
             ioe.printStackTrace();
         }
         return digest;
+    }
+    public static String humanReadableBytes(long bytesLong) {
+        String result;
+        double bytesDouble = (double) bytesLong;
+        int stringMaxLength = 3;
+        if (bytesDouble/Math.pow(1024,3)>1d) {
+            result = truncateDecimals(bytesDouble/1e+9, stringMaxLength)+" GB";
+        } else if (bytesDouble/Math.pow(1024,2)>1d){
+            result = truncateDecimals(bytesDouble/Math.pow(1024,2), stringMaxLength)+" MB";
+        } else if (bytesDouble/1024>1d){
+            result = truncateDecimals(bytesDouble/1024, stringMaxLength)+" KB";
+        } else {
+            result = truncateDecimals(bytesDouble, stringMaxLength)+" B";
+        }
+        return result;
+    }
+    public static String truncateDecimals(double input, int length) {
+        int inputInteger = (int) input;
+        double inputDecimal = input - ((double)(inputInteger));
+        String result1 = Integer.toString(inputInteger);
+        String result2 = Double.toString(inputDecimal);
+        result2 = result2.substring(result2.indexOf('.'));
+        if (result2.length() > length) {
+            result2 = result2.substring(0, length);
+        }
+
+        return result1+result2;
     }
 }

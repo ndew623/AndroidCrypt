@@ -5,7 +5,6 @@ package com.dewdrop623.androidaescrypt.FileOperations;
  */
 
 public class FileOperationType {
-    public static final int RENAME = 0;
     public static final int  MOVE = 1;
     public static final int  COPY = 2;
     public static final int  CREATE_FILE = 3;

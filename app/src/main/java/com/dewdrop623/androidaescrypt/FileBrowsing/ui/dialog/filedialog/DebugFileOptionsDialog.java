@@ -5,16 +5,22 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.MainActivity;
 import com.dewdrop623.androidaescrypt.FileBrowsing.ui.view.CaptionedImageButton;
+import com.dewdrop623.androidaescrypt.FileOperations.FileUtils;
 import com.dewdrop623.androidaescrypt.R;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 /**
  * appears when a file is selected and makes options available
  */
 
 public class DebugFileOptionsDialog extends FileDialog {
+    TextView fileAttributesTextView;
     CaptionedImageButton encryptButton;
     CaptionedImageButton decryptButton;
     CaptionedImageButton copyButton;
@@ -26,6 +32,7 @@ public class DebugFileOptionsDialog extends FileDialog {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         View view = inflateLayout(R.layout.dialogfragment_debug_file_options);
+        fileAttributesTextView = (TextView) view.findViewById(R.id.fileAttributesTextView);
         encryptButton = (CaptionedImageButton) view.findViewById(R.id.encryptButton);
         decryptButton = (CaptionedImageButton) view.findViewById(R.id.decryptButton);
         copyButton = (CaptionedImageButton) view.findViewById(R.id.copyButton);
@@ -54,6 +61,16 @@ public class DebugFileOptionsDialog extends FileDialog {
         } else {
             unFavoriteButton.setVisibility(View.GONE);
         }
+
+        String attributesString = "";
+        attributesString += getText(R.string.parent_folder)+": "+file.getParent()+"\n";
+        if (!file.isDirectory()) {
+            attributesString += getText(R.string.file_size) + ": "+ FileUtils.humanReadableBytes(file.length())+"\n";
+        }
+        attributesString += getText(R.string.last_modified)+": "+ DateFormat.getDateInstance().format(file.lastModified())+" "+DateFormat.getTimeInstance().format(file.lastModified())+"\n";
+        attributesString += getText(R.string.readable)+": "+(file.canRead()?"Yes":"No")+"\n";
+        attributesString += getText(R.string.writable)+": "+(file.canWrite()?"Yes":"No");
+        fileAttributesTextView.setText(attributesString);
 
         return createDialog(file.getName(), view, null);
     }

@@ -64,4 +64,9 @@
     <string name="enter_desination_directory">Enter destination directory</string>
     <string name="destination_is_not_a_directory">Desination is not a directory</string>
     <string name="destination_does_not_exist">Destination does not exist</string>
+    <string name="parent_folder">Parent folder</string>
+    <string name="file_size">File size</string>
+    <string name="last_modified">Last modified</string>
+    <string name="readable">Readable</string>
+    <string name="writable">Writable</string>
 </resources>
