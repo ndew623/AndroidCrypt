@@ -27,27 +27,14 @@
             android:clipToPadding="false">
             <ImageButton
                 android:id="@+id/cancelMoveCopyButton"
-                android:visibility="gone"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
                 android:src="@drawable/ic_cancel"
-                android:background="@drawable/circle_button_selecter"
-                android:layout_marginRight="8dp"
-                android:elevation="4dp" />
+                style = "@style/IconFileViewerImageButton"/>
             <ImageButton
                 android:id="@+id/moveCopyButton"
-                android:visibility="gone"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:background="@drawable/circle_button_selecter"
-                android:elevation="4dp"/>
+                style = "@style/IconFileViewerImageButton"/>
             <ImageButton
                 android:id="@+id/selectDirectoryButton"
-                android:visibility="gone"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
                 android:src="@drawable/ic_select_folder"
-                android:background="@drawable/circle_button_selecter"/>
-                android:elevation="4dp"/>
+                style = "@style/IconFileViewerImageButton"/>
         </LinearLayout>
 </RelativeLayout>

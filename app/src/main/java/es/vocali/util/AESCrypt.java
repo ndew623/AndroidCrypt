@@ -15,9 +15,9 @@
  */
 package es.vocali.util;
 
-import com.dewdrop623.androidaescrypt.FileOperations.operator.AESCryptDecryptFileOperator;
-import com.dewdrop623.androidaescrypt.FileOperations.operator.AESCryptEncryptFileOperator;
-import com.dewdrop623.androidaescrypt.FileOperations.operator.FileOperator;
+import com.dewdrop623.androidcrypt.FileOperations.operator.AESCryptDecryptFileOperator;
+import com.dewdrop623.androidcrypt.FileOperations.operator.AESCryptEncryptFileOperator;
+import com.dewdrop623.androidcrypt.FileOperations.operator.FileOperator;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

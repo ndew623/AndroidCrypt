@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Android AESCrypt</string>
+    <string name="app_name">AndroidCrypt</string>
     <string name="delete">Delete</string>
     <string name="deleting">Deleting</string>
     <string name="cancel">Cancel</string>

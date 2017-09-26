@@ -8,7 +8,7 @@
         android:id="@+id/mainActivityFrameLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="com.dewdrop623.androidaescrypt.FileBrowsing.ui.MainActivity"/>
+        tools:context="com.dewdrop623.androidcrypt.FileBrowsing.ui.MainActivity"/>
 
     <ListView
         android:id="@+id/left_drawer"

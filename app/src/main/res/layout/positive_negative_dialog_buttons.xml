@@ -6,7 +6,7 @@
     android:orientation="horizontal"
     android:gravity="end"
     android:padding="16dp"
-    tools:context="com.dewdrop623.androidaescrypt.FileBrowsing.ui.dialog.questiondialog.QuestionDialog">
+    tools:context="com.dewdrop623.androidcrypt.FileBrowsing.ui.dialog.questiondialog.QuestionDialog">
     <Button
         android:id="@+id/negativeButton"
         style="@style/DialogButton" />

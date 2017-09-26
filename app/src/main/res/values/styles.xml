@@ -46,4 +46,12 @@
         <item name="android:layout_marginLeft">10dip</item>
     </style>
 
+    <style name="IconFileViewerImageButton" parent="Base.Widget.AppCompat.ImageButton">
+        <item name = "android:visibility">gone</item>
+        <item name = "android:layout_width">50dp</item>
+        <item name = "android:layout_height">50dp</item>
+        <item name = "android:background">@drawable/circle_button_selecter</item>
+        <item name = "android:layout_marginRight">8dp</item>
+    </style>
+
 </resources>
