@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.res.ResourcesCompat;
+import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,9 +31,10 @@ import java.util.Collection;
  */
 
 public class IconFileViewer extends FileViewer {
+
     private GridView fileGridView;
     private FileGridAdapter fileGridAdapter;
-
+    private TextView currentPathTextView;
 
     @Override
     public void setFileList(File[] fileList) {
@@ -68,6 +70,7 @@ public class IconFileViewer extends FileViewer {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_icon_file_viewer, container, false);
+        currentPathTextView = (TextView) view.findViewById(R.id.currentPathTextView);
         fileGridView = (GridView) view.findViewById(R.id.fileGridView);
         fileGridAdapter = new FileGridAdapter(getContext());
         fileGridView.setAdapter(fileGridAdapter);
@@ -77,7 +80,7 @@ public class IconFileViewer extends FileViewer {
         moveCopyButton = (ImageButton) view.findViewById(R.id.moveCopyButton);
         cancelButton = (ImageButton) view.findViewById(R.id.cancelMoveCopyButton);
         selectDirectoryButton = (ImageButton) view.findViewById(R.id.selectDirectoryButton);
-
+        currentPathTextView.setMovementMethod(new ScrollingMovementMethod());
 
         updateFileArrayAdapterFileList();
         setButtonListeners();
@@ -102,15 +105,14 @@ public class IconFileViewer extends FileViewer {
     @Override
     public void moveFile(File file) {
         super.moveFile(file);
-        moveCopyButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.ic_move,null));
+        moveCopyButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_move, null));
     }
 
     @Override
     public void copyFile(File file) {
         super.copyFile(file);
-        moveCopyButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.ic_copy,null));
+        moveCopyButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_copy, null));
     }
-
 
 
     @Override
@@ -138,6 +140,8 @@ public class IconFileViewer extends FileViewer {
         sortFileList();
         fileGridAdapter.addAll(fileList);
         fileGridAdapter.notifyDataSetChanged();
+
+        currentPathTextView.setText(fileBrowser.getCurrentPath().getAbsolutePath());
     }
 
     protected void resetDirectorySelectOperations() {
@@ -154,7 +158,7 @@ public class IconFileViewer extends FileViewer {
             if (clickedFile.isDirectory()) {
                 fileBrowser.setCurrentPath(clickedFile);
             } else {
-                ((MainActivity)getActivity()).openOptionsDialog(clickedFile, getSelfForButtonListeners());
+                ((MainActivity) getActivity()).openOptionsDialog(clickedFile, getSelfForButtonListeners());
             }
         }
     };
@@ -163,7 +167,7 @@ public class IconFileViewer extends FileViewer {
         public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
             File clickedFile = fileGridAdapter.getItem(position);
             if (clickedFile != FileBrowser.parentDirectory) {
-                ((MainActivity)getActivity()).openOptionsDialog(clickedFile, getSelfForButtonListeners());
+                ((MainActivity) getActivity()).openOptionsDialog(clickedFile, getSelfForButtonListeners());
             }
             return true;
         }

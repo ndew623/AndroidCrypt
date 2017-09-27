@@ -1,6 +1,7 @@
 package com.dewdrop623.androidcrypt.FileBrowsing.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -37,6 +38,7 @@ import com.dewdrop623.androidcrypt.FileBrowsing.ui.fileviewer.FileViewer;
 import com.dewdrop623.androidcrypt.FileBrowsing.ui.fileviewer.IconFileViewer;
 import com.dewdrop623.androidcrypt.FileOperations.FileUtils;
 import com.dewdrop623.androidcrypt.R;
+import com.dewdrop623.androidcrypt.SettingsActivity;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -96,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
                 invalidateOptionsMenu();
             }
         };
-        drawerLayout.setDrawerListener(drawerToggle);
+        drawerLayout.setDrawerListener(drawerToggle);//TODO fix deprecated method
 
         //the action bar needs some methods called to get the drawer open button
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -166,6 +168,9 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (drawerToggle.onOptionsItemSelected(item)) {
             return true;
+        } else if (item.getItemId() == R.id.settings_menu_button) {
+            Intent settingsIntent = new Intent(this, SettingsActivity.class);
+            startActivity(settingsIntent);
         }
         return super.onOptionsItemSelected(item);
     }

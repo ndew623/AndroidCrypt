@@ -12,7 +12,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.dewdrop623.androidcrypt.FileBrowsing.ui.MainActivity">
+        <activity android:name=".FileBrowsing.ui.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -21,24 +21,28 @@
         </activity>
 
         <service
-            android:name="com.dewdrop623.androidcrypt.FileOperations.FileModifierService"
+            android:name=".FileOperations.FileModifierService"
             android:enabled="true"
             android:exported="true" />
 
         <activity
-            android:name="com.dewdrop623.androidcrypt.FileBrowsing.ui.dialog.questiondialog.QuestionDialog"
-            android:theme="@style/DialogTheme"/>
-        <activity
-            android:name="com.dewdrop623.androidcrypt.FileBrowsing.ui.dialog.questiondialog.YesNoQuestionDialog"
-            android:theme="@style/DialogTheme"/>
-        <activity
-            android:name="com.dewdrop623.androidcrypt.FileBrowsing.ui.dialog.questiondialog.YesNoRememberAnswerQuestionDialog"
-            android:theme="@style/DialogTheme"/>
-        <activity
-            android:name="com.dewdrop623.androidcrypt.FileBrowsing.ui.dialog.questiondialog.TextOrCancelQuestionDialog"
-            android:theme="@style/DialogTheme"/>
-        <activity android:name="com.dewdrop623.androidcrypt.FileBrowsing.ui.dialog.FileOperationDialog"
+            android:name=".FileBrowsing.ui.dialog.questiondialog.QuestionDialog"
             android:theme="@style/DialogTheme" />
+        <activity
+            android:name=".FileBrowsing.ui.dialog.questiondialog.YesNoQuestionDialog"
+            android:theme="@style/DialogTheme" />
+        <activity
+            android:name=".FileBrowsing.ui.dialog.questiondialog.YesNoRememberAnswerQuestionDialog"
+            android:theme="@style/DialogTheme" />
+        <activity
+            android:name=".FileBrowsing.ui.dialog.questiondialog.TextOrCancelQuestionDialog"
+            android:theme="@style/DialogTheme" />
+        <activity
+            android:name=".FileBrowsing.ui.dialog.FileOperationDialog"
+            android:theme="@style/DialogTheme" />
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"></activity>
     </application>
 
 </manifest>

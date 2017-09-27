@@ -1,7 +1,7 @@
-#Mon Sep 25 23:59:02 EDT 2017
-base.0=/home/nick/Android/projects/AndroidAESCrypt/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run-bootstrap_b42acc17500ebf9889b6cd0e2641e750ac04a3eb
+#Tue Sep 26 22:26:17 EDT 2017
+base.0=/home/nick/Android/projects/AndroidCrypt/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run_4ac1bef622c88aae5f8d52b0133f4c01b0c92729
 renamed.1=classes2.dex
 renamed.0=classes.dex
-file.1=/home/nick/Android/projects/AndroidAESCrypt/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run_2e09eac646331641111049542ef1c039e72c9178/classes.dex
-base.1=/home/nick/Android/projects/AndroidAESCrypt/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run_2e09eac646331641111049542ef1c039e72c9178
-file.0=/home/nick/Android/projects/AndroidAESCrypt/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run-bootstrap_b42acc17500ebf9889b6cd0e2641e750ac04a3eb/classes.dex
+file.1=/home/nick/Android/projects/AndroidCrypt/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run-bootstrap_885ab5f88523832cbdb3060b51735b7d79811f0b/classes.dex
+base.1=/home/nick/Android/projects/AndroidCrypt/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run-bootstrap_885ab5f88523832cbdb3060b51735b7d79811f0b
+file.0=/home/nick/Android/projects/AndroidCrypt/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run_4ac1bef622c88aae5f8d52b0133f4c01b0c92729/classes.dex
