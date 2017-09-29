@@ -1,5 +1,6 @@
 package com.dewdrop623.androidcrypt.FileBrowsing;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
@@ -7,6 +8,7 @@ import android.os.FileObserver;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.dewdrop623.androidcrypt.FileBrowsing.ui.SettingsHelper;
 import com.dewdrop623.androidcrypt.FileBrowsing.ui.fileviewer.FileViewer;
 import com.dewdrop623.androidcrypt.FileOperations.FileModifierService;
 
@@ -24,11 +26,10 @@ public class FileBrowser {
 
     public static final File parentDirectory = new File("..");
     public static final File root = new File("/");
-    public static final File topLevelInternal = new File(Environment.getExternalStorageDirectory().toString());
+    public static final File homeDirectory = Environment.getExternalStorageDirectory();
 
-    public FileBrowser() {
-        //TODO get path from settings, for now just use default external storage path
-        currentPath = topLevelInternal;
+    public FileBrowser(Context context) {
+        currentPath = new File(SettingsHelper.getStartDirectory(context));
         monitorCurrentPathForChanges();
     }
     public void setFileViewer(FileViewer fileViewer) {

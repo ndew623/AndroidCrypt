@@ -38,7 +38,6 @@ import com.dewdrop623.androidcrypt.FileBrowsing.ui.fileviewer.FileViewer;
 import com.dewdrop623.androidcrypt.FileBrowsing.ui.fileviewer.IconFileViewer;
 import com.dewdrop623.androidcrypt.FileOperations.FileUtils;
 import com.dewdrop623.androidcrypt.R;
-import com.dewdrop623.androidcrypt.SettingsActivity;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -263,8 +262,6 @@ public class MainActivity extends AppCompatActivity {
     /*
      * PRIVATE METHODS
      * */
-
-
     //reset the fileViewer member variable (e.g. after a screen rotation)
     private void refreshFileViewerReferenceWithLayoutID(FragmentManager fragmentManager) {
         fileViewer = (FileViewer) fragmentManager.findFragmentById(R.id.mainActivityFrameLayout);

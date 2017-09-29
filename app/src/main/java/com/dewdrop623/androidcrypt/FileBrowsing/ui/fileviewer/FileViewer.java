@@ -111,7 +111,7 @@ public abstract class FileViewer extends Fragment{
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        FileBrowser fileBrowser = new FileBrowser();
+        FileBrowser fileBrowser = new FileBrowser(getContext());
         fileBrowser.setFileViewer(this);
         this.savedInstanceState = savedInstanceState;
         if (savedInstanceState != null) {
@@ -143,7 +143,7 @@ public abstract class FileViewer extends Fragment{
         fileBrowser.modifyFile(args);
     }
     final protected void goToHomeDirectory () {
-        fileBrowser.setCurrentPath(FileBrowser.topLevelInternal);
+        fileBrowser.setCurrentPath(FileBrowser.homeDirectory);
     }
     final protected void setButtonListeners() {
         moveCopyButton.setOnClickListener(moveCopyButtonOnClickListener);

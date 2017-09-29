@@ -6,6 +6,8 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="windowActionBar">true</item>
+        <item name="windowNoTitle">false</item>
     </style>
 
     <style name="DialogTheme" parent="Theme.AppCompat.Light.Dialog">
@@ -47,11 +49,11 @@
     </style>
 
     <style name="IconFileViewerImageButton" parent="Base.Widget.AppCompat.ImageButton">
-        <item name = "android:visibility">gone</item>
-        <item name = "android:layout_width">50dp</item>
-        <item name = "android:layout_height">50dp</item>
-        <item name = "android:background">@drawable/circle_button_selecter</item>
-        <item name = "android:layout_marginRight">8dp</item>
+        <item name="android:visibility">gone</item>
+        <item name="android:layout_width">50dp</item>
+        <item name="android:layout_height">50dp</item>
+        <item name="android:background">@drawable/circle_button_selecter</item>
+        <item name="android:layout_marginRight">8dp</item>
     </style>
 
 </resources>
