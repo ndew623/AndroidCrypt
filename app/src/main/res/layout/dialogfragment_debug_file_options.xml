@@ -72,7 +72,7 @@
                 android:id="@+id/unfavoriteButton"
                 style="@style/FileOptionsCaptionedImageButton"
                 captionedimageview:caption="@string/unfavorite"
-                captionedimageview:img_src="@drawable/ic_star" />
+                captionedimageview:img_src="@drawable/ic_remove" />
         </LinearLayout>
     </HorizontalScrollView>
 </LinearLayout>
