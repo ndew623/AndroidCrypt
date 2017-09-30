@@ -23,7 +23,13 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * intended to be extended by other file viewers, each with a different UI for file browsing
+ * FileViewer is an abstract Fragment. It implements the common logic and contains the common UI elements across all types of FileViewers
+ * FileViewer:
+ * -contains the references to buttons for moving/copying files, selecting a directory, and canceling those operations (button appearance is left to the concrete subclass)
+ * -assigns and implements the onclicklisteners for the previously mentioned buttons
+ * -interacts with the FileBrowser instance when updating the display or modifiying files
+ * -tracks the current state of whether a file is being moved/copied or a directory is being selected
+ * -provides other common logic, such as the back button going up a directory, returning to the home directory, initiating the process of copy/move/select directory
  */
 
 public abstract class FileViewer extends Fragment{
@@ -94,7 +100,6 @@ public abstract class FileViewer extends Fragment{
     private View.OnClickListener selectDirectoryButtonOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-
             selectDirectoryOnClick();
             resetDirectorySelectOperations();
         }

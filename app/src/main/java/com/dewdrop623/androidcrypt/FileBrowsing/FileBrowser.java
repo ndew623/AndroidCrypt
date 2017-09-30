@@ -15,7 +15,13 @@ import com.dewdrop623.androidcrypt.FileOperations.FileModifierService;
 import java.io.File;
 
 /**
- * keeps track of current directory, monitors files for changes, takes commands from FileViewer and executes them
+ * Every FileViewer instance interacts with the file system through FileBrowser
+ * FileBrowser:
+ * -keeps references to important directories
+ * -keeps track of the current directory
+ * -monitors files for changes
+ * -sends updated file lists for FileViewer to display
+ * -takes commands from FileViewer and executes them
  */
 
 public class FileBrowser {

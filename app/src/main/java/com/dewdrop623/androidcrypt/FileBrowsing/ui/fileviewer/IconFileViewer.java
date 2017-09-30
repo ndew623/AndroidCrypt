@@ -27,7 +27,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * A subclass of FileViewer that displays filesystem with icons in a grid
+ * IconFileViewer is a subclass of FileViewer that defines the final UI appearance
+ * IconFileViewer:
+ * -displays the file list obtained from FileBrowser in a grid
+ * -defines and implements the logic of an actionbar options menu
+ * -defines the appearance of the buttons for moving/copying/selecting a directory
  */
 
 public class IconFileViewer extends FileViewer {
