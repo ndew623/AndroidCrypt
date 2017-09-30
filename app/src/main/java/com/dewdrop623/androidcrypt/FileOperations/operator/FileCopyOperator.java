@@ -1,5 +1,6 @@
 package com.dewdrop623.androidcrypt.FileOperations.operator;
 
+import android.media.MediaScannerConnection;
 import android.os.Bundle;
 
 import com.dewdrop623.androidcrypt.FileOperations.FileModifierService;
@@ -79,6 +80,8 @@ public class FileCopyOperator extends FileOperator {
             }
         } catch (IOException ioe) {
             ioe.printStackTrace();
+        } finally {
+            MediaScannerConnection.scanFile(fileModifierService, new String[] {outputFile.getAbsolutePath()}, null, null );
         }
         if (!silent) {
             fileModifierService.updateNotification(100);

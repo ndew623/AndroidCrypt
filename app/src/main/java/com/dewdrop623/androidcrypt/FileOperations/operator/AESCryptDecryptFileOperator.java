@@ -1,5 +1,6 @@
 package com.dewdrop623.androidcrypt.FileOperations.operator;
 
+import android.media.MediaScannerConnection;
 import android.os.Bundle;
 
 import com.dewdrop623.androidcrypt.FileOperations.FileModifierService;
@@ -93,6 +94,8 @@ public class AESCryptDecryptFileOperator extends FileOperator {
             fileModifierService.showToast(fileModifierService.getString(R.string.unsupported_encoding_exception));
         } catch (IOException ioe) {
             fileModifierService.showToast(fileModifierService.getString(R.string.ioexception)+": "+fileModifierService.getString(R.string.wrong_password_question));
+        } finally {
+            MediaScannerConnection.scanFile(fileModifierService, new String[] {outputFile.getAbsolutePath()}, null, null );
         }
     }
 

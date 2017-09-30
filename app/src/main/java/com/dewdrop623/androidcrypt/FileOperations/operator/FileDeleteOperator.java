@@ -1,5 +1,6 @@
 package com.dewdrop623.androidcrypt.FileOperations.operator;
 
+import android.media.MediaScannerConnection;
 import android.os.Bundle;
 
 import com.dewdrop623.androidcrypt.FileOperations.FileModifierService;
@@ -48,6 +49,8 @@ public class FileDeleteOperator extends FileOperator {
         if (!silent) {
             fileModifierService.updateNotification(100);
         }
+        MediaScannerConnection.scanFile(fileModifierService, new String[] {file.getAbsolutePath()}, null, null );
+
     }
 
     @Override

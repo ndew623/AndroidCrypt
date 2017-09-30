@@ -1,5 +1,6 @@
 package com.dewdrop623.androidcrypt.FileOperations.operator;
 
+import android.media.MediaScannerConnection;
 import android.os.Bundle;
 
 import com.dewdrop623.androidcrypt.FileOperations.FileModifierService;
@@ -35,6 +36,7 @@ public class FileMoveOperator extends FileOperator {
     protected void initMemVarFromArgs() {
         outputFileName = args.getString(FILE_NEW_NAME_ARG, file.getName());
         outputFile = new File(args.getString(FILE_MOVE_DESTINATION_ARG)+"/"+outputFileName);
+        MediaScannerConnection.scanFile(fileModifierService, new String[] {outputFile.getAbsolutePath()}, null, null);
     }
 
     @Override
