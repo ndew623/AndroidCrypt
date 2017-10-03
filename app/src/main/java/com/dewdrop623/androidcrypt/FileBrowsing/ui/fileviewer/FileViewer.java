@@ -58,34 +58,34 @@ public abstract class FileViewer extends Fragment{
     //MEMBER VARIABLES
     ////////////////////////////////
 
-    //keys to remember states on rotation
-    protected static final String MOVE_STATE_KEY = "com.dewdrop623.androidcrypt.FileBrowsing.ui.fileviewer.FileViewer.MOVE_STATE_KEY";
-    protected static final String MOVE_COPY_FILE_KEY = "com.dewdrop623.androidcrypt.FileBrowsing.ui.fileviewer.FileViewer.MOVE_COPY_FILE_KEY";
-    protected static final String CURRENT_DIRECTORY_KEY = "com.dewdrop623.androidcrypt.FileBrowsing.ui.fileviewer.FileViewer.CURRENT_DIRECTORY_KEY";
+    //keys to remember state on rotation
+    private static final String MOVE_STATE_KEY = "com.dewdrop623.androidcrypt.FileBrowsing.ui.fileviewer.FileViewer.MOVE_STATE_KEY";
+    private static final String MOVE_COPY_FILE_KEY = "com.dewdrop623.androidcrypt.FileBrowsing.ui.fileviewer.FileViewer.MOVE_COPY_FILE_KEY";
+    private static final String CURRENT_DIRECTORY_KEY = "com.dewdrop623.androidcrypt.FileBrowsing.ui.fileviewer.FileViewer.CURRENT_DIRECTORY_KEY";
 
     //for storing the current state
-    protected Bundle savedInstanceState = null;
+    private Bundle savedInstanceState = null;
 
     //represents the move and copy states
-    protected final int MOVE = 2;
-    protected final int COPY = 1;
-    protected final int NONE = 0;
+    private final int MOVE = 2;
+    private final int COPY = 1;
+    private final int NONE = 0;
 
     //represents the current state of moving or copying
     private File moveCopyFile;
-    protected int moveState = NONE;
+    private int moveState = NONE;
 
     //references to the move/copy/select directory ui buttons
-    protected ImageButton moveCopyButton;
-    protected ImageButton cancelButton;
-    protected ImageButton selectDirectoryButton;
+    private ImageButton moveCopyButton;
+    private ImageButton cancelButton;
+    private ImageButton selectDirectoryButton;
 
     //the TextView that shows the current directory under the actionbar
     private TextView currentPathTextView;
 
     //the list of files being displayed and the instance of FileBrowser
-    protected File[] fileList;
-    protected FileBrowser fileBrowser;
+    private File[] fileList;
+    private FileBrowser fileBrowser;
 
     //The list view to display the files
     protected AbsListView fileListView;
@@ -110,7 +110,7 @@ public abstract class FileViewer extends Fragment{
     };
 
     /*
-    *the button listener for both the move/copy button
+    *the button listener for the move/copy button
      */
     private View.OnClickListener moveCopyButtonOnClickListener = new View.OnClickListener() {
         @Override
@@ -158,6 +158,7 @@ public abstract class FileViewer extends Fragment{
         }
     };
 
+    // the onClickListener for file items in the fileListView
     private AdapterView.OnItemClickListener onItemClickListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -169,6 +170,8 @@ public abstract class FileViewer extends Fragment{
             }
         }
     };
+
+    //the onLongClickListener for file items in the fileListView
     private AdapterView.OnItemLongClickListener onItemLongClickListener = new AdapterView.OnItemLongClickListener() {
         @Override
         public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
@@ -184,7 +187,9 @@ public abstract class FileViewer extends Fragment{
     //PUBLIC METHODS
     /////////////////////////
 
-    //create a FileBrowser and assign it to the member variable
+    /*create a FileBrowser and assign it to the member variable
+    * get the savedInstanceState and put it in a member variable
+    * */
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -197,15 +202,7 @@ public abstract class FileViewer extends Fragment{
         }
     }
 
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_icon_file_viewer, container, false);
-
-
-        return view;
-    }
-
+    //create the options menu
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.file_viewer_menu, menu);
@@ -221,6 +218,7 @@ public abstract class FileViewer extends Fragment{
 
     }
 
+    //define behavior for the options menu
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -236,12 +234,12 @@ public abstract class FileViewer extends Fragment{
 
     //called by the MainActivity when the back button is pressed, goes up one directory if not already at root
     public void onBackPressed() {
-        if (!fileBrowser.getCurrentPath().equals(fileBrowser.root)) {
-            fileBrowser.setCurrentPath(fileBrowser.parentDirectory);
+        if (!fileBrowser.getCurrentPath().equals(FileBrowser.root)) {
+            fileBrowser.setCurrentPath(FileBrowser.parentDirectory);
         }
     }
 
-    //meant to be called by the FileBrowser, this changes the list of files to be displayed
+    //meant to be called by the FileBrowser, updates the displayed list of files
     public void setFileList(File[] fileList) {
         this.fileList=fileList;
         updateFileArrayAdapterFileList();
@@ -270,6 +268,7 @@ public abstract class FileViewer extends Fragment{
     public final void setFileBrowser(FileBrowser fileBrowser) {
         this.fileBrowser=fileBrowser;
     }
+
     //send a Bundle with the necessary arguments to FileBrowser's modifyFile to be executed as a command
     public final void sendFileCommandToFileBrowser(Bundle args) {
         fileBrowser.modifyFile(args);
@@ -290,50 +289,7 @@ public abstract class FileViewer extends Fragment{
     //PROTECTED METHODS
     ///////////////////////////////////
 
-    //open a dialog to create a new folder
-    protected void createFolder() {
-        DebugCreateDirectoryDialog debugCreateDirectoryDialog = new DebugCreateDirectoryDialog();
-        Bundle args = new Bundle();
-        args.putString(FileDialog.PATH_ARGUMENT, fileBrowser.getCurrentPath().getAbsolutePath());
-        debugCreateDirectoryDialog.setArguments(args);
-        debugCreateDirectoryDialog.setFileViewer(this);
-        ((MainActivity)getActivity()).showDialogFragment(debugCreateDirectoryDialog);
-    }
-
-    //the button listeners are in anonymous classes. They need to pass an instance of this FileViewer but for them this points to the anonymous class, they can reach this method though
-    protected final FileViewer getSelfForButtonListeners() {return this;}
-
-    //gets called when EncryptDecryptFileDialog asks to select an output directory. Can be overridden by child class
-    protected void onSelectEncryptDecryptOutputDirectory() {
-        selectDirectoryButton.setVisibility(View.VISIBLE);
-        cancelButton.setVisibility(View.VISIBLE);
-    }
-    //actions taken when a file copy/move operation is initiated by this.copyFile or this.moveFile, intended to be overrode by the concrete class but still call super()
-    protected void onMoveOrCopy(File file) {
-        moveCopyFile=file;
-        moveCopyButton.setVisibility(View.VISIBLE);
-        cancelButton.setVisibility(View.VISIBLE);
-    }
-
-    /*
-      called by the click listener for the cancel button. can be overidden by child classes
-      should reset the state for move/copy and encrypt/decrypt directory select operations
-     */
-    protected void resetDirectorySelectOperations() {
-        moveState = NONE;
-        moveCopyFile = null;
-        encryptDecryptDialogStateBundle = null;
-        isSelectingEncryptDecryptOutputDirectory = false;
-        moveCopyButton.setVisibility(View.GONE);
-        cancelButton.setVisibility(View.GONE);
-        selectDirectoryButton.setVisibility(View.GONE);
-    }
-
-    //change to current and displayed directory to the homeDirectory
-    protected final void goToHomeDirectory () {
-        fileBrowser.setCurrentPath(FileBrowser.homeDirectory);
-    }
-    //after the concrete class inflates the view and the callback for the list adapter getview method, do the rest of the ui initialization work
+    //after the concrete class inflates the view and defines the callback for the list adapter getview method, do the rest of the ui initialization work
     protected final void initializeFileViewerWithViewAndFileListAdapterGetViewCallback(View view, FileListAdapterGetViewCallback fileListAdapterGetViewCallback) {
         fileListAdapter = new FileListAdapter(fileListAdapterGetViewCallback);
         fileListView.setAdapter(fileListAdapter);
@@ -365,12 +321,59 @@ public abstract class FileViewer extends Fragment{
             }
         }
     }
+    ///////////////////////////////////
+    //PRIVATE METHODS
+    ///////////////////////////////////
+
+    //open a dialog to create a new folder
+    private void createFolder() {
+        DebugCreateDirectoryDialog debugCreateDirectoryDialog = new DebugCreateDirectoryDialog();
+        Bundle args = new Bundle();
+        args.putString(FileDialog.PATH_ARGUMENT, fileBrowser.getCurrentPath().getAbsolutePath());
+        debugCreateDirectoryDialog.setArguments(args);
+        debugCreateDirectoryDialog.setFileViewer(this);
+        ((MainActivity)getActivity()).showDialogFragment(debugCreateDirectoryDialog);
+    }
+
+    //the button listeners are in anonymous classes. They need to pass an instance of this FileViewer but for them this points to the anonymous class, they can reach this method though
+    private FileViewer getSelfForButtonListeners() {return this;}
+
+    //gets called when EncryptDecryptFileDialog asks to select an output directory.
+    private void onSelectEncryptDecryptOutputDirectory() {
+        selectDirectoryButton.setVisibility(View.VISIBLE);
+        cancelButton.setVisibility(View.VISIBLE);
+    }
+    //actions taken when a file copy/move operation is initiated by this.copyFile or this.moveFile
+    private void onMoveOrCopy(File file) {
+        moveCopyFile=file;
+        moveCopyButton.setVisibility(View.VISIBLE);
+        cancelButton.setVisibility(View.VISIBLE);
+    }
+
+    /*
+      called by the click listener for the cancel button.
+      should reset the state for move/copy and encrypt/decrypt directory select operations
+     */
+    private void resetDirectorySelectOperations() {
+        moveState = NONE;
+        moveCopyFile = null;
+        encryptDecryptDialogStateBundle = null;
+        isSelectingEncryptDecryptOutputDirectory = false;
+        moveCopyButton.setVisibility(View.GONE);
+        cancelButton.setVisibility(View.GONE);
+        selectDirectoryButton.setVisibility(View.GONE);
+    }
+
+    //change to current and displayed directory to the homeDirectory
+    private void goToHomeDirectory () {
+        fileBrowser.setCurrentPath(FileBrowser.homeDirectory);
+    }
 
     //sort the fileList member variable alphabetically
-    protected final void sortFileList() {
+    private void sortFileList() {
         List<File> fileListObjects=Arrays.asList(fileList);
         Collections.sort(fileListObjects, fileObjectAlphabeticalComparator);
-        fileList= (File[]) fileListObjects.toArray();
+        fileList = (File[]) fileListObjects.toArray();
     }
 
 
@@ -379,7 +382,7 @@ public abstract class FileViewer extends Fragment{
             return;
         }
         fileListAdapter.clear();
-        if (!fileBrowser.getCurrentPath().equals(fileBrowser.root)) {
+        if (!fileBrowser.getCurrentPath().equals(FileBrowser.root)) {
             fileListAdapter.add(FileBrowser.parentDirectory);
         }
         sortFileList();
