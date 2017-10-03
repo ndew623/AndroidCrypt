@@ -1,229 +1,50 @@
 package com.dewdrop623.androidcrypt.FileBrowsing.ui.fileviewer;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.res.ResourcesCompat;
-import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.GridView;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.dewdrop623.androidcrypt.FileBrowsing.FileBrowser;
-import com.dewdrop623.androidcrypt.FileBrowsing.ui.MainActivity;
 import com.dewdrop623.androidcrypt.R;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
 
 /**
- * IconFileViewer is a subclass of FileViewer that defines the final UI appearance
+ * IconFileViewer is concrete implementation of FileViewer
  * IconFileViewer:
- * -displays the file list obtained from FileBrowser in a grid
- * -defines and implements the logic of an actionbar options menu
- * -defines the appearance of the buttons for moving/copying/selecting a directory
+ * -inflates the FileViewer's layout
+ * -gets an AbsListView instance from that view
+ * -creates an instance of FileViewer.FileListAdapterGetViewCallback where it defines the getView behavior for the adapter for the AbsListView
+ * -calls the FileViewer method that finishes the set up and passes to it: the view and getView callback
  */
 
 public class IconFileViewer extends FileViewer {
 
-    private GridView fileGridView;
-    private FileGridAdapter fileGridAdapter;
-    private TextView currentPathTextView;
-
-    @Override
-    public void setFileList(File[] fileList) {
-        super.setFileList(fileList);
-        updateFileArrayAdapterFileList();
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.file_viewer_menu, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.home_button:
-                goToHomeDirectory();
-                return true;
-            case R.id.createFolderButton:
-                createFolder();
-                return true;
-        }
-        return false;
-    }
-
+    /*inflates a layout, gets its listView
+    * passes the listView and a callback for the adapter to the parent class
+     */
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_icon_file_viewer, container, false);
-        currentPathTextView = (TextView) view.findViewById(R.id.currentPathTextView);
-        fileGridView = (GridView) view.findViewById(R.id.fileGridView);
-        fileGridAdapter = new FileGridAdapter(getContext());
-        fileGridView.setAdapter(fileGridAdapter);
-        fileGridView.setOnItemClickListener(onItemClickListener);
-        fileGridView.setOnItemLongClickListener(onItemLongClickListener);
-
-        moveCopyButton = (ImageButton) view.findViewById(R.id.moveCopyButton);
-        cancelButton = (ImageButton) view.findViewById(R.id.cancelMoveCopyButton);
-        selectDirectoryButton = (ImageButton) view.findViewById(R.id.selectDirectoryButton);
-        currentPathTextView.setMovementMethod(new ScrollingMovementMethod());
-
-        updateFileArrayAdapterFileList();
-        setButtonListeners();
-
-        if (savedInstanceState != null) {
-            int prevMoveState = savedInstanceState.getInt(MOVE_STATE_KEY, 0);
-            if (prevMoveState != 0) {
-                String prevMoveCopyFile = savedInstanceState.getString(MOVE_COPY_FILE_KEY, MOVE_COPY_FILE_KEY);
-                if (!prevMoveCopyFile.equals(MOVE_COPY_FILE_KEY)) {
-                    if (prevMoveState == COPY) {
-                        copyFile(new File(prevMoveCopyFile));
-                    } else if (prevMoveState == MOVE) {
-                        moveFile(new File(prevMoveCopyFile));
-                    }
-                }
-            }
-        }
-
+        fileListView = (GridView) view.findViewById(R.id.fileGridView);
+        initializeFileViewerWithViewAndFileListAdapterGetViewCallback(view, fileListAdapterGetViewCallback);
         return view;
     }
 
-    @Override
-    public void moveFile(File file) {
-        super.moveFile(file);
-        moveCopyButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_move, null));
-    }
-
-    @Override
-    public void copyFile(File file) {
-        super.copyFile(file);
-        moveCopyButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_copy, null));
-    }
-
-
-    @Override
-    protected void onMoveOrCopy(File file) {
-        super.onMoveOrCopy(file);
-        moveCopyButton.setVisibility(View.VISIBLE);
-        cancelButton.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    protected void onSelectEncryptDecryptOutputDirectory() {
-        super.onSelectEncryptDecryptOutputDirectory();
-        selectDirectoryButton.setVisibility(View.VISIBLE);
-        cancelButton.setVisibility(View.VISIBLE);
-    }
-
-    private void updateFileArrayAdapterFileList() {
-        if (fileGridAdapter == null) { //file viewer has not been displayed yet
-            return;
-        }
-        fileGridAdapter.clear();
-        if (!fileBrowser.getCurrentPath().equals(fileBrowser.root)) {
-            fileGridAdapter.add(FileBrowser.parentDirectory);
-        }
-        sortFileList();
-        fileGridAdapter.addAll(fileList);
-        fileGridAdapter.notifyDataSetChanged();
-
-        currentPathTextView.setText(fileBrowser.getCurrentPath().getAbsolutePath());
-    }
-
-    protected void resetDirectorySelectOperations() {
-        super.resetDirectorySelectOperations();
-        moveCopyButton.setVisibility(View.GONE);
-        cancelButton.setVisibility(View.GONE);
-        selectDirectoryButton.setVisibility(View.GONE);
-    }
-
-    private AdapterView.OnItemClickListener onItemClickListener = new AdapterView.OnItemClickListener() {
+    //implementation of FileViewer.FileListAdapterGetViewCallback for IconFileViewer
+    private FileListAdapterGetViewCallback fileListAdapterGetViewCallback = new FileListAdapterGetViewCallback() {
         @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            File clickedFile = fileGridAdapter.getItem(position);
-            if (clickedFile.isDirectory()) {
-                fileBrowser.setCurrentPath(clickedFile);
-            } else {
-                ((MainActivity) getActivity()).openOptionsDialog(clickedFile, getSelfForButtonListeners());
-            }
-        }
-    };
-    private AdapterView.OnItemLongClickListener onItemLongClickListener = new AdapterView.OnItemLongClickListener() {
-        @Override
-        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-            File clickedFile = fileGridAdapter.getItem(position);
-            if (clickedFile != FileBrowser.parentDirectory) {
-                ((MainActivity) getActivity()).openOptionsDialog(clickedFile, getSelfForButtonListeners());
-            }
-            return true;
-        }
-    };
-
-    private class FileGridAdapter extends BaseAdapter {
-        private Context context;
-        private ArrayList<File> files = new ArrayList();
-
-        public FileGridAdapter(Context context) {
-            this.context = context;
-        }
-
-        public void add(File file) {
-            files.add(file);
-        }
-
-        public void addAll(Collection<File> collection) {
-            files.addAll(collection);
-        }
-
-        public void addAll(File[] fileArray) {
-            for (File file : fileArray) {
-                files.add(file);
-            }
-        }
-
-        public void clear() {
-            files.clear();
-        }
-
-        @Override
-        public int getCount() {
-            return files.size();
-        }
-
-        @Override
-        public File getItem(int i) {
-            return files.get(i);
-        }
-
-        @Override
-        public long getItemId(int i) {
-            return files.get(i).hashCode();
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public View getView(int position, View convertView, ViewGroup parent, FileViewer.FileListAdapter fileListAdapter) {
             if (convertView == null) {
-                convertView = LayoutInflater.from(context).inflate(R.layout.view_icon, parent, false);
+                convertView = LayoutInflater.from(getContext()).inflate(R.layout.view_icon, parent, false);
             }
-            File file = getItem(position);
+            File file = fileListAdapter.getItem(position);
             ImageView fileIconImageView = (ImageView) convertView.findViewById(R.id.fileIconImageView);
             TextView fileNameTextView = (TextView) convertView.findViewById(R.id.fileNameTextView);
             if (file.isDirectory()) {
@@ -234,5 +55,5 @@ public class IconFileViewer extends FileViewer {
             fileNameTextView.setText(file.getName());
             return convertView;
         }
-    }
+    };
 }

@@ -1,10 +1,23 @@
 package com.dewdrop623.androidcrypt.FileBrowsing.ui.fileviewer;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.res.ResourcesCompat;
+import android.text.method.ScrollingMovementMethod;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.dewdrop623.androidcrypt.FileBrowsing.FileBrowser;
 import com.dewdrop623.androidcrypt.FileBrowsing.ui.MainActivity;
@@ -15,9 +28,12 @@ import com.dewdrop623.androidcrypt.FileOperations.FileModifierService;
 import com.dewdrop623.androidcrypt.FileOperations.FileOperationType;
 import com.dewdrop623.androidcrypt.FileOperations.operator.FileCopyOperator;
 import com.dewdrop623.androidcrypt.FileOperations.operator.FileMoveOperator;
+import com.dewdrop623.androidcrypt.R;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -25,11 +41,15 @@ import java.util.List;
 /**
  * FileViewer is an abstract Fragment. It implements the common logic and contains the common UI elements across all types of FileViewers
  * FileViewer:
- * -contains the references to buttons for moving/copying files, selecting a directory, and canceling those operations (button appearance is left to the concrete subclass)
- * -assigns and implements the onclicklisteners for the previously mentioned buttons
- * -interacts with the FileBrowser instance when updating the display or modifiying files
- * -tracks the current state of whether a file is being moved/copied or a directory is being selected
- * -provides other common logic, such as the back button going up a directory, returning to the home directory, initiating the process of copy/move/select directory
+ * -contains the references to the UI elements
+ * -implements the UI logic
+ * -interacts with the FileBrowser to update the display and modify files
+ *
+ * Concrete implementations of FileViewer must:
+ * -override onCreateView and inflate a layout with all of the view ids that FileViewer needs
+ * -get an AbsListView instance from the inflated layout
+ * -implement a FileListAdapterGetViewCallback to define the logic of FileListAdapter's getView method
+ * -call initializeFileViewerWithViewAndFileListAdapterGetViewCallback
  */
 
 public abstract class FileViewer extends Fragment{
@@ -60,9 +80,16 @@ public abstract class FileViewer extends Fragment{
     protected ImageButton cancelButton;
     protected ImageButton selectDirectoryButton;
 
+    //the TextView that shows the current directory under the actionbar
+    private TextView currentPathTextView;
+
     //the list of files being displayed and the instance of FileBrowser
     protected File[] fileList;
     protected FileBrowser fileBrowser;
+
+    //The list view to display the files
+    protected AbsListView fileListView;
+    private FileListAdapter fileListAdapter;
 
     //represent the selecting directory state
     private boolean isSelectingEncryptDecryptOutputDirectory = false;
@@ -131,6 +158,28 @@ public abstract class FileViewer extends Fragment{
         }
     };
 
+    private AdapterView.OnItemClickListener onItemClickListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            File clickedFile = fileListAdapter.getItem(position);
+            if (clickedFile.isDirectory()) {
+                fileBrowser.setCurrentPath(clickedFile);
+            } else {
+                ((MainActivity) getActivity()).openOptionsDialog(clickedFile, getSelfForButtonListeners());
+            }
+        }
+    };
+    private AdapterView.OnItemLongClickListener onItemLongClickListener = new AdapterView.OnItemLongClickListener() {
+        @Override
+        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+            File clickedFile = fileListAdapter.getItem(position);
+            if (clickedFile != FileBrowser.parentDirectory) {
+                ((MainActivity) getActivity()).openOptionsDialog(clickedFile, getSelfForButtonListeners());
+            }
+            return true;
+        }
+    };
+
     /////////////////////////
     //PUBLIC METHODS
     /////////////////////////
@@ -139,12 +188,27 @@ public abstract class FileViewer extends Fragment{
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         fileBrowser = new FileBrowser(getContext());
         fileBrowser.setFileViewer(this);
         this.savedInstanceState = savedInstanceState;
         if (savedInstanceState != null) {
             fileBrowser.setCurrentPath(new File(savedInstanceState.getString(CURRENT_DIRECTORY_KEY,"/")));
         }
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_icon_file_viewer, container, false);
+
+
+        return view;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.file_viewer_menu, menu);
     }
 
     //save the current state for a screen rotation
@@ -157,6 +221,19 @@ public abstract class FileViewer extends Fragment{
 
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.home_button:
+                goToHomeDirectory();
+                return true;
+            case R.id.createFolderButton:
+                createFolder();
+                return true;
+        }
+        return false;
+    }
+
     //called by the MainActivity when the back button is pressed, goes up one directory if not already at root
     public void onBackPressed() {
         if (!fileBrowser.getCurrentPath().equals(fileBrowser.root)) {
@@ -167,17 +244,20 @@ public abstract class FileViewer extends Fragment{
     //meant to be called by the FileBrowser, this changes the list of files to be displayed
     public void setFileList(File[] fileList) {
         this.fileList=fileList;
+        updateFileArrayAdapterFileList();
     }
 
     //initiate a move file operation
     public void moveFile(File file) {
         moveState = MOVE;
+        moveCopyButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_move, null));
         onMoveOrCopy(file);
     }
 
     //initiate a copy file operation
     public void copyFile(File file) {
         moveState = COPY;
+        moveCopyButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_copy, null));
         onMoveOrCopy(file);
     }
 
@@ -225,11 +305,14 @@ public abstract class FileViewer extends Fragment{
 
     //gets called when EncryptDecryptFileDialog asks to select an output directory. Can be overridden by child class
     protected void onSelectEncryptDecryptOutputDirectory() {
-
+        selectDirectoryButton.setVisibility(View.VISIBLE);
+        cancelButton.setVisibility(View.VISIBLE);
     }
     //actions taken when a file copy/move operation is initiated by this.copyFile or this.moveFile, intended to be overrode by the concrete class but still call super()
     protected void onMoveOrCopy(File file) {
         moveCopyFile=file;
+        moveCopyButton.setVisibility(View.VISIBLE);
+        cancelButton.setVisibility(View.VISIBLE);
     }
 
     /*
@@ -241,17 +324,46 @@ public abstract class FileViewer extends Fragment{
         moveCopyFile = null;
         encryptDecryptDialogStateBundle = null;
         isSelectingEncryptDecryptOutputDirectory = false;
+        moveCopyButton.setVisibility(View.GONE);
+        cancelButton.setVisibility(View.GONE);
+        selectDirectoryButton.setVisibility(View.GONE);
     }
 
     //change to current and displayed directory to the homeDirectory
     protected final void goToHomeDirectory () {
         fileBrowser.setCurrentPath(FileBrowser.homeDirectory);
     }
-    //after the concrete class assigns the button references, this method should be called to assign their onClick behavior
-    protected final void setButtonListeners() {
+    //after the concrete class inflates the view and the callback for the list adapter getview method, do the rest of the ui initialization work
+    protected final void initializeFileViewerWithViewAndFileListAdapterGetViewCallback(View view, FileListAdapterGetViewCallback fileListAdapterGetViewCallback) {
+        fileListAdapter = new FileListAdapter(fileListAdapterGetViewCallback);
+        fileListView.setAdapter(fileListAdapter);
+        fileListView.setOnItemClickListener(onItemClickListener);
+        fileListView.setOnItemLongClickListener(onItemLongClickListener);
+        currentPathTextView = (TextView) view.findViewById(R.id.currentPathTextView);
+        moveCopyButton = (ImageButton) view.findViewById(R.id.moveCopyButton);
+        cancelButton = (ImageButton) view.findViewById(R.id.cancelMoveCopyButton);
+        selectDirectoryButton = (ImageButton) view.findViewById(R.id.selectDirectoryButton);
+        currentPathTextView.setMovementMethod(new ScrollingMovementMethod());
+
         moveCopyButton.setOnClickListener(moveCopyButtonOnClickListener);
         cancelButton.setOnClickListener(cancelMoveCopyButtonOnClickListener);
         selectDirectoryButton.setOnClickListener(selectDirectoryButtonOnClickListener);
+
+        updateFileArrayAdapterFileList();
+
+        if (savedInstanceState != null) {
+            int prevMoveState = savedInstanceState.getInt(MOVE_STATE_KEY, 0);
+            if (prevMoveState != 0) {
+                String prevMoveCopyFile = savedInstanceState.getString(MOVE_COPY_FILE_KEY, MOVE_COPY_FILE_KEY);
+                if (!prevMoveCopyFile.equals(MOVE_COPY_FILE_KEY)) {
+                    if (prevMoveState == COPY) {
+                        copyFile(new File(prevMoveCopyFile));
+                    } else if (prevMoveState == MOVE) {
+                        moveFile(new File(prevMoveCopyFile));
+                    }
+                }
+            }
+        }
     }
 
     //sort the fileList member variable alphabetically
@@ -259,5 +371,76 @@ public abstract class FileViewer extends Fragment{
         List<File> fileListObjects=Arrays.asList(fileList);
         Collections.sort(fileListObjects, fileObjectAlphabeticalComparator);
         fileList= (File[]) fileListObjects.toArray();
+    }
+
+
+    private void updateFileArrayAdapterFileList() {
+        if (fileListView == null) { //file viewer has not been displayed yet
+            return;
+        }
+        fileListAdapter.clear();
+        if (!fileBrowser.getCurrentPath().equals(fileBrowser.root)) {
+            fileListAdapter.add(FileBrowser.parentDirectory);
+        }
+        sortFileList();
+        fileListAdapter.addAll(fileList);
+        fileListAdapter.notifyDataSetChanged();
+
+        currentPathTextView.setText(fileBrowser.getCurrentPath().getAbsolutePath());
+    }
+
+    ///////////////////////
+    //INTERNAL CLASSES
+    ///////////////////////
+    //intialize an instance of this and pass it to the contructor for FileListAdapter to change its getView behavior
+    protected abstract class FileListAdapterGetViewCallback {
+        public abstract View getView(int position, View convertView, ViewGroup parent, FileListAdapter fileListAdapter);
+    }
+    ///the adapter for the file list view
+    protected class FileListAdapter extends BaseAdapter {
+        private FileListAdapterGetViewCallback fileListAdapterGetViewCallback;
+        private ArrayList<File> files = new ArrayList();
+
+        public FileListAdapter(FileListAdapterGetViewCallback fileListAdapterGetViewCallback) {
+            this.fileListAdapterGetViewCallback = fileListAdapterGetViewCallback;
+        }
+
+        public void add(File file) {
+            files.add(file);
+        }
+
+        public void addAll(Collection<File> collection) {
+            files.addAll(collection);
+        }
+
+        public void addAll(File[] fileArray) {
+            for (File file : fileArray) {
+                files.add(file);
+            }
+        }
+
+        public void clear() {
+            files.clear();
+        }
+
+        @Override
+        public int getCount() {
+            return files.size();
+        }
+
+        @Override
+        public File getItem(int i) {
+            return files.get(i);
+        }
+
+        @Override
+        public long getItemId(int i) {
+            return files.get(i).hashCode();
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            return fileListAdapterGetViewCallback.getView(position, convertView, parent, this);
+        }
     }
 }
