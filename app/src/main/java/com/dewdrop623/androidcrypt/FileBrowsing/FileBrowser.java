@@ -40,7 +40,6 @@ public class FileBrowser {
     }
     public void setFileViewer(FileViewer fileViewer) {
         this.fileViewer = fileViewer;
-        fileViewer.setFileBrowser(this);
         updateFileViewer();
     }
     private void updateFileViewer() {

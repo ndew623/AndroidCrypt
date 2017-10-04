@@ -264,11 +264,6 @@ public abstract class FileViewer extends Fragment{
         fileBrowser.setCurrentPath(newPath);
     }
 
-    //set the FileBrowser for this FileViewer
-    public final void setFileBrowser(FileBrowser fileBrowser) {
-        this.fileBrowser=fileBrowser;
-    }
-
     //send a Bundle with the necessary arguments to FileBrowser's modifyFile to be executed as a command
     public final void sendFileCommandToFileBrowser(Bundle args) {
         fileBrowser.modifyFile(args);
