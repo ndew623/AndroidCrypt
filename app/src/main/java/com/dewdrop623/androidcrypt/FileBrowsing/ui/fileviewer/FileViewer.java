@@ -62,6 +62,8 @@ public abstract class FileViewer extends Fragment{
     private static final String MOVE_STATE_KEY = "com.dewdrop623.androidcrypt.FileBrowsing.ui.fileviewer.FileViewer.MOVE_STATE_KEY";
     private static final String MOVE_COPY_FILE_KEY = "com.dewdrop623.androidcrypt.FileBrowsing.ui.fileviewer.FileViewer.MOVE_COPY_FILE_KEY";
     private static final String CURRENT_DIRECTORY_KEY = "com.dewdrop623.androidcrypt.FileBrowsing.ui.fileviewer.FileViewer.CURRENT_DIRECTORY_KEY";
+    private static final String IS_SELECTING_DIRECTORY_KEY = "com.dewdrop623.androidcrypt.FileBrowsing.ui.fileviewer.FileViewer.IS_SELECTING_DIRECTORY_KEY";
+    private static final String ENCRYPT_DECRYPT_DIALOG_STATE_KEY = "com.dewdrop623.androidcrypt.FileBrowsing.ui.fileviewer.FileViewer.ENCRYPT_DECRYPT_DIALOG_STATE_KEY";
 
     //for storing the current state
     private Bundle savedInstanceState = null;
@@ -214,6 +216,8 @@ public abstract class FileViewer extends Fragment{
         outState.putInt(MOVE_STATE_KEY, moveState);
         outState.putString(MOVE_COPY_FILE_KEY, (moveCopyFile==null)?"":moveCopyFile.getAbsolutePath());
         outState.putString(CURRENT_DIRECTORY_KEY, fileBrowser.getCurrentPath().getAbsolutePath());
+        outState.putBoolean(IS_SELECTING_DIRECTORY_KEY, isSelectingEncryptDecryptOutputDirectory);
+        outState.putBundle(ENCRYPT_DECRYPT_DIALOG_STATE_KEY, encryptDecryptDialogStateBundle);
         super.onSaveInstanceState(outState);
 
     }
@@ -247,6 +251,7 @@ public abstract class FileViewer extends Fragment{
 
     //initiate a move file operation
     public void moveFile(File file) {
+        resetDirectorySelectOperations();
         moveState = MOVE;
         moveCopyButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_move, null));
         onMoveOrCopy(file);
@@ -254,6 +259,7 @@ public abstract class FileViewer extends Fragment{
 
     //initiate a copy file operation
     public void copyFile(File file) {
+        resetDirectorySelectOperations();
         moveState = COPY;
         moveCopyButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_copy, null));
         onMoveOrCopy(file);
@@ -275,9 +281,11 @@ public abstract class FileViewer extends Fragment{
         it will be sent to a new EncryptDecryptFileDialog as arguments with a true boolean argument to indicate that there is state information in the bundle
      */
     public final void selectEncryptDecryptOutputDirectory(Bundle dialogState) {
+        resetDirectorySelectOperations();
         encryptDecryptDialogStateBundle = dialogState;
         isSelectingEncryptDecryptOutputDirectory = true;
-        onSelectEncryptDecryptOutputDirectory();
+        selectDirectoryButton.setVisibility(View.VISIBLE);
+        cancelButton.setVisibility(View.VISIBLE);
     }
 
     ///////////////////////////////////
@@ -314,6 +322,10 @@ public abstract class FileViewer extends Fragment{
                     }
                 }
             }
+            isSelectingEncryptDecryptOutputDirectory = savedInstanceState.getBoolean(IS_SELECTING_DIRECTORY_KEY, false);
+            if (isSelectingEncryptDecryptOutputDirectory) {
+                selectEncryptDecryptOutputDirectory(savedInstanceState.getBundle(ENCRYPT_DECRYPT_DIALOG_STATE_KEY));
+            }
         }
     }
     ///////////////////////////////////
@@ -333,11 +345,6 @@ public abstract class FileViewer extends Fragment{
     //the button listeners are in anonymous classes. They need to pass an instance of this FileViewer but for them this points to the anonymous class, they can reach this method though
     private FileViewer getSelfForButtonListeners() {return this;}
 
-    //gets called when EncryptDecryptFileDialog asks to select an output directory.
-    private void onSelectEncryptDecryptOutputDirectory() {
-        selectDirectoryButton.setVisibility(View.VISIBLE);
-        cancelButton.setVisibility(View.VISIBLE);
-    }
     //actions taken when a file copy/move operation is initiated by this.copyFile or this.moveFile
     private void onMoveOrCopy(File file) {
         moveCopyFile=file;
