@@ -1,12 +1,10 @@
 package com.dewdrop623.androidcrypt.FileBrowsing.ui.fileviewer;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.res.ResourcesCompat;
 import android.text.method.ScrollingMovementMethod;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -16,7 +14,6 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.dewdrop623.androidcrypt.FileBrowsing.FileBrowser;
@@ -229,7 +226,11 @@ public abstract class FileViewer extends Fragment{
             case R.id.home_button:
                 goToHomeDirectory();
                 return true;
-            case R.id.createFolderButton:
+            case R.id.refresh_button:
+                //setting the fileBrowser to its current path will cause it to refresh FileViewer
+                fileBrowser.setCurrentPath(fileBrowser.getCurrentPath());
+                return true;
+            case R.id.create_folder_button:
                 createFolder();
                 return true;
         }

@@ -6,13 +6,20 @@
         android:id="@+id/home_button"
         android:icon="@drawable/ic_home"
         app:showAsAction="ifRoom"
-        android:orderInCategory="50"/>
+        android:orderInCategory="1"/>
     <item
         android:title="@string/create_folder"
-        android:id="@+id/createFolderButton"
+        android:id="@+id/create_folder_button"
         android:icon="@drawable/ic_add_folder"
         app:showAsAction="ifRoom"
-        android:orderInCategory="1"
+        android:orderInCategory="50"
+        />
+    <item
+        android:title="@string/refresh"
+        android:id="@+id/refresh_button"
+        android:icon="@drawable/ic_refresh"
+        app:showAsAction="ifRoom"
+        android:orderInCategory="75"
         />
     <item
         android:id="@+id/settings_menu_button"
