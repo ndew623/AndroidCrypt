@@ -150,4 +150,6 @@
     <string name="view_type">View type</string>
     <string name="icon_view">Icon view</string>
     <string name="list_view">List view</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="action_settings">Settings</string>
 </resources>

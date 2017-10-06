@@ -2,9 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.dewdrop623.androidcrypt">
 
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -12,36 +9,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".FileBrowsing.ui.MainActivity">
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/title_activity_main"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <service
-            android:name=".FileOperations.FileModifierService"
-            android:enabled="true"
-            android:exported="true" />
-
-        <activity
-            android:name=".FileBrowsing.ui.dialog.questiondialog.QuestionDialog"
-            android:theme="@style/DialogTheme" />
-        <activity
-            android:name=".FileBrowsing.ui.dialog.questiondialog.YesNoQuestionDialog"
-            android:theme="@style/DialogTheme" />
-        <activity
-            android:name=".FileBrowsing.ui.dialog.questiondialog.YesNoRememberAnswerQuestionDialog"
-            android:theme="@style/DialogTheme" />
-        <activity
-            android:name=".FileBrowsing.ui.dialog.questiondialog.TextOrCancelQuestionDialog"
-            android:theme="@style/DialogTheme" />
-        <activity
-            android:name=".FileBrowsing.ui.dialog.FileOperationDialog"
-            android:theme="@style/DialogTheme" />
-        <activity android:name=".FileBrowsing.ui.SettingsActivity"
-            android:label="@string/title_activity_settings"/>
     </application>
 
 </manifest>
