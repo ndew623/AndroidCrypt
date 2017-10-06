@@ -296,7 +296,9 @@ public abstract class FileViewer extends Fragment{
     //after the concrete class inflates the view and defines the callback for the list adapter getview method, do the rest of the ui initialization work
     protected final void initializeFileViewerWithViewAndFileListAdapterGetViewCallback(View view, FileListAdapterGetViewCallback fileListAdapterGetViewCallback) {
         fileListAdapter = new FileListAdapter(fileListAdapterGetViewCallback);
+        fileListView.setVisibility(View.VISIBLE);
         fileListView.setAdapter(fileListAdapter);
+        fileListView.setVisibility(View.VISIBLE);
         fileListView.setOnItemClickListener(onItemClickListener);
         fileListView.setOnItemLongClickListener(onItemLongClickListener);
         currentPathTextView = (TextView) view.findViewById(R.id.currentPathTextView);

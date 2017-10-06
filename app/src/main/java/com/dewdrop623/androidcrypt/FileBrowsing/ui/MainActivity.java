@@ -35,7 +35,6 @@ import android.widget.Toast;
 import com.dewdrop623.androidcrypt.FileBrowsing.ui.dialog.filedialog.DebugFileOptionsDialog;
 import com.dewdrop623.androidcrypt.FileBrowsing.ui.dialog.filedialog.FileDialog;
 import com.dewdrop623.androidcrypt.FileBrowsing.ui.fileviewer.FileViewer;
-import com.dewdrop623.androidcrypt.FileBrowsing.ui.fileviewer.IconFileViewer;
 import com.dewdrop623.androidcrypt.FileOperations.FileUtils;
 import com.dewdrop623.androidcrypt.R;
 
@@ -107,10 +106,7 @@ public class MainActivity extends AppCompatActivity {
         FragmentManager fragmentManager = getSupportFragmentManager();
         if (savedInstanceState == null) {
             //the activity is new and we need to instantiate the fragment that is the main gui and add it to the stack
-            fileViewer = new IconFileViewer();
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.add(R.id.mainActivityFrameLayout, fileViewer);
-            fragmentTransaction.commit();
+            createNewFileViewer(fragmentManager);
         } else if (fileViewer == null) {
             //the fragment is not new. the screen probably just rotated. find the old fragment from the stack from the id in its layout and update our member variable reference to it
             refreshFileViewerReferenceWithLayoutID(fragmentManager);
@@ -155,6 +151,16 @@ public class MainActivity extends AppCompatActivity {
     /*
     * PUBLIC METHODS
     * */
+
+    //after coming back to activity, check if settings changing the layout where made
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (SettingsHelper.layoutChanged()) {
+            createNewFileViewer(getSupportFragmentManager());
+        }
+    }
+
     //documention about the drawer had a code example and this was in there. it probably does something useful
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
@@ -262,6 +268,17 @@ public class MainActivity extends AppCompatActivity {
     /*
      * PRIVATE METHODS
      * */
+
+    private void createNewFileViewer(FragmentManager fragmentManager) {
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        if (fileViewer != null) {
+            fragmentTransaction.remove(fileViewer);
+        }
+        fileViewer = SettingsHelper.getCorrectFileViewerInstance(this);
+        fragmentTransaction.add(R.id.mainActivityFrameLayout, fileViewer);
+        fragmentTransaction.commit();
+    }
+
     //reset the fileViewer member variable (e.g. after a screen rotation)
     private void refreshFileViewerReferenceWithLayoutID(FragmentManager fragmentManager) {
         fileViewer = (FileViewer) fragmentManager.findFragmentById(R.id.mainActivityFrameLayout);

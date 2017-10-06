@@ -3,7 +3,6 @@ package com.dewdrop623.androidcrypt.FileOperations.operator;
 import android.os.Bundle;
 
 import com.dewdrop623.androidcrypt.FileOperations.FileModifierService;
-import com.dewdrop623.androidcrypt.R;
 
 import java.io.File;
 import java.util.Stack;

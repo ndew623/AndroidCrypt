@@ -6,8 +6,8 @@ import android.support.v4.content.res.ResourcesCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.dewdrop623.androidcrypt.R;
@@ -15,24 +15,23 @@ import com.dewdrop623.androidcrypt.R;
 import java.io.File;
 
 /**
- * IconFileViewer is concrete implementation of FileViewer
- * IconFileViewer:
+ * ListFileViewer is concrete implementation of FileViewer
+ * ListFileViewer:
  * -inflates the FileViewer's layout
  * -gets an AbsListView instance from that view
  * -creates an instance of FileViewer.FileListAdapterGetViewCallback where it defines the getView behavior for the adapter for the AbsListView
  * -calls the FileViewer method that finishes the set up and passes to it: the view and getView callback
  */
 
-public class IconFileViewer extends FileViewer {
-
+public class ListFileViewer extends FileViewer {
     /*inflates a layout, gets its listView
-    * passes the listView and a callback for the adapter to the parent class
-     */
+ * passes the listView and a callback for the adapter to the parent class
+  */
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_file_viewer, container, false);
-        fileListView = (GridView) view.findViewById(R.id.fileGridView);
+        fileListView = (ListView) view.findViewById(R.id.fileListView);
         initializeFileViewerWithViewAndFileListAdapterGetViewCallback(view, fileListAdapterGetViewCallback);
         return view;
     }
@@ -42,17 +41,17 @@ public class IconFileViewer extends FileViewer {
         @Override
         public View getView(int position, View convertView, ViewGroup parent, FileViewer.FileListAdapter fileListAdapter) {
             if (convertView == null) {
-                convertView = LayoutInflater.from(getContext()).inflate(R.layout.listitem_iconfileviewer_icon, parent, false);
+                convertView = LayoutInflater.from(getContext()).inflate(R.layout.listitem_listfileviewer_item, parent, false);
             }
             File file = fileListAdapter.getItem(position);
-            ImageView fileIconImageView = (ImageView) convertView.findViewById(R.id.fileIconImageView);
-            TextView fileNameTextView = (TextView) convertView.findViewById(R.id.fileNameTextView);
+            ImageView listItemImageView = (ImageView) convertView.findViewById(R.id.listItemImageView);
+            TextView listItemTextView = (TextView) convertView.findViewById(R.id.listItemTextView);
             if (file.isDirectory()) {
-                fileIconImageView.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_folder, null));
+                listItemImageView.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_folder, null));
             } else {
-                fileIconImageView.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_file, null));
+                listItemImageView.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_file, null));
             }
-            fileNameTextView.setText(file.getName());
+            listItemTextView.setText(file.getName());
             return convertView;
         }
     };

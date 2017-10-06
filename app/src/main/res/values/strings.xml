@@ -147,4 +147,7 @@
     <string name="are_you_sure">Are you sure?</string>
     <string name="are_you_sure_you_want_to_reset_everything_to_defaults">Are you sure you want to reset everything to defaults?</string>
     <string name="refresh">Refresh</string>
+    <string name="view_type">View type</string>
+    <string name="icon_view">Icon view</string>
+    <string name="list_view">List view</string>
 </resources>
