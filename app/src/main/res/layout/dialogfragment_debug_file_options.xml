@@ -28,7 +28,7 @@
                 android:layout_marginBottom="8dp">
 
                 <com.dewdrop623.androidcrypt.FileBrowsing.ui.view.CaptionedImageButton
-                    android:id="@+id/encryptButton"
+                    android:id="@+id/encryptDecryptButton"
                     style="@style/FileOptionsCaptionedImageButton"
                     captionedimageview:caption="@string/encrypt"
                     captionedimageview:img_src="@drawable/ic_lock" />

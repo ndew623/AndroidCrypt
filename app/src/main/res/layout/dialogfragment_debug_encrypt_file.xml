@@ -40,7 +40,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
     <Button
-        android:id="@+id/encryptButton"
+        android:id="@+id/encryptDecryptButton"
         android:text="@string/encrypt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
