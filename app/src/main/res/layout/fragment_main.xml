@@ -19,13 +19,13 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <EditText
-                android:id="@+id/inputFileEditText"
-                android:maxLines="1"
-                android:inputType="text"
+            <TextView
+                android:id="@+id/inputFileTextView"
+                android:text="@string/no_input_file_selected"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"/>
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"/>
 
             <ImageButton
                 android:id="@+id/selectInputFileButton"
