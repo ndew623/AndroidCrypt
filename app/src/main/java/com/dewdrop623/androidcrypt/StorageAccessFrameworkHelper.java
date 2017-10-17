@@ -26,6 +26,13 @@ public class StorageAccessFrameworkHelper {
         mainActivityFragment.startActivityForResult(intent, REQUEST_CODE);
     }
 
+    /**
+     *Pick a directory with the Storage Access Framework
+     */
+    public static void safPickDirectory(MainActivityFragment mainActivityFragment, final int REQUEST_CODE) {
+        //TODO do this
+    }
+
     /*
     * return an input stream for a given Uri
     * */

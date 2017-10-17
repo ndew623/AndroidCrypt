@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Environment;
+import android.support.annotation.IdRes;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -17,6 +19,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,17 +33,20 @@ public class MainActivityFragment extends Fragment {
     private static final int FILE_SEARCH_REQUEST_CODE = 623;
     private static final int WRITE_FILE_PERMISSION_REQUEST_CODE = 440;
 
+    private boolean useManuallyEnteredFilePath = false;
     private Uri inputFileUri = null;
     private Uri outputFileUri = null;
 
-    private TextView inputFileTextView;
+    private RadioGroup inputFileSelectTypeRadioGroup;
+    private EditText manuallyEnteredFileInputPathEditText;
+    private TextView inputContentURITextView;
     private ImageButton selectInputFileButton;
     private EditText passwordEditText;
     private EditText confirmPasswordEditText;
     private CheckBox showPasswordCheckbox;
     private EditText fileDestinationDirectoryEditText;
-    private ImageButton selectDirectoryButton;
-    private EditText fileNameEditText;
+    private ImageButton selectOutputDirectoryButton;
+    private EditText outputFileNameEditText;
     private Button encryptDecryptButton;
 
     public MainActivityFragment() {
@@ -51,26 +57,47 @@ public class MainActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
 
-        inputFileTextView = (TextView) view.findViewById(R.id.inputFileTextView);
+        inputFileSelectTypeRadioGroup = (RadioGroup) view.findViewById(R.id.inputFileSelectTypeRadioGroup);
+        manuallyEnteredFileInputPathEditText = (EditText) view.findViewById(R.id.manuallyEnteredFileInputPathEditText);
+        inputContentURITextView = (TextView) view.findViewById(R.id.inputContentURITextView);
         selectInputFileButton = (ImageButton) view.findViewById(R.id.selectInputFileButton);
         passwordEditText = (EditText) view.findViewById(R.id.passwordEditText);
         confirmPasswordEditText = (EditText) view.findViewById(R.id.confirmPasswordEditText);
         showPasswordCheckbox = (CheckBox) view.findViewById(R.id.showPasswordCheckbox);
         fileDestinationDirectoryEditText = (EditText) view.findViewById(R.id.fileDestinationDirectoryEditText);
-        selectDirectoryButton = (ImageButton) view.findViewById(R.id.selectDirectoryButton);
-        fileNameEditText = (EditText) view.findViewById(R.id.fileNameEditText);
+        selectOutputDirectoryButton = (ImageButton) view.findViewById(R.id.selectOutputDirectoryButton);
+        outputFileNameEditText = (EditText) view.findViewById(R.id.outputFileNameEditText);
         encryptDecryptButton = (Button) view.findViewById(R.id.encryptDecryptButton);
+
+        inputFileSelectTypeRadioGroup.setOnCheckedChangeListener(inputFileSelectTypeRadioGroupOnCheckedChangedListener);
         encryptDecryptButton.setOnClickListener(encryptDecryptButtonOnClickListener);
         showPasswordCheckbox.setOnCheckedChangeListener(showPasswordCheckBoxOnCheckedChangeListener);
-        selectDirectoryButton.setOnClickListener(selectDirectoryButtonOnClickListener);
+        selectOutputDirectoryButton.setOnClickListener(selectOutputDirectoryButtonOnClickListener);
         selectInputFileButton.setOnClickListener(selectInputDirectoryButtonOnClickListener);
 
+        inputFileSelectTypeRadioGroup.check(R.id.selectFileRadioButton);
         setShowPassword(false);
+
+        manuallyEnteredFileInputPathEditText.setText(Environment.getExternalStorageDirectory().getAbsolutePath()+"/");
 
         checkPermissions();
 
         return view;
     }
+
+    private RadioGroup.OnCheckedChangeListener inputFileSelectTypeRadioGroupOnCheckedChangedListener = new RadioGroup.OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(RadioGroup radioGroup, @IdRes int i) {
+            switch (i) {
+                case R.id.selectFileRadioButton:
+                    makeSelectFileModeActive();
+                    break;
+                case R.id.manuallyEnterFileRadioButton:
+                    makeManuallyEnterPathModeActive();
+                    break;
+            }
+        }
+    };
 
     private CheckBox.OnCheckedChangeListener showPasswordCheckBoxOnCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() {
         @Override
@@ -86,7 +113,7 @@ public class MainActivityFragment extends Fragment {
         }
     };
 
-    private View.OnClickListener selectDirectoryButtonOnClickListener = new View.OnClickListener() {
+    private View.OnClickListener selectOutputDirectoryButtonOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             //TODO implement
@@ -116,7 +143,7 @@ public class MainActivityFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == FILE_SEARCH_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
                 inputFileUri = data.getData();
-                inputFileTextView.setText(inputFileUri.getEncodedPath());
+                inputContentURITextView.setText(inputFileUri.getEncodedPath());
         } else {
             showError(R.string.storage_access_response_not_result_ok);
         }
@@ -155,6 +182,33 @@ public class MainActivityFragment extends Fragment {
         }
         passwordEditText.setInputType(inputType);
         confirmPasswordEditText.setInputType(inputType);
+    }
+
+    /**
+     * makes ui visible for selecting a file using storage access framework. when encryption/decryption
+     * happens, the member variable for the selected URI will be used to get an input stream.
+     * Hides ui for manually entering a file path.
+     */
+    private void makeSelectFileModeActive() {
+        selectInputFileButton.setVisibility(View.VISIBLE);
+        inputContentURITextView.setVisibility(View.VISIBLE);
+        if (inputFileUri != null) {
+            inputContentURITextView.setText(inputFileUri.getEncodedPath());
+        }
+        manuallyEnteredFileInputPathEditText.setVisibility(View.GONE);
+        useManuallyEnteredFilePath = false;
+    }
+
+    /**
+     *Makes ui visible for manually typing a file path. When encryption/decryption happens,
+     * new File(manuallyEnteredFileInputPathEditText.getText().toString()) will be used.
+     * Hides the ui for selecting a file with the storage access framework
+     */
+    private void makeManuallyEnterPathModeActive() {
+        selectInputFileButton.setVisibility(View.GONE);
+        inputContentURITextView.setVisibility(View.GONE);
+        manuallyEnteredFileInputPathEditText.setVisibility(View.VISIBLE);
+        useManuallyEnteredFilePath = true;
     }
 
     /*

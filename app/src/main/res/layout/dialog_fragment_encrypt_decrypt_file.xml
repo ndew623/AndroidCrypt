@@ -58,7 +58,7 @@
                 android:layout_weight="1"/>
 
             <ImageButton
-                android:id="@+id/selectDirectoryButton"
+                android:id="@+id/selectOutputDirectoryButton"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_marginLeft="4dp"
@@ -73,10 +73,10 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/enter_filename" />
+            android:text="@string/enter_destination_filename" />
 
         <EditText
-            android:id="@+id/fileNameEditText"
+            android:id="@+id/outputFileNameEditText"
             android:maxLines="1"
             android:inputType="text"
             android:layout_width="match_parent"

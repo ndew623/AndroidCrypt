@@ -72,7 +72,7 @@
             style="@style/IconFileViewerImageButton" />
 
         <ImageButton
-            android:id="@+id/selectDirectoryButton"
+            android:id="@+id/selectOutputDirectoryButton"
             style="@style/IconFileViewerImageButton"
             app:srcCompat="@drawable/ic_select_folder" />
     </LinearLayout>

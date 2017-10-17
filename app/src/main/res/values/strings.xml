@@ -11,7 +11,7 @@
     <string name="ok">Ok</string>
     <string name="enter_password">Enter password</string>
     <string name="confirm_password">Confirm password</string>
-    <string name="enter_filename">Enter filename</string>
+    <string name="enter_destination_filename">Enter destination filename</string>
     <string name="no_match">The passwords do not match</string>
     <string name="cannot_be_empty">cannot be empty</string>
     <string name="file_name">File name</string>
@@ -142,4 +142,6 @@
     <string name="enter_input_file">Enter input file</string>
     <string name="storage_access_response_not_result_ok">Storage Access Framework response code was not \"result ok\"</string>
     <string name="no_input_file_selected">No input file selected</string>
+    <string name="manually_enter_file_path">Manually Enter File Path</string>
+    <string name="select_file">Select File</string>
 </resources>

@@ -7,11 +7,32 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="5dp">
 
         <TextView
             android:text="@string/enter_input_file"
             android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <RadioGroup
+            android:id="@+id/inputFileSelectTypeRadioGroup"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <RadioButton
+                android:id="@+id/selectFileRadioButton"
+                android:text="@string/select_file"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <RadioButton
+                android:id="@+id/manuallyEnterFileRadioButton"
+                android:text="@string/manually_enter_file_path"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </RadioGroup>
+        <EditText
+            android:id="@+id/manuallyEnteredFileInputPathEditText"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
         <LinearLayout
@@ -20,7 +41,7 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/inputFileTextView"
+                android:id="@+id/inputContentURITextView"
                 android:text="@string/no_input_file_selected"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -89,7 +110,7 @@
                 android:layout_weight="1"/>
 
             <ImageButton
-                android:id="@+id/selectDirectoryButton"
+                android:id="@+id/selectOutputDirectoryButton"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_marginLeft="4dp"
@@ -104,10 +125,10 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/enter_filename" />
+            android:text="@string/enter_destination_filename" />
 
         <EditText
-            android:id="@+id/fileNameEditText"
+            android:id="@+id/outputFileNameEditText"
             android:maxLines="1"
             android:inputType="text"
             android:layout_width="match_parent"
