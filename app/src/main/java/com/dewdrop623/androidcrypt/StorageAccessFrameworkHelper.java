@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.net.Uri;
+import android.provider.DocumentsContract;
+import android.provider.DocumentsProvider;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,8 +21,8 @@ public class StorageAccessFrameworkHelper {
     /*
     * start an Storage Access Framework activity for selecting the input file
      */
-    public static void safOpenFile(MainActivityFragment mainActivityFragment, final int REQUEST_CODE) {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+    public static void safPickFile(MainActivityFragment mainActivityFragment, final int REQUEST_CODE) {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("*/*");
         mainActivityFragment.startActivityForResult(intent, REQUEST_CODE);
@@ -30,7 +32,10 @@ public class StorageAccessFrameworkHelper {
      *Pick a directory with the Storage Access Framework
      */
     public static void safPickDirectory(MainActivityFragment mainActivityFragment, final int REQUEST_CODE) {
-        //TODO do this
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("*/*");
+        mainActivityFragment.startActivityForResult(intent, REQUEST_CODE);
     }
 
     /*

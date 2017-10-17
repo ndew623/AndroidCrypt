@@ -30,7 +30,8 @@ import java.io.IOException;
  */
 public class MainActivityFragment extends Fragment {
 
-    private static final int FILE_SEARCH_REQUEST_CODE = 623;
+    private static final int SELECT_INPUT_FILE_REQUEST_CODE = 623;
+    private static final int SELECT_OUTPUT_DIRECTORY_REQUEST_CODE = 8878;
     private static final int WRITE_FILE_PERMISSION_REQUEST_CODE = 440;
 
     private boolean useManuallyEnteredFilePath = false;
@@ -109,14 +110,14 @@ public class MainActivityFragment extends Fragment {
     private View.OnClickListener selectInputDirectoryButtonOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            performFileSearch();
+            selectInputFile();
         }
     };
 
     private View.OnClickListener selectOutputDirectoryButtonOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            //TODO implement
+            selectOutputDirectory();
         }
     };
 
@@ -135,13 +136,23 @@ public class MainActivityFragment extends Fragment {
         }
     };
 
-    public void performFileSearch() {
-        StorageAccessFrameworkHelper.safOpenFile(this, FILE_SEARCH_REQUEST_CODE);
+    /**
+     * ask StorageAccessFramework to allow user to pick a file
+     */
+    private void selectInputFile() {
+        StorageAccessFrameworkHelper.safPickFile(this, SELECT_INPUT_FILE_REQUEST_CODE);
+    }
+
+    /**
+     * ask StorageAccessFramework to allow user to pick a directory
+     */
+    private void selectOutputDirectory() {
+        StorageAccessFrameworkHelper.safPickDirectory(this, SELECT_OUTPUT_DIRECTORY_REQUEST_CODE);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == FILE_SEARCH_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+        if (requestCode == SELECT_INPUT_FILE_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
                 inputFileUri = data.getData();
                 inputContentURITextView.setText(inputFileUri.getEncodedPath());
         } else {
