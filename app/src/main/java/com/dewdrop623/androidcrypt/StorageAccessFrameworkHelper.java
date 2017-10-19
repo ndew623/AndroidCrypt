@@ -12,6 +12,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 
 /**
  * provides access to the StorageAccessFramework
@@ -44,5 +45,12 @@ public class StorageAccessFrameworkHelper {
     * */
     public static InputStream getUriInputStream (Context context, Uri uri) throws IOException {
         return context.getContentResolver().openInputStream(uri);
+    }
+
+    /**
+     * return an output stream for a given Uri
+     */
+    public static OutputStream getUriOutputStream (Context context, Uri uri) throws IOException {
+        return context.getContentResolver().openOutputStream(uri);
     }
 }
