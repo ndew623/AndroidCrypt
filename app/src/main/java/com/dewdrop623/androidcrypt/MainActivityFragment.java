@@ -130,7 +130,7 @@ public class MainActivityFragment extends Fragment {
         public void onClick(View view) {
             if (validationCheck()) {
                 try {
-                    StorageAccessFrameworkHelper.getUriInputStream(referenceToThisForAnonymousClassButtonListeners(), inputFileUri).close();
+                    StorageAccessFrameworkHelper.getUriInputStream(referenceToThisForAnonymousClassButtonListeners().getContext(), inputFileUri).close();
                 } catch (IOException ioe) {
                     showError(R.string.ioexception);
                     ioe.printStackTrace();
@@ -170,7 +170,7 @@ public class MainActivityFragment extends Fragment {
      * called by MainActivity when the Floating Action Button is pressed.
      */
     public void actionButtonPressed() {
-
+        
     }
 
     //check for the necessary permissions. destroy and recreate the activity if permissions are asked for so that the files (which couldn't be seen previously) will be displayed

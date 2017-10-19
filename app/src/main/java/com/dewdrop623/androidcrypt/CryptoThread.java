@@ -28,6 +28,7 @@ public class CryptoThread extends Thread {
     private Uri outputUri;
     private String password;
     private int version;
+    boolean operationType;
 
     /**
      * Takes a context, input and output uris, the password, a version (use VERSION_X constants), and operation type (defined by the OPERATION_TYPE_X constants)
@@ -38,6 +39,7 @@ public class CryptoThread extends Thread {
         this.outputUri = outputUri;
         this.password = password;
         this.version = version;
+        this.operationType = operationType;
     }
 
     @Override
@@ -66,7 +68,11 @@ public class CryptoThread extends Thread {
         //call AESCrypt
         try {
             AESCrypt aesCrypt = new AESCrypt(password);
-            aesCrypt.encrypt(version, inputStream, outputStream);
+            if (operationType == OPERATION_TYPE_ENCRYPTION) {
+                aesCrypt.encrypt(version, inputStream, outputStream);
+            } else {
+                aesCrypt.decrypt(version, inputStream, outputStream);
+            }
         } catch (GeneralSecurityException gse) {
             gse.printStackTrace();
             //TODO, probably can't do this from the thread. Move it to somewhere else.
