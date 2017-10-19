@@ -3,13 +3,16 @@ package com.dewdrop623.androidcrypt;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.annotation.IdRes;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.CursorLoader;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,7 +48,7 @@ public class MainActivityFragment extends Fragment {
     private EditText passwordEditText;
     private EditText confirmPasswordEditText;
     private CheckBox showPasswordCheckbox;
-    private EditText fileDestinationDirectoryEditText;
+    private TextView fileDestinationDirectoryTextView;
     private ImageButton selectOutputDirectoryButton;
     private EditText outputFileNameEditText;
     private Button encryptDecryptButton;
@@ -65,7 +68,7 @@ public class MainActivityFragment extends Fragment {
         passwordEditText = (EditText) view.findViewById(R.id.passwordEditText);
         confirmPasswordEditText = (EditText) view.findViewById(R.id.confirmPasswordEditText);
         showPasswordCheckbox = (CheckBox) view.findViewById(R.id.showPasswordCheckbox);
-        fileDestinationDirectoryEditText = (EditText) view.findViewById(R.id.fileDestinationDirectoryEditText);
+        fileDestinationDirectoryTextView = (TextView) view.findViewById(R.id.fileDestinationDirectoryTextView);
         selectOutputDirectoryButton = (ImageButton) view.findViewById(R.id.selectOutputDirectoryButton);
         outputFileNameEditText = (EditText) view.findViewById(R.id.outputFileNameEditText);
         encryptDecryptButton = (Button) view.findViewById(R.id.encryptDecryptButton);
@@ -153,14 +156,25 @@ public class MainActivityFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == SELECT_INPUT_FILE_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-                inputFileUri = data.getData();
-                inputContentURITextView.setText(inputFileUri.getEncodedPath());
+            inputFileUri = data.getData();
+            inputContentURITextView.setText(inputFileUri.getPath());
+        } else if (requestCode == SELECT_OUTPUT_DIRECTORY_REQUEST_CODE) {
+            outputFileUri = data.getData();
+            fileDestinationDirectoryTextView.setText(outputFileUri.getPath());
         } else {
-            showError(R.string.storage_access_response_not_result_ok);
+            showError(R.string.error_unexpected_response_from_saf);
         }
     }
+
+    /**
+     * called by MainActivity when the Floating Action Button is pressed.
+     */
+    public void actionButtonPressed() {
+
+    }
+
     //check for the necessary permissions. destroy and recreate the activity if permissions are asked for so that the files (which couldn't be seen previously) will be displayed
-    public void checkPermissions() {
+    private void checkPermissions() {
         if(ContextCompat.checkSelfPermission(getContext(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED ) {
             ActivityCompat.requestPermissions(getActivity(), new String[] {android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_FILE_PERMISSION_REQUEST_CODE);
         }
@@ -193,6 +207,21 @@ public class MainActivityFragment extends Fragment {
         }
         passwordEditText.setInputType(inputType);
         confirmPasswordEditText.setInputType(inputType);
+    }
+
+    /**
+     * thanks to Sebastiano on stackoverflow.
+     * get the file path so it can be displayed in ui
+     */
+    private String getRealPathFromURI(Uri contentUri) {
+        String[] proj = { MediaStore.Images.Media.DATA };
+        CursorLoader loader = new CursorLoader(getContext(), contentUri, proj, null, null, null);
+        Cursor cursor = loader.loadInBackground();
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        String result = cursor.getString(column_index);
+        cursor.close();
+        return result;
     }
 
     /**

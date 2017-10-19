@@ -50,7 +50,7 @@
             android:orientation="horizontal">
 
             <EditText
-                android:id="@+id/fileDestinationDirectoryEditText"
+                android:id="@+id/fileDestinationDirectoryTextView"
                 android:maxLines="1"
                 android:inputType="text"
                 android:layout_width="0dp"
