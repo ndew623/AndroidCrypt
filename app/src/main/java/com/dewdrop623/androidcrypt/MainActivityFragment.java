@@ -170,7 +170,16 @@ public class MainActivityFragment extends Fragment {
      * called by MainActivity when the Floating Action Button is pressed.
      */
     public void actionButtonPressed() {
-        
+        if (inputFileUri == null || outputFileUri == null) {
+            return ;
+        }
+        Intent intent = new Intent(getContext(), CryptoService.class);
+        intent.putExtra(CryptoService.INPUT_URI_EXTRA_KEY, inputFileUri.toString());
+        intent.putExtra(CryptoService.OUTPUT_URI_EXTRA_KEY, outputFileUri.toString());
+        //TODO probably major security flaw to put encryption keys in an intent. research and change if necessary.
+        intent.putExtra(CryptoService.PASSWORD_EXTRA_KEY, passwordEditText.getText().toString());
+        intent.putExtra(CryptoService.VERSION_EXTRA_KEY, CryptoThread.VERSION_2);
+        intent.putExtra(CryptoService.OPERATION_TYPE_EXTRA_KEY, CryptoThread.OPERATION_TYPE_ENCRYPTION);
     }
 
     //check for the necessary permissions. destroy and recreate the activity if permissions are asked for so that the files (which couldn't be seen previously) will be displayed
