@@ -144,4 +144,6 @@
     <string name="no_input_file_selected">No input file selected</string>
     <string name="manually_enter_file_path">Manually Enter File Path</string>
     <string name="select_file">Select File</string>
+    <string name="error_could_not_get_input_file">Error: could not get input file</string>
+    <string name="error_could_close_input_file">Error: could not close input file</string>
 </resources>

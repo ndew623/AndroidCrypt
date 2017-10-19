@@ -2,6 +2,7 @@ package com.dewdrop623.androidcrypt;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.provider.DocumentsContract;
@@ -41,7 +42,7 @@ public class StorageAccessFrameworkHelper {
     /*
     * return an input stream for a given Uri
     * */
-    public static InputStream getUriInputStream (MainActivityFragment mainActivityFragment, Uri uri) throws IOException {
-        return mainActivityFragment.getActivity().getContentResolver().openInputStream(uri);
+    public static InputStream getUriInputStream (Context context, Uri uri) throws IOException {
+        return context.getContentResolver().openInputStream(uri);
     }
 }
