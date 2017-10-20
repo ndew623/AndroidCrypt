@@ -17,7 +17,6 @@ import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -37,21 +36,19 @@ public class MainActivityFragment extends Fragment {
     private static final int SELECT_OUTPUT_DIRECTORY_REQUEST_CODE = 8878;
     private static final int WRITE_FILE_PERMISSION_REQUEST_CODE = 440;
 
-    private boolean useManuallyEnteredFilePath = false;
+    private boolean operationType = CryptoThread.OPERATION_TYPE_ENCRYPTION;
     private Uri inputFileUri = null;
     private Uri outputFileUri = null;
 
-    private RadioGroup inputFileSelectTypeRadioGroup;
-    private EditText manuallyEnteredFileInputPathEditText;
     private TextView inputContentURITextView;
     private ImageButton selectInputFileButton;
     private EditText passwordEditText;
+    private TextView confirmPasswordTextView;
     private EditText confirmPasswordEditText;
     private CheckBox showPasswordCheckbox;
     private TextView fileDestinationDirectoryTextView;
     private ImageButton selectOutputDirectoryButton;
-    private EditText outputFileNameEditText;
-    private Button encryptDecryptButton;
+    private RadioGroup operationTypeRadioGroup;
 
     public MainActivityFragment() {
     }
@@ -61,43 +58,48 @@ public class MainActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
 
-        inputFileSelectTypeRadioGroup = (RadioGroup) view.findViewById(R.id.inputFileSelectTypeRadioGroup);
-        manuallyEnteredFileInputPathEditText = (EditText) view.findViewById(R.id.manuallyEnteredFileInputPathEditText);
         inputContentURITextView = (TextView) view.findViewById(R.id.inputContentURITextView);
         selectInputFileButton = (ImageButton) view.findViewById(R.id.selectInputFileButton);
         passwordEditText = (EditText) view.findViewById(R.id.passwordEditText);
+        confirmPasswordTextView = (TextView) view.findViewById(R.id.confirmPasswordTextView);
         confirmPasswordEditText = (EditText) view.findViewById(R.id.confirmPasswordEditText);
         showPasswordCheckbox = (CheckBox) view.findViewById(R.id.showPasswordCheckbox);
-        fileDestinationDirectoryTextView = (TextView) view.findViewById(R.id.fileDestinationDirectoryTextView);
+        fileDestinationDirectoryTextView = (TextView) view.findViewById(R.id.outputContentURITextView);
         selectOutputDirectoryButton = (ImageButton) view.findViewById(R.id.selectOutputDirectoryButton);
-        outputFileNameEditText = (EditText) view.findViewById(R.id.outputFileNameEditText);
-        encryptDecryptButton = (Button) view.findViewById(R.id.encryptDecryptButton);
+        operationTypeRadioGroup = (RadioGroup) view.findViewById(R.id.operationTypeRadioGroup);
 
-        inputFileSelectTypeRadioGroup.setOnCheckedChangeListener(inputFileSelectTypeRadioGroupOnCheckedChangedListener);
-        encryptDecryptButton.setOnClickListener(encryptDecryptButtonOnClickListener);
+        operationTypeRadioGroup.setOnCheckedChangeListener(operationTypeRadioGroupOnCheckedChangedListener);
         showPasswordCheckbox.setOnCheckedChangeListener(showPasswordCheckBoxOnCheckedChangeListener);
         selectOutputDirectoryButton.setOnClickListener(selectOutputDirectoryButtonOnClickListener);
         selectInputFileButton.setOnClickListener(selectInputDirectoryButtonOnClickListener);
 
-        inputFileSelectTypeRadioGroup.check(R.id.selectFileRadioButton);
         setShowPassword(false);
-
-        manuallyEnteredFileInputPathEditText.setText(Environment.getExternalStorageDirectory().getAbsolutePath()+"/");
 
         checkPermissions();
 
         return view;
     }
 
-    private RadioGroup.OnCheckedChangeListener inputFileSelectTypeRadioGroupOnCheckedChangedListener = new RadioGroup.OnCheckedChangeListener() {
+    /**
+     * onCreateView apparently runs before MainActivity initializes its views in MainActivity.onCreate()
+     * this is an issue because the OnCheckedChangeListener for the encryption/decryption RadioGroup changes the icon on the Floating Action Button,
+     * which is one of MainActivity's views
+     * therefore, this method can be called by MainActivity at the end of its onCreate() method
+     */
+    public void onPostMainActivityOnCreate() {
+        //set the default mode, check triggers OnCheckedChangedListener
+        operationTypeRadioGroup.check(R.id.encryptionRadioButton);
+    }
+
+    private RadioGroup.OnCheckedChangeListener operationTypeRadioGroupOnCheckedChangedListener = new RadioGroup.OnCheckedChangeListener() {
         @Override
         public void onCheckedChanged(RadioGroup radioGroup, @IdRes int i) {
             switch (i) {
-                case R.id.selectFileRadioButton:
-                    makeSelectFileModeActive();
+                case R.id.encryptionRadioButton:
+                    enableEncryptionMode();
                     break;
-                case R.id.manuallyEnterFileRadioButton:
-                    makeManuallyEnterPathModeActive();
+                case R.id.decryptionRadioButton:
+                    enableDecryptionMode();
                     break;
             }
         }
@@ -180,6 +182,7 @@ public class MainActivityFragment extends Fragment {
         intent.putExtra(CryptoService.PASSWORD_EXTRA_KEY, passwordEditText.getText().toString());
         intent.putExtra(CryptoService.VERSION_EXTRA_KEY, CryptoThread.VERSION_2);
         intent.putExtra(CryptoService.OPERATION_TYPE_EXTRA_KEY, CryptoThread.OPERATION_TYPE_ENCRYPTION);
+        getContext().startService(intent);
     }
 
     //check for the necessary permissions. destroy and recreate the activity if permissions are asked for so that the files (which couldn't be seen previously) will be displayed
@@ -219,45 +222,25 @@ public class MainActivityFragment extends Fragment {
     }
 
     /**
-     * thanks to Sebastiano on stackoverflow.
-     * get the file path so it can be displayed in ui
+     * Makes encryption mode active.
+     * Shows the confirm password entry field, changes the member variable operationType, and changes the icon on the Floating Action Button
      */
-    private String getRealPathFromURI(Uri contentUri) {
-        String[] proj = { MediaStore.Images.Media.DATA };
-        CursorLoader loader = new CursorLoader(getContext(), contentUri, proj, null, null, null);
-        Cursor cursor = loader.loadInBackground();
-        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        cursor.moveToFirst();
-        String result = cursor.getString(column_index);
-        cursor.close();
-        return result;
+    private void enableEncryptionMode() {
+        operationType = CryptoThread.OPERATION_TYPE_ENCRYPTION;
+        confirmPasswordTextView.setVisibility(View.VISIBLE);
+        confirmPasswordEditText.setVisibility(View.VISIBLE);
+        ((MainActivity)getActivity()).setFABIcon(R.drawable.ic_lock);
     }
 
     /**
-     * makes ui visible for selecting a file using storage access framework. when encryption/decryption
-     * happens, the member variable for the selected URI will be used to get an input stream.
-     * Hides ui for manually entering a file path.
+     * Makes decryption mode active.
+     * Hides the confirm password entry field, changes the member variable operationType, and changes the icon on the Floating Action Button
      */
-    private void makeSelectFileModeActive() {
-        selectInputFileButton.setVisibility(View.VISIBLE);
-        inputContentURITextView.setVisibility(View.VISIBLE);
-        if (inputFileUri != null) {
-            inputContentURITextView.setText(inputFileUri.getEncodedPath());
-        }
-        manuallyEnteredFileInputPathEditText.setVisibility(View.GONE);
-        useManuallyEnteredFilePath = false;
-    }
-
-    /**
-     *Makes ui visible for manually typing a file path. When encryption/decryption happens,
-     * new File(manuallyEnteredFileInputPathEditText.getText().toString()) will be used.
-     * Hides the ui for selecting a file with the storage access framework
-     */
-    private void makeManuallyEnterPathModeActive() {
-        selectInputFileButton.setVisibility(View.GONE);
-        inputContentURITextView.setVisibility(View.GONE);
-        manuallyEnteredFileInputPathEditText.setVisibility(View.VISIBLE);
-        useManuallyEnteredFilePath = true;
+    private void enableDecryptionMode() {
+        operationType = CryptoThread.OPERATION_TYPE_DECRYPTION;
+        confirmPasswordTextView.setVisibility(View.INVISIBLE);
+        confirmPasswordEditText.setVisibility(View.INVISIBLE);
+        ((MainActivity)getActivity()).setFABIcon(R.drawable.ic_unlock);
     }
 
     /*

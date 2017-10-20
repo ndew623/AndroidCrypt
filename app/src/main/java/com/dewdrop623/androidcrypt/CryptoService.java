@@ -58,8 +58,7 @@ public class CryptoService extends Service {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
         Intent resultIntent = new Intent(this, MainActivity.class);
 
-        builder.setSmallIcon(R.drawable.ic_lock);
-        builder.setContentTitle(getString(R.string.app_name)).setContentText("placeholder notification");
+        builder.setSmallIcon(R.drawable.ic_lock).setContentTitle(getString(R.string.app_name)).setContentText("placeholder notification");
         return  builder.build();
     }
 }

@@ -21,11 +21,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
     <EditText
-        android:id="@+id/fileDestinationDirectoryTextView"
+        android:id="@+id/outputContentURITextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
     <TextView
-        android:text="@string/enter_destination_filename"
+        android:text="@string/enter_output_file"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
     <EditText

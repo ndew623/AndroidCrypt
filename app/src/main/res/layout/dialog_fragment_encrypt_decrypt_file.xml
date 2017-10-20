@@ -50,7 +50,7 @@
             android:orientation="horizontal">
 
             <EditText
-                android:id="@+id/fileDestinationDirectoryTextView"
+                android:id="@+id/outputContentURITextView"
                 android:maxLines="1"
                 android:inputType="text"
                 android:layout_width="0dp"
@@ -73,7 +73,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/enter_destination_filename" />
+            android:text="@string/enter_output_file" />
 
         <EditText
             android:id="@+id/outputFileNameEditText"

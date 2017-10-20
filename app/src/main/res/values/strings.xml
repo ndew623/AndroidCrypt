@@ -11,7 +11,7 @@
     <string name="ok">Ok</string>
     <string name="enter_password">Enter password</string>
     <string name="confirm_password">Confirm password</string>
-    <string name="enter_destination_filename">Enter destination filename</string>
+    <string name="enter_output_file">Enter output file</string>
     <string name="no_match">The passwords do not match</string>
     <string name="cannot_be_empty">cannot be empty</string>
     <string name="file_name">File name</string>
@@ -151,4 +151,5 @@
     <string name="error_utf16_encoding_is_not_supported">Error: UTF-16 encoding is not supported</string>
     <string name="error_cryto_operation_encountered_ioexception">Error: Crypto operation encountered an IOException</string>
     <string name="error_could_not_close_output_file">Error: Could not close output file</string>
+    <string name="no_output_file_selected">No output value selected</string>
 </resources>
