@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
                 mainActivityFragment.actionButtonPressed();
             }
         });
+        getMainActivityFragment().onPostMainActivityOnCreate();
     }
 
     public void setFABIcon(int drawableId) {

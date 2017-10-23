@@ -1,9 +1,9 @@
 package com.dewdrop623.androidcrypt;
 
-import android.content.Context;
 import android.net.Uri;
 import android.widget.Toast;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -23,7 +23,7 @@ public class CryptoThread extends Thread {
     public static final int VERSION_1 = 1;
     public static final int VERSION_2 = 2;
 
-    private Context context;
+    private CryptoService cryptoService;
     private Uri inputUri;
     private Uri outputUri;
     private String password;
@@ -31,10 +31,10 @@ public class CryptoThread extends Thread {
     boolean operationType;
 
     /**
-     * Takes a context, input and output uris, the password, a version (use VERSION_X constants), and operation type (defined by the OPERATION_TYPE_X constants)
+     * Takes a cryptoService, input and output uris, the password, a version (use VERSION_X constants), and operation type (defined by the OPERATION_TYPE_X constants)
      */
-    public CryptoThread(Context context, Uri inputUri, Uri outputUri, String password, int version, boolean operationType) {
-        this.context = context;
+    public CryptoThread(CryptoService cryptoService, Uri inputUri, Uri outputUri, String password, int version, boolean operationType) {
+        this.cryptoService = cryptoService;
         this.inputUri = inputUri;
         this.outputUri = outputUri;
         this.password = password;
@@ -48,21 +48,19 @@ public class CryptoThread extends Thread {
         InputStream inputStream = null;
         //get the input stream
         try {
-            inputStream = StorageAccessFrameworkHelper.getUriInputStream(context, inputUri);
+            inputStream = StorageAccessFrameworkHelper.getUriInputStream(cryptoService, inputUri);
         } catch (IOException ioe) {
             ioe.printStackTrace();
-            //TODO, probably can't do this from the thread. Move it to somewhere else.
-            Toast.makeText(context, R.string.error_could_not_get_input_file, Toast.LENGTH_SHORT);
+            cryptoService.showToastOnGuiThread(R.string.error_could_not_get_input_file);
         }
 
         OutputStream outputStream = null;
         //get the output stream
         try {
-            outputStream = StorageAccessFrameworkHelper.getUriOutputStream(context, outputUri);
+            outputStream = StorageAccessFrameworkHelper.getUriOutputStream(cryptoService, outputUri);
         } catch (IOException ioe) {
             ioe.printStackTrace();
-            //TODO, probably can't do this from the thread. Move it to somewhere else.
-            Toast.makeText(context, R.string.error_could_not_get_output_file, Toast.LENGTH_SHORT);
+            cryptoService.showToastOnGuiThread(R.string.error_could_not_get_output_file);
         }
 
         //call AESCrypt
@@ -71,19 +69,16 @@ public class CryptoThread extends Thread {
             if (operationType == OPERATION_TYPE_ENCRYPTION) {
                 aesCrypt.encrypt(version, inputStream, outputStream);
             } else {
-                aesCrypt.decrypt(version, inputStream, outputStream);
+                aesCrypt.decrypt(new File(inputUri.getPath()).length(), inputStream, outputStream);//TODO, getting filesize this way doesn't work
             }
         } catch (GeneralSecurityException gse) {
             gse.printStackTrace();
-            //TODO, probably can't do this from the thread. Move it to somewhere else.
-            Toast.makeText(context, R.string.error_platform_does_not_support_the_required_cryptographic_methods, Toast.LENGTH_SHORT);
+            cryptoService.showToastOnGuiThread(R.string.error_platform_does_not_support_the_required_cryptographic_methods);
         } catch (UnsupportedEncodingException uee) {
             uee.printStackTrace();
-            //TODO, probably can't do this from the thread. Move it to somewhere else.
-            Toast.makeText(context, R.string.error_utf16_encoding_is_not_supported, Toast.LENGTH_SHORT);
+            cryptoService.showToastOnGuiThread(R.string.error_utf16_encoding_is_not_supported);
         } catch (IOException ioe) {
-            //TODO, probably can't do this from the thread. Move it to somewhere else.
-            Toast.makeText(context, R.string.error_cryto_operation_encountered_ioexception, Toast.LENGTH_SHORT);
+            cryptoService.showToastOnGuiThread(ioe.getMessage());
         }
 
         //close the streams
@@ -93,7 +88,7 @@ public class CryptoThread extends Thread {
             } catch (IOException ioe) {
                 ioe.printStackTrace();
                 //TODO, probably can't do this from the thread. Move it to somewhere else.
-                Toast.makeText(context, R.string.error_could_not_close_input_file, Toast.LENGTH_SHORT);
+                cryptoService.showToastOnGuiThread(R.string.error_could_not_close_input_file);
             }
         }
         if (outputStream != null) {
@@ -101,8 +96,11 @@ public class CryptoThread extends Thread {
                 outputStream.close();
             } catch (IOException ioe) {
                 //TODO, probably can't do this from the thread. Move it to somewhere else.
-                Toast.makeText(context, R.string.error_could_not_close_output_file, Toast.LENGTH_SHORT);
+                cryptoService.showToastOnGuiThread(R.string.error_could_not_close_output_file);
             }
         }
+
+        //stop the service, and remove the notification
+        cryptoService.stopForeground(true);
     }
 }

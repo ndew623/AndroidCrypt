@@ -181,7 +181,7 @@ public class MainActivityFragment extends Fragment {
         //TODO probably major security flaw to put encryption keys in an intent. research and change if necessary.
         intent.putExtra(CryptoService.PASSWORD_EXTRA_KEY, passwordEditText.getText().toString());
         intent.putExtra(CryptoService.VERSION_EXTRA_KEY, CryptoThread.VERSION_2);
-        intent.putExtra(CryptoService.OPERATION_TYPE_EXTRA_KEY, CryptoThread.OPERATION_TYPE_ENCRYPTION);
+        intent.putExtra(CryptoService.OPERATION_TYPE_EXTRA_KEY, operationType);
         getContext().startService(intent);
     }
 

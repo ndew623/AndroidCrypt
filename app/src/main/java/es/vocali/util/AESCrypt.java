@@ -15,7 +15,6 @@
  */
 package es.vocali.util;
 
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -54,15 +53,15 @@ import javax.crypto.spec.SecretKeySpec;
  */
 public class AESCrypt {
 	private static final String JCE_EXCEPTION_MESSAGE = "Please make sure "
-		+ "\"Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files\" "
-		+ "(http://java.sun.com/javase/downloads/index.jsp) is installed on your JRE.";
+			+ "\"Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files\" "
+			+ "(http://java.sun.com/javase/downloads/index.jsp) is installed on your JRE.";
 	private static final String RANDOM_ALG = "SHA1PRNG";
 	private static final String DIGEST_ALG = "SHA-256";
 	private static final String HMAC_ALG = "HmacSHA256";
 	private static final String CRYPT_ALG = "AES";
 	private static final String CRYPT_TRANS = "AES/CBC/NoPadding";
 	private static final byte[] DEFAULT_MAC =
-		{0x01, 0x23, 0x45, 0x67, (byte) 0x89, (byte) 0xab, (byte) 0xcd, (byte) 0xef};
+			{0x01, 0x23, 0x45, 0x67, (byte) 0x89, (byte) 0xab, (byte) 0xcd, (byte) 0xef};
 	private static final int KEY_SIZE = 32;
 	private static final int BLOCK_SIZE = 16;
 	private static final int SHA_SIZE = 32;
@@ -78,15 +77,12 @@ public class AESCrypt {
 	private IvParameterSpec ivSpec2;
 	private SecretKeySpec aesKey2;
 
-	//for progress update
-	private int bytesRead = 0;
 
-	
 	/*******************
 	 * PRIVATE METHODS *
 	 *******************/
-	
-	
+
+
 	/**
 	 * Prints a debug message on standard output if DEBUG mode is turned on.
 	 */
@@ -95,8 +91,8 @@ public class AESCrypt {
 			System.out.println("[DEBUG] " + message);
 		}
 	}
-	
-	
+
+
 	/**
 	 * Prints a debug message on standard output if DEBUG mode is turned on.
 	 */
@@ -112,8 +108,8 @@ public class AESCrypt {
 			System.out.println(buffer.toString());
 		}
 	}
-	
-	
+
+
 	/**
 	 * Generates a pseudo-random byte array.
 	 * @return pseudo-random byte array of <tt>len</tt> bytes.
@@ -123,8 +119,8 @@ public class AESCrypt {
 		random.nextBytes(bytes);
 		return bytes;
 	}
-	
-	
+
+
 	/**
 	 * SHA256 digest over given byte array and random bytes.<br>
 	 * <tt>bytes.length</tt> * <tt>num</tt> random bytes are added to the digest.
@@ -143,8 +139,8 @@ public class AESCrypt {
 		}
 		System.arraycopy(digest.digest(), 0, bytes, 0, bytes.length);
 	}
-	
-	
+
+
 	/**
 	 * Generates a pseudo-random IV based on time and this computer's MAC.
 	 * <p>
@@ -166,7 +162,7 @@ public class AESCrypt {
 		if (mac == null) {
 			mac = DEFAULT_MAC;
 		}
-		
+
 		for (int i = 0; i < 8; i++) {
 			iv[i] = (byte) (time >> (i * 8));
 		}
@@ -174,8 +170,8 @@ public class AESCrypt {
 		digestRandomBytes(iv, 256);
 		return iv;
 	}
-	
-	
+
+
 	/**
 	 * Generates an AES key starting with an IV and applying the supplied user password.
 	 * <p>
@@ -194,7 +190,7 @@ public class AESCrypt {
 		return aesKey;
 	}
 
-	
+
 	/**
 	 * Generates the random IV used to crypt file contents.
 	 * @return IV 2.
@@ -204,8 +200,8 @@ public class AESCrypt {
 		digestRandomBytes(iv, 256);
 		return iv;
 	}
-	
-	
+
+
 	/**
 	 * Generates the random AES key used to crypt file contents.
 	 * @return AES key of {@link #KEY_SIZE} bytes.
@@ -215,8 +211,8 @@ public class AESCrypt {
 		digestRandomBytes(aesKey, 32);
 		return aesKey;
 	}
-	
-	
+
+
 	/**
 	 * Utility method to read bytes from a stream until the given array is fully filled.
 	 * @throws IOException if the array can't be filled.
@@ -227,12 +223,12 @@ public class AESCrypt {
 		}
 	}
 
-	
+
 	/**************
 	 * PUBLIC API *
 	 **************/
-	
-	
+
+
 	/**
 	 * Builds an object to encrypt or decrypt files with the given password.
 	 * @throws GeneralSecurityException if the platform does not support the required cryptographic methods.
@@ -241,8 +237,8 @@ public class AESCrypt {
 	public AESCrypt(String password) throws GeneralSecurityException, UnsupportedEncodingException {
 		this(false, password);
 	}
-	
-	
+
+
 	/**
 	 * Builds an object to encrypt or decrypt files with the given password.
 	 * @throws GeneralSecurityException if the platform does not support the required cryptographic methods.
@@ -256,13 +252,12 @@ public class AESCrypt {
 			digest = MessageDigest.getInstance(DIGEST_ALG);
 			cipher = Cipher.getInstance(CRYPT_TRANS);
 			hmac = Mac.getInstance(HMAC_ALG);
-
 		} catch (GeneralSecurityException e) {
 			throw new GeneralSecurityException(JCE_EXCEPTION_MESSAGE, e);
 		}
 	}
-	
-	
+
+
 	/**
 	 * Changes the password this object uses to encrypt and decrypt.
 	 * @throws UnsupportedEncodingException if UTF-16 encoding is not supported.
@@ -271,8 +266,8 @@ public class AESCrypt {
 		this.password = password.getBytes("UTF-16LE");
 		debug("Using password: ", this.password);
 	}
-	
-	
+
+
 	/**
 	 * The file at <tt>fromPath</tt> is encrypted and saved at <tt>toPath</tt> location.
 	 * <p>
@@ -281,7 +276,7 @@ public class AESCrypt {
 	 * @throws GeneralSecurityException if the platform does not support the required cryptographic methods.
 	 */
 	public void encrypt(int version, String fromPath, String toPath)
-	throws IOException, GeneralSecurityException {
+			throws IOException, GeneralSecurityException {
 		InputStream in = null;
 		OutputStream out = null;
 		try {
@@ -289,7 +284,7 @@ public class AESCrypt {
 			debug("Opened for reading: " + fromPath);
 			out = new BufferedOutputStream(new FileOutputStream(toPath));
 			debug("Opened for writing: " + toPath);
-			
+
 			encrypt(version, in, out);
 		} finally {
 			if (in != null) {
@@ -297,10 +292,10 @@ public class AESCrypt {
 			}
 			if (out != null) {
 				out.close();
-			}			
+			}
 		}
 	}
-	
+
 	/**
 	 * The input stream is encrypted and saved to the output stream.
 	 * <p>
@@ -310,8 +305,7 @@ public class AESCrypt {
 	 * @throws GeneralSecurityException if the platform does not support the required cryptographic methods.
 	 */
 	public void encrypt(int version, InputStream in, OutputStream out)
-	throws IOException, GeneralSecurityException {
-
+			throws IOException, GeneralSecurityException {
 		try {
 			byte[] text = null;
 
@@ -339,7 +333,7 @@ public class AESCrypt {
 			cipher.doFinal(aesKey2.getEncoded(), 0, KEY_SIZE, text, BLOCK_SIZE);
 			out.write(text);	// Crypted IV and key.
 			debug("IV2 + AES2 ciphertext: ", text);
-			
+
 			hmac.init(new SecretKeySpec(aesKey1.getEncoded(), HMAC_ALG));
 			text = hmac.doFinal(text);
 			out.write(text);	// HMAC from previous cyphertext.
@@ -354,14 +348,11 @@ public class AESCrypt {
 				hmac.update(text);
 				out.write(text);	// Crypted file data block.
 				last = len;
-				//for progress update
-				bytesRead += len;
-
 			}
 			last &= 0x0f;
 			out.write(last);	// Last block size mod 16.
 			debug("Last block size mod 16: " + last);
-			
+
 			text = hmac.doFinal();
 			out.write(text);	// HMAC from previous cyphertext.
 			debug("HMAC2: ", text);
@@ -369,7 +360,7 @@ public class AESCrypt {
 			throw new GeneralSecurityException(JCE_EXCEPTION_MESSAGE, e);
 		}
 	}
-	
+
 
 	/**
 	 * The file at <tt>fromPath</tt> is decrypted and saved at <tt>toPath</tt> location.
@@ -379,7 +370,7 @@ public class AESCrypt {
 	 * @throws GeneralSecurityException if the platform does not support the required cryptographic methods.
 	 */
 	public void decrypt(String fromPath, String toPath)
-	throws IOException, GeneralSecurityException {
+			throws IOException, GeneralSecurityException {
 		InputStream in = null;
 		OutputStream out = null;
 		try {
@@ -387,7 +378,7 @@ public class AESCrypt {
 			debug("Opened for reading: " + fromPath);
 			out = new BufferedOutputStream(new FileOutputStream(toPath));
 			debug("Opened for writing: " + toPath);
-			
+
 			decrypt(new File(fromPath).length(), in, out);
 		} finally {
 			if (in != null) {
@@ -397,9 +388,9 @@ public class AESCrypt {
 				out.close();
 			}
 		}
-	}	
-	
-	
+	}
+
+
 	/**
 	 * The input stream is decrypted and saved to the output stream.
 	 * <p>
@@ -410,26 +401,26 @@ public class AESCrypt {
 	 * @throws GeneralSecurityException if the platform does not support the required cryptographic methods.
 	 */
 	public void decrypt(long inSize, InputStream in, OutputStream out)
-	throws IOException, GeneralSecurityException {
+			throws IOException, GeneralSecurityException {
 		try {
 			byte[] text = null, backup = null;
 			long total = 3 + 1 + 1 + BLOCK_SIZE + BLOCK_SIZE + KEY_SIZE + SHA_SIZE + 1 + SHA_SIZE;
 			int version;
-			
+
 			text = new byte[3];
 			readBytes(in, text);	// Heading.
 			if (!new String(text, "UTF-8").equals("AES")) {
 				throw new IOException("Invalid file header");
 			}
-			
+
 			version = in.read();	// Version.
 			if (version < 1 || version > 2) {
 				throw new IOException("Unsupported version number: " + version);
 			}
 			debug("Version: " + version);
-			
+
 			in.read();	// Reserved.
-			
+
 			if (version == 2) {	// Extensions.
 				text = new byte[2];
 				int len;
@@ -443,14 +434,14 @@ public class AESCrypt {
 					debug("Skipped extension sized: " + len);
 				} while (len != 0);
 			}
-			
+
 			text = new byte[BLOCK_SIZE];
 			readBytes(in, text);	// Initialization Vector.
 			ivSpec1 = new IvParameterSpec(text);
 			aesKey1 = new SecretKeySpec(generateAESKey1(ivSpec1.getIV(), password), CRYPT_ALG);
 			debug("IV1: ", ivSpec1.getIV());
 			debug("AES1: ", aesKey1.getEncoded());
-			
+
 			cipher.init(Cipher.DECRYPT_MODE, aesKey1, ivSpec1);
 			backup = new byte[BLOCK_SIZE + KEY_SIZE];
 			readBytes(in, backup);	// IV and key to decrypt file contents.
@@ -460,7 +451,7 @@ public class AESCrypt {
 			aesKey2 = new SecretKeySpec(text, BLOCK_SIZE, KEY_SIZE, CRYPT_ALG);
 			debug("IV2: ", ivSpec2.getIV());
 			debug("AES2: ", aesKey2.getEncoded());
-			
+
 			hmac.init(new SecretKeySpec(aesKey1.getEncoded(), HMAC_ALG));
 			backup = hmac.doFinal(backup);
 			text = new byte[SHA_SIZE];
@@ -469,12 +460,12 @@ public class AESCrypt {
 				throw new IOException("Message has been altered or password incorrect");
 			}
 			debug("HMAC1: ", text);
-			
+
 			total = inSize - total;	// Payload size.
 			if (total % BLOCK_SIZE != 0) {
 				throw new IOException("Input file is corrupt");
 			}
-			if (total == 0) {	// Hack: empty files won't enter block-processing for-loop below. 
+			if (total == 0) {	// Hack: empty files won't enter block-processing for-loop below.
 				in.read();	// Skip last block size mod 16.
 			}
 			debug("Payload size: " + total);
@@ -496,12 +487,9 @@ public class AESCrypt {
 					len = (last > 0 ? last : BLOCK_SIZE);
 				}
 				out.write(text, 0, len);
-
-				//for progress update
-				bytesRead += len;
 			}
 			out.write(cipher.doFinal());
-			
+
 			backup = hmac.doFinal();
 			text = new byte[SHA_SIZE];
 			readBytes(in, text);	// HMAC and authenticity test.
@@ -513,8 +501,8 @@ public class AESCrypt {
 			throw new GeneralSecurityException(JCE_EXCEPTION_MESSAGE, e);
 		}
 	}
-	
-	
+
+
 	public static void main(String[] args) {
 		try {
 			if (args.length < 4) {
@@ -523,15 +511,15 @@ public class AESCrypt {
 			}
 			AESCrypt aes = new AESCrypt(true, args[1]);
 			switch (args[0].charAt(0)) {
-			case 'e':
-				aes.encrypt(2, args[2], args[3]);
-				break;
-			case 'd':
-				aes.decrypt(args[2], args[3]);
-				break;
-			default:
-				System.out.println("Invalid operation: must be (e)ncrypt or (d)ecrypt.");
-				return;
+				case 'e':
+					aes.encrypt(2, args[2], args[3]);
+					break;
+				case 'd':
+					aes.decrypt(args[2], args[3]);
+					break;
+				default:
+					System.out.println("Invalid operation: must be (e)ncrypt or (d)ecrypt.");
+					return;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

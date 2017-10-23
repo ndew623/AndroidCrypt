@@ -2,13 +2,16 @@ package com.dewdrop623.androidcrypt;
 
 import android.app.Notification;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
+import android.widget.Toast;
 
 /**
  * Crypto service runs a background thread that does the encryption and decryption operations.
@@ -43,6 +46,26 @@ public class CryptoService extends Service {
         cryptoThread.start();
 
         return START_STICKY;
+    }
+
+    /**
+     * Called by CryptoThread to report errors
+     */
+    public void showToastOnGuiThread(final int msg) {
+        showToastOnGuiThread(getString(msg));
+    }
+
+    /**
+     * Called by CryptoThread to report errors
+     */
+    public void showToastOnGuiThread(final String msg) {
+        final Context context = this;
+        new Handler(getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     @Nullable
