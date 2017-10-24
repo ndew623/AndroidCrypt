@@ -1,17 +1,11 @@
 package com.dewdrop623.androidcrypt;
 
-import android.app.Activity;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.provider.DocumentsContract;
-import android.provider.DocumentsProvider;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 
 /**

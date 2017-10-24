@@ -2,7 +2,6 @@ package com.dewdrop623.androidcrypt;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -27,13 +26,19 @@ public class MainActivity extends AppCompatActivity {
                 mainActivityFragment.actionButtonPressed();
             }
         });
+
+        //Tell the fragment that MainActivity.onCreate() is completed
         getMainActivityFragment().onPostMainActivityOnCreate();
     }
 
+    //Called by MainActivityFragment to change the icon when switching between encryption and decryption.
     public void setFABIcon(int drawableId) {
         fab.setImageDrawable(ResourcesCompat.getDrawable(getResources(), drawableId, null));
     }
 
+    /*
+    * Get the apps main fragment.
+     */
     private MainActivityFragment getMainActivityFragment() {
         return (MainActivityFragment) getSupportFragmentManager().findFragmentById(R.id.main_fragment);
     }

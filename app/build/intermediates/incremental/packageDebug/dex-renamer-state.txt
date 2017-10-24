@@ -1,4 +1,4 @@
-#Fri Oct 20 19:49:26 EDT 2017
+#Tue Oct 24 17:53:05 EDT 2017
 base.0=/home/nick/Android/projects/AndroidCrypt/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run_4ac1bef622c88aae5f8d52b0133f4c01b0c92729
 renamed.1=classes2.dex
 renamed.0=classes.dex

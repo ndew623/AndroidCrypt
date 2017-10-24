@@ -10,10 +10,37 @@
         android:orientation="vertical"
         android:padding="5dp">
 
+        <LinearLayout
+            android:layout_margin="15dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/encryptModeButton"
+                android:layout_marginRight="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="38dp"
+                android:background="@drawable/operation_mode_button_selector"
+                android:text="@string/encrypt"
+                android:textColor="#FFF"/>
+
+            <Button
+                android:id="@+id/decryptModeButton"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="38dp"
+                android:background="@drawable/operation_mode_button_selector"
+                android:text="@string/decrypt"
+                android:textColor="#FFF"/>
+        </LinearLayout>
+
         <TextView
-            android:text="@string/enter_input_file"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:text="@string/enter_input_file" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -22,23 +49,23 @@
 
             <TextView
                 android:id="@+id/inputContentURITextView"
-                android:text="@string/no_input_file_selected"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
                 android:layout_weight="1"
-                android:layout_gravity="center_vertical"/>
+                android:text="@string/no_input_file_selected" />
 
             <ImageButton
                 android:id="@+id/selectInputFileButton"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_marginLeft="4dp"
-                android:layout_marginStart="4dp"
-                android:layout_marginRight="8dp"
+                android:layout_gravity="center_vertical"
                 android:layout_marginEnd="8dp"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="4dp"
                 android:background="@drawable/circle_button_selecter"
-                app:srcCompat="@drawable/ic_select_folder"
-                android:layout_gravity="center_vertical"/>
+                app:srcCompat="@drawable/ic_select_folder" />
         </LinearLayout>
 
         <TextView
@@ -48,10 +75,10 @@
 
         <EditText
             android:id="@+id/passwordEditText"
-            android:maxLines="1"
-            android:inputType="text"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:maxLines="1" />
 
         <TextView
             android:id="@+id/confirmPasswordTextView"
@@ -61,10 +88,10 @@
 
         <EditText
             android:id="@+id/confirmPasswordEditText"
-            android:maxLines="1"
-            android:inputType="text"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:maxLines="1" />
 
         <CheckBox
             android:id="@+id/showPasswordCheckbox"
@@ -84,41 +111,23 @@
 
             <TextView
                 android:id="@+id/outputContentURITextView"
-                android:text="@string/no_output_file_selected"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
                 android:layout_weight="1"
-                android:layout_gravity="center_vertical"/>
+                android:text="@string/no_output_file_selected" />
 
             <ImageButton
                 android:id="@+id/selectOutputDirectoryButton"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_marginLeft="4dp"
-                android:layout_marginStart="4dp"
-                android:layout_marginRight="8dp"
+                android:layout_gravity="center_vertical"
                 android:layout_marginEnd="8dp"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="4dp"
                 android:background="@drawable/circle_button_selecter"
-                app:srcCompat="@drawable/ic_select_folder"
-                android:layout_gravity="center_vertical"/>
+                app:srcCompat="@drawable/ic_select_folder" />
         </LinearLayout>
-        <RadioGroup
-            android:id="@+id/operationTypeRadioGroup"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_gravity="center_horizontal"
-            android:gravity="center_horizontal">
-            <RadioButton
-                android:id="@+id/encryptionRadioButton"
-                android:text="@string/encrypt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-            <RadioButton
-                android:id="@+id/decryptionRadioButton"
-                android:text="@string/decrypt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-        </RadioGroup>
     </LinearLayout>
 </ScrollView>

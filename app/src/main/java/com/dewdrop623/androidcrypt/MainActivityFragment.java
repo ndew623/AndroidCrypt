@@ -3,20 +3,18 @@ package com.dewdrop623.androidcrypt;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.net.Uri;
-import android.os.Environment;
-import android.provider.MediaStore;
+import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.CursorLoader;
+import android.support.v4.content.res.ResourcesCompat;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -40,6 +38,8 @@ public class MainActivityFragment extends Fragment {
     private Uri inputFileUri = null;
     private Uri outputFileUri = null;
 
+    private Button encryptModeButton;
+    private Button decryptModeButton;
     private TextView inputContentURITextView;
     private ImageButton selectInputFileButton;
     private EditText passwordEditText;
@@ -48,7 +48,6 @@ public class MainActivityFragment extends Fragment {
     private CheckBox showPasswordCheckbox;
     private TextView fileDestinationDirectoryTextView;
     private ImageButton selectOutputDirectoryButton;
-    private RadioGroup operationTypeRadioGroup;
 
     public MainActivityFragment() {
     }
@@ -58,6 +57,8 @@ public class MainActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
 
+        encryptModeButton = (Button) view.findViewById(R.id.encryptModeButton);
+        decryptModeButton = (Button) view.findViewById(R.id.decryptModeButton);
         inputContentURITextView = (TextView) view.findViewById(R.id.inputContentURITextView);
         selectInputFileButton = (ImageButton) view.findViewById(R.id.selectInputFileButton);
         passwordEditText = (EditText) view.findViewById(R.id.passwordEditText);
@@ -66,12 +67,12 @@ public class MainActivityFragment extends Fragment {
         showPasswordCheckbox = (CheckBox) view.findViewById(R.id.showPasswordCheckbox);
         fileDestinationDirectoryTextView = (TextView) view.findViewById(R.id.outputContentURITextView);
         selectOutputDirectoryButton = (ImageButton) view.findViewById(R.id.selectOutputDirectoryButton);
-        operationTypeRadioGroup = (RadioGroup) view.findViewById(R.id.operationTypeRadioGroup);
 
-        operationTypeRadioGroup.setOnCheckedChangeListener(operationTypeRadioGroupOnCheckedChangedListener);
         showPasswordCheckbox.setOnCheckedChangeListener(showPasswordCheckBoxOnCheckedChangeListener);
         selectOutputDirectoryButton.setOnClickListener(selectOutputDirectoryButtonOnClickListener);
         selectInputFileButton.setOnClickListener(selectInputDirectoryButtonOnClickListener);
+        encryptModeButton.setOnClickListener(operationModeButtonsOnClickListener);
+        decryptModeButton.setOnClickListener(operationModeButtonsOnClickListener);
 
         setShowPassword(false);
 
@@ -87,18 +88,18 @@ public class MainActivityFragment extends Fragment {
      * therefore, this method can be called by MainActivity at the end of its onCreate() method
      */
     public void onPostMainActivityOnCreate() {
-        //set the default mode, check triggers OnCheckedChangedListener
-        operationTypeRadioGroup.check(R.id.encryptionRadioButton);
+        //set the default mode
+        enableEncryptionMode();
     }
 
-    private RadioGroup.OnCheckedChangeListener operationTypeRadioGroupOnCheckedChangedListener = new RadioGroup.OnCheckedChangeListener() {
+    private View.OnClickListener operationModeButtonsOnClickListener = new View.OnClickListener() {
         @Override
-        public void onCheckedChanged(RadioGroup radioGroup, @IdRes int i) {
-            switch (i) {
-                case R.id.encryptionRadioButton:
+        public void onClick(View view) {
+            switch (view.getId()) {
+                case R.id.encryptModeButton:
                     enableEncryptionMode();
                     break;
-                case R.id.decryptionRadioButton:
+                case R.id.decryptModeButton:
                     enableDecryptionMode();
                     break;
             }
@@ -123,21 +124,6 @@ public class MainActivityFragment extends Fragment {
         @Override
         public void onClick(View view) {
             selectOutputDirectory();
-        }
-    };
-
-
-    private View.OnClickListener encryptDecryptButtonOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            if (validationCheck()) {
-                try {
-                    StorageAccessFrameworkHelper.getUriInputStream(referenceToThisForAnonymousClassButtonListeners().getContext(), inputFileUri).close();
-                } catch (IOException ioe) {
-                    showError(R.string.ioexception);
-                    ioe.printStackTrace();
-                }
-            }
         }
     };
 
@@ -226,6 +212,7 @@ public class MainActivityFragment extends Fragment {
      * Shows the confirm password entry field, changes the member variable operationType, and changes the icon on the Floating Action Button
      */
     private void enableEncryptionMode() {
+        changeOperationTypeButtonAppearance(R.drawable.operation_mode_button_selected, R.drawable.operation_mode_button_selector);
         operationType = CryptoThread.OPERATION_TYPE_ENCRYPTION;
         confirmPasswordTextView.setVisibility(View.VISIBLE);
         confirmPasswordEditText.setVisibility(View.VISIBLE);
@@ -237,10 +224,19 @@ public class MainActivityFragment extends Fragment {
      * Hides the confirm password entry field, changes the member variable operationType, and changes the icon on the Floating Action Button
      */
     private void enableDecryptionMode() {
+        changeOperationTypeButtonAppearance(R.drawable.operation_mode_button_selector, R.drawable.operation_mode_button_selected);
         operationType = CryptoThread.OPERATION_TYPE_DECRYPTION;
         confirmPasswordTextView.setVisibility(View.INVISIBLE);
         confirmPasswordEditText.setVisibility(View.INVISIBLE);
         ((MainActivity)getActivity()).setFABIcon(R.drawable.ic_unlock);
+    }
+
+    /*
+    * Used to change the highlighting on the buttons when changing between encryption and decryption modes.
+     */
+    private void changeOperationTypeButtonAppearance(int encryptionDrawableId, int decryptionDrawableId) {
+        encryptModeButton.setBackground(ResourcesCompat.getDrawable(getResources(), encryptionDrawableId, null));
+        decryptModeButton.setBackground(ResourcesCompat.getDrawable(getResources(), decryptionDrawableId, null));
     }
 
     /*

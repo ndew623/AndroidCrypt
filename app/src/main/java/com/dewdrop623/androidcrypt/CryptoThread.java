@@ -1,9 +1,7 @@
 package com.dewdrop623.androidcrypt;
 
 import android.net.Uri;
-import android.widget.Toast;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -13,13 +11,17 @@ import java.security.GeneralSecurityException;
 import es.vocali.util.AESCrypt;
 
 /**
- * does the crypto operations. meant to  be run in CryptoService
+ * CryptoThread handles the usage of AESCrypt to do crypto operations.
+ * CryptoThread is intended to be initialized and started by a CryptoService instance.
  */
 
 public class CryptoThread extends Thread {
+
+    /*
+    * Constants.
+     */
     public static final boolean OPERATION_TYPE_ENCRYPTION = true;
     public static final boolean OPERATION_TYPE_DECRYPTION = false;
-
     public static final int VERSION_1 = 1;
     public static final int VERSION_2 = 2;
 
@@ -28,7 +30,7 @@ public class CryptoThread extends Thread {
     private Uri outputUri;
     private String password;
     private int version;
-    boolean operationType;
+    private boolean operationType;
 
     /**
      * Takes a cryptoService, input and output uris, the password, a version (use VERSION_X constants), and operation type (defined by the OPERATION_TYPE_X constants)
@@ -69,7 +71,7 @@ public class CryptoThread extends Thread {
             if (operationType == OPERATION_TYPE_ENCRYPTION) {
                 aesCrypt.encrypt(version, inputStream, outputStream);
             } else {
-                aesCrypt.decrypt(new File(inputUri.getPath()).length(), inputStream, outputStream);//TODO, getting filesize this way doesn't work
+                aesCrypt.decrypt(inputStream.available(), inputStream, outputStream);
             }
         } catch (GeneralSecurityException gse) {
             gse.printStackTrace();
@@ -87,7 +89,6 @@ public class CryptoThread extends Thread {
                 inputStream.close();
             } catch (IOException ioe) {
                 ioe.printStackTrace();
-                //TODO, probably can't do this from the thread. Move it to somewhere else.
                 cryptoService.showToastOnGuiThread(R.string.error_could_not_close_input_file);
             }
         }
@@ -95,7 +96,6 @@ public class CryptoThread extends Thread {
             try {
                 outputStream.close();
             } catch (IOException ioe) {
-                //TODO, probably can't do this from the thread. Move it to somewhere else.
                 cryptoService.showToastOnGuiThread(R.string.error_could_not_close_output_file);
             }
         }
