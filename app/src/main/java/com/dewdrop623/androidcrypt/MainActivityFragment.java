@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.IdRes;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -18,12 +17,8 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import java.io.IOException;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -41,13 +36,13 @@ public class MainActivityFragment extends Fragment {
     private Button encryptModeButton;
     private Button decryptModeButton;
     private TextView inputContentURITextView;
-    private ImageButton selectInputFileButton;
+    private FileSelectButton inputFileSelectButton;
+    private FileSelectButton outputFileSelectButton;
     private EditText passwordEditText;
     private TextView confirmPasswordTextView;
     private EditText confirmPasswordEditText;
     private CheckBox showPasswordCheckbox;
-    private TextView fileDestinationDirectoryTextView;
-    private ImageButton selectOutputDirectoryButton;
+    private TextView outputContentURITextView;
 
     public MainActivityFragment() {
     }
@@ -60,17 +55,17 @@ public class MainActivityFragment extends Fragment {
         encryptModeButton = (Button) view.findViewById(R.id.encryptModeButton);
         decryptModeButton = (Button) view.findViewById(R.id.decryptModeButton);
         inputContentURITextView = (TextView) view.findViewById(R.id.inputContentURITextView);
-        selectInputFileButton = (ImageButton) view.findViewById(R.id.selectInputFileButton);
+        inputFileSelectButton = (FileSelectButton) view.findViewById(R.id.selectInputFileButton);
+        outputFileSelectButton = (FileSelectButton) view.findViewById(R.id.selectOutputFileButton);
         passwordEditText = (EditText) view.findViewById(R.id.passwordEditText);
         confirmPasswordTextView = (TextView) view.findViewById(R.id.confirmPasswordTextView);
         confirmPasswordEditText = (EditText) view.findViewById(R.id.confirmPasswordEditText);
         showPasswordCheckbox = (CheckBox) view.findViewById(R.id.showPasswordCheckbox);
-        fileDestinationDirectoryTextView = (TextView) view.findViewById(R.id.outputContentURITextView);
-        selectOutputDirectoryButton = (ImageButton) view.findViewById(R.id.selectOutputDirectoryButton);
+        outputContentURITextView = (TextView) view.findViewById(R.id.outputContentURITextView);
 
         showPasswordCheckbox.setOnCheckedChangeListener(showPasswordCheckBoxOnCheckedChangeListener);
-        selectOutputDirectoryButton.setOnClickListener(selectOutputDirectoryButtonOnClickListener);
-        selectInputFileButton.setOnClickListener(selectInputDirectoryButtonOnClickListener);
+        outputFileSelectButton.setOnClickListener(outputFileSelectButtonOnClickListener);
+        inputFileSelectButton.setOnClickListener(inputFileSelectButtonOnClickListener);
         encryptModeButton.setOnClickListener(operationModeButtonsOnClickListener);
         decryptModeButton.setOnClickListener(operationModeButtonsOnClickListener);
 
@@ -113,17 +108,17 @@ public class MainActivityFragment extends Fragment {
         }
     };
 
-    private View.OnClickListener selectInputDirectoryButtonOnClickListener = new View.OnClickListener() {
+    private View.OnClickListener inputFileSelectButtonOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             selectInputFile();
         }
     };
 
-    private View.OnClickListener selectOutputDirectoryButtonOnClickListener = new View.OnClickListener() {
+    private View.OnClickListener outputFileSelectButtonOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            selectOutputDirectory();
+            selectOutputFile();
         }
     };
 
@@ -137,18 +132,47 @@ public class MainActivityFragment extends Fragment {
     /**
      * ask StorageAccessFramework to allow user to pick a directory
      */
-    private void selectOutputDirectory() {
+    private void selectOutputFile() {
         StorageAccessFrameworkHelper.safPickDirectory(this, SELECT_OUTPUT_DIRECTORY_REQUEST_CODE);
+    }
+
+    /*
+    * Set the inputFileUri or outputFileUri member variable and change UI. Pass null to clear the uri value and reset ui.
+     */
+    private void setContentUri(Uri uri, boolean output) {
+        TextView contentURITextView;
+        FileSelectButton fileSelectButton;
+
+        if (output) {
+            outputFileUri = uri;
+            contentURITextView = outputContentURITextView;
+            fileSelectButton = outputFileSelectButton;
+        } else {
+            inputFileUri = uri;
+            contentURITextView = inputContentURITextView;
+            fileSelectButton = inputFileSelectButton;
+        }
+
+        String contentURIText = "";
+        int contentURITextViewVisibility = View.GONE;
+        boolean fileSelectButtonMinimize = false;
+        if (uri != null) {
+            contentURIText = uri.getLastPathSegment();
+            contentURITextViewVisibility = View.VISIBLE;
+            fileSelectButtonMinimize = true;
+        }
+
+        contentURITextView.setText(contentURIText);
+        contentURITextView.setVisibility(contentURITextViewVisibility);
+        fileSelectButton.setMinimized(fileSelectButtonMinimize);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == SELECT_INPUT_FILE_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            inputFileUri = data.getData();
-            inputContentURITextView.setText(inputFileUri.getPath());
+            setContentUri(data.getData(), false);
         } else if (requestCode == SELECT_OUTPUT_DIRECTORY_REQUEST_CODE) {
-            outputFileUri = data.getData();
-            fileDestinationDirectoryTextView.setText(outputFileUri.getPath());
+            setContentUri(data.getData(), true);
         } else {
             showError(R.string.error_unexpected_response_from_saf);
         }

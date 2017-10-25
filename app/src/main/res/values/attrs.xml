@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="CaptionedImageButton">
-        <attr name="caption" format="string"/>
-        <attr name="img_src" format="reference"/>
-        <attr name="img_background" format="reference"/>
-        <attr name="img_width_dp" format="dimension"></attr>
-        <attr name="img_height_dp" format="dimension"></attr>
+    <declare-styleable name="FileSelectButton">
+        <attr name="output_button" format="boolean"/>
+        <attr name="minimized" format="boolean"/>
     </declare-styleable>
 </resources>

@@ -31,16 +31,6 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <style name="FileOptionsCaptionedImageButton" parent="">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="img_background">@drawable/circle_button_selecter</item>
-        <item name="img_height_dp">40dp</item>
-        <item name="img_width_dp">40dp</item>
-        <item name="android:layout_marginLeft">8dp</item>
-        <item name="android:layout_marginRight">8dp</item>
-    </style>
-
     <style name="DefaultDialogTitle" parent="TextAppearance.AppCompat.Title">
         <item name="android:layout_marginTop">6dip</item>
         <item name="android:layout_marginBottom">9dip</item>

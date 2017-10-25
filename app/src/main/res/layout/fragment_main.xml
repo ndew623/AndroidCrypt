@@ -7,45 +7,53 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="5dp">
+        android:orientation="vertical">
 
         <LinearLayout
-            android:layout_margin="15dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="15dp"
             android:gravity="center">
 
             <Button
                 android:id="@+id/encryptModeButton"
-                android:layout_marginRight="10dp"
-                android:layout_marginEnd="10dp"
-                android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="38dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_weight="1"
                 android:background="@drawable/operation_mode_button_selector"
                 android:text="@string/encrypt"
-                android:textColor="#FFF"/>
+                android:textColor="#FFF" />
 
             <Button
                 android:id="@+id/decryptModeButton"
-                android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="38dp"
+                android:layout_weight="1"
                 android:background="@drawable/operation_mode_button_selector"
                 android:text="@string/decrypt"
-                android:textColor="#FFF"/>
+                android:textColor="#FFF" />
         </LinearLayout>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:padding="8dp"
             android:text="@string/enter_input_file" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:orientation="horizontal">
+
+            <com.dewdrop623.androidcrypt.FileSelectButton
+                android:id="@+id/selectInputFileButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:minimized="false"
+                app:output_button="false" />
 
             <TextView
                 android:id="@+id/inputContentURITextView"
@@ -53,37 +61,59 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
-                android:text="@string/no_input_file_selected" />
-
-            <ImageButton
-                android:id="@+id/selectInputFileButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="center_vertical"
-                android:layout_marginEnd="8dp"
-                android:layout_marginLeft="4dp"
-                android:layout_marginRight="8dp"
-                android:layout_marginStart="4dp"
-                android:background="@drawable/circle_button_selecter"
-                app:srcCompat="@drawable/ic_select_folder" />
+                android:padding="8dp"
+                android:text="@string/no_input_file_selected"
+                android:visibility="gone" />
         </LinearLayout>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="@string/enter_output_file" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <com.dewdrop623.androidcrypt.FileSelectButton
+                android:id="@+id/selectOutputFileButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:minimized="false"
+                app:output_button="true" />
+
+            <TextView
+                android:id="@+id/outputContentURITextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:padding="8dp"
+                android:text="@string/no_output_file_selected"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
             android:text="@string/enter_password" />
 
         <EditText
             android:id="@+id/passwordEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="text"
             android:maxLines="1" />
 
         <TextView
             android:id="@+id/confirmPasswordTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:padding="8dp"
             android:text="@string/confirm_password" />
 
         <EditText
@@ -98,36 +128,5 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/show_password" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/enter_output_file" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/outputContentURITextView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
-                android:text="@string/no_output_file_selected" />
-
-            <ImageButton
-                android:id="@+id/selectOutputDirectoryButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="center_vertical"
-                android:layout_marginEnd="8dp"
-                android:layout_marginLeft="4dp"
-                android:layout_marginRight="8dp"
-                android:layout_marginStart="4dp"
-                android:background="@drawable/circle_button_selecter"
-                app:srcCompat="@drawable/ic_select_folder" />
-        </LinearLayout>
     </LinearLayout>
 </ScrollView>

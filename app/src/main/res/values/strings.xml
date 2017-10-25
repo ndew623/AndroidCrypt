@@ -152,4 +152,6 @@
     <string name="error_cryto_operation_encountered_ioexception">Error: Crypto operation encountered an IOException</string>
     <string name="error_could_not_close_output_file">Error: Could not close output file</string>
     <string name="no_output_file_selected">No output value selected</string>
+    <string name="select_output_file">Select Output File</string>
+    <string name="select_input_file">Select Input File</string>
 </resources>
