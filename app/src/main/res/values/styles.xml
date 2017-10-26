@@ -31,19 +31,43 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <style name="DefaultDialogTitle" parent="TextAppearance.AppCompat.Title">
-        <item name="android:layout_marginTop">6dip</item>
-        <item name="android:layout_marginBottom">9dip</item>
-        <item name="android:layout_marginRight">10dip</item>
-        <item name="android:layout_marginLeft">10dip</item>
+    <style name="PasswordEditText" parent="Widget.AppCompat.EditText">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:gravity">center</item>
+        <item name="android:inputType">text</item>
     </style>
 
-    <style name="IconFileViewerImageButton" parent="Base.Widget.AppCompat.ImageButton">
+    <style name="SectionTitleTextView">
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">#000</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:padding">8dp</item>
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:layout_marginStart">12dp</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
+    <style name="ContentURITextView">
+        <item name="android:textColor">#000</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:maxLines">1</item>
         <item name="android:visibility">gone</item>
-        <item name="android:layout_width">50dp</item>
-        <item name="android:layout_height">50dp</item>
-        <item name="android:background">@drawable/circle_button_selecter</item>
-        <item name="android:layout_marginRight">8dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_marginStart">8dp</item>
+        <item name="android:paddingEnd">8dp</item>
+    </style>
+
+    <style name="ContentURIUnderlineView">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1.5dp</item>
+        <item name="android:background">@color/colorAccent</item>
+        <item name="android:visibility">gone</item>
     </style>
 
 </resources>

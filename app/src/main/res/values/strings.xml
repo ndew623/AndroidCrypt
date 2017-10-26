@@ -154,4 +154,6 @@
     <string name="no_output_file_selected">No output value selected</string>
     <string name="select_output_file">Select Output File</string>
     <string name="select_input_file">Select Input File</string>
+    <string name="input_file">Input File</string>
+    <string name="output_file">Output File</string>
 </resources>

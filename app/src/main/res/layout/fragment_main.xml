@@ -12,7 +12,9 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="15dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="15dp"
             android:gravity="center">
 
             <Button
@@ -37,10 +39,8 @@
         </LinearLayout>
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:text="@string/enter_input_file" />
+            style="@style/SectionTitleTextView"
+            android:text="@string/input_file" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -55,22 +55,23 @@
                 app:minimized="false"
                 app:output_button="false" />
 
-            <TextView
-                android:id="@+id/inputContentURITextView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
-                android:padding="8dp"
-                android:text="@string/no_input_file_selected"
-                android:visibility="gone" />
+            <HorizontalScrollView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/inputContentURITextView"
+                    style="@style/ContentURITextView" />
+            </HorizontalScrollView>
         </LinearLayout>
 
+        <View
+            android:id="@+id/inputContentURIUnderlineView"
+            style="@style/ContentURIUnderlineView"/>
+
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:text="@string/enter_output_file" />
+            style="@style/SectionTitleTextView"
+            android:text="@string/output_file" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -85,48 +86,43 @@
                 app:minimized="false"
                 app:output_button="true" />
 
-            <TextView
-                android:id="@+id/outputContentURITextView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
-                android:padding="8dp"
-                android:text="@string/no_output_file_selected"
-                android:visibility="gone" />
+            <HorizontalScrollView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/outputContentURITextView"
+                    style="@style/ContentURITextView" />
+            </HorizontalScrollView>
 
         </LinearLayout>
 
+        <View
+            android:id="@+id/outputContentURIUnderlineView"
+            style="@style/ContentURIUnderlineView"/>
+
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:text="@string/enter_password" />
+            style="@style/SectionTitleTextView"
+            android:text="@string/password" />
 
         <EditText
             android:id="@+id/passwordEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:maxLines="1" />
+            style="@style/PasswordEditText" />
 
         <TextView
             android:id="@+id/confirmPasswordTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
+            style="@style/SectionTitleTextView"
             android:text="@string/confirm_password" />
 
         <EditText
             android:id="@+id/confirmPasswordEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="text"
-            android:maxLines="1" />
+            style="@style/PasswordEditText" />
 
         <CheckBox
             android:id="@+id/showPasswordCheckbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
             android:text="@string/show_password" />
     </LinearLayout>
 </ScrollView>

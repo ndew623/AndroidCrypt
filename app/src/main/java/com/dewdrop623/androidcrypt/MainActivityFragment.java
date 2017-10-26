@@ -13,6 +13,7 @@ import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -36,13 +37,15 @@ public class MainActivityFragment extends Fragment {
     private Button encryptModeButton;
     private Button decryptModeButton;
     private TextView inputContentURITextView;
+    private View inputContentURIUnderlineView;
+    private TextView outputContentURITextView;
+    private View outputContentURIUnderlineView;
     private FileSelectButton inputFileSelectButton;
     private FileSelectButton outputFileSelectButton;
     private EditText passwordEditText;
     private TextView confirmPasswordTextView;
     private EditText confirmPasswordEditText;
     private CheckBox showPasswordCheckbox;
-    private TextView outputContentURITextView;
 
     public MainActivityFragment() {
     }
@@ -55,13 +58,15 @@ public class MainActivityFragment extends Fragment {
         encryptModeButton = (Button) view.findViewById(R.id.encryptModeButton);
         decryptModeButton = (Button) view.findViewById(R.id.decryptModeButton);
         inputContentURITextView = (TextView) view.findViewById(R.id.inputContentURITextView);
+        inputContentURIUnderlineView = view.findViewById(R.id.inputContentURIUnderlineView);
+        outputContentURITextView = (TextView) view.findViewById(R.id.outputContentURITextView);
+        outputContentURIUnderlineView = view.findViewById(R.id.outputContentURIUnderlineView);
         inputFileSelectButton = (FileSelectButton) view.findViewById(R.id.selectInputFileButton);
         outputFileSelectButton = (FileSelectButton) view.findViewById(R.id.selectOutputFileButton);
         passwordEditText = (EditText) view.findViewById(R.id.passwordEditText);
         confirmPasswordTextView = (TextView) view.findViewById(R.id.confirmPasswordTextView);
         confirmPasswordEditText = (EditText) view.findViewById(R.id.confirmPasswordEditText);
         showPasswordCheckbox = (CheckBox) view.findViewById(R.id.showPasswordCheckbox);
-        outputContentURITextView = (TextView) view.findViewById(R.id.outputContentURITextView);
 
         showPasswordCheckbox.setOnCheckedChangeListener(showPasswordCheckBoxOnCheckedChangeListener);
         outputFileSelectButton.setOnClickListener(outputFileSelectButtonOnClickListener);
@@ -73,12 +78,15 @@ public class MainActivityFragment extends Fragment {
 
         checkPermissions();
 
+        //Hide the keyboard that automatically pops up.
+        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
         return view;
     }
 
     /**
      * onCreateView apparently runs before MainActivity initializes its views in MainActivity.onCreate()
-     * this is an issue because the OnCheckedChangeListener for the encryption/decryption RadioGroup changes the icon on the Floating Action Button,
+     * this is an issue because enableEncryptionMode() changes the icon on the Floating Action Button,
      * which is one of MainActivity's views
      * therefore, this method can be called by MainActivity at the end of its onCreate() method
      */
@@ -142,21 +150,25 @@ public class MainActivityFragment extends Fragment {
     private void setContentUri(Uri uri, boolean output) {
         TextView contentURITextView;
         FileSelectButton fileSelectButton;
+        View contentURIUnderlineView;
 
         if (output) {
             outputFileUri = uri;
             contentURITextView = outputContentURITextView;
             fileSelectButton = outputFileSelectButton;
+            contentURIUnderlineView = outputContentURIUnderlineView;
         } else {
             inputFileUri = uri;
             contentURITextView = inputContentURITextView;
             fileSelectButton = inputFileSelectButton;
+            contentURIUnderlineView = inputContentURIUnderlineView;
         }
 
         String contentURIText = "";
         int contentURITextViewVisibility = View.GONE;
         boolean fileSelectButtonMinimize = false;
         if (uri != null) {
+            String path = uri.getLastPathSegment();
             contentURIText = uri.getLastPathSegment();
             contentURITextViewVisibility = View.VISIBLE;
             fileSelectButtonMinimize = true;
@@ -165,6 +177,7 @@ public class MainActivityFragment extends Fragment {
         contentURITextView.setText(contentURIText);
         contentURITextView.setVisibility(contentURITextViewVisibility);
         fileSelectButton.setMinimized(fileSelectButtonMinimize);
+        contentURIUnderlineView.setVisibility(contentURITextViewVisibility);
     }
 
     @Override
@@ -213,7 +226,7 @@ public class MainActivityFragment extends Fragment {
     * Display an error to the user.
     * */
     private void showError(int stringId) {
-        Toast.makeText(getContext(), stringId, Toast.LENGTH_SHORT).show();
+        showError(getString(stringId));
     }
 
     private MainActivityFragment referenceToThisForAnonymousClassButtonListeners() {
@@ -250,8 +263,8 @@ public class MainActivityFragment extends Fragment {
     private void enableDecryptionMode() {
         changeOperationTypeButtonAppearance(R.drawable.operation_mode_button_selector, R.drawable.operation_mode_button_selected);
         operationType = CryptoThread.OPERATION_TYPE_DECRYPTION;
-        confirmPasswordTextView.setVisibility(View.INVISIBLE);
-        confirmPasswordEditText.setVisibility(View.INVISIBLE);
+        confirmPasswordTextView.setVisibility(View.GONE);
+        confirmPasswordEditText.setVisibility(View.GONE);
         ((MainActivity)getActivity()).setFABIcon(R.drawable.ic_unlock);
     }
 
