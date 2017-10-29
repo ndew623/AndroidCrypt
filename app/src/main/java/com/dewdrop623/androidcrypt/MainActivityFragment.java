@@ -3,8 +3,10 @@ package com.dewdrop623.androidcrypt;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.OpenableColumns;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -32,12 +34,14 @@ public class MainActivityFragment extends Fragment {
     private static final int SELECT_OUTPUT_DIRECTORY_REQUEST_CODE = 8878;
     private static final int WRITE_FILE_PERMISSION_REQUEST_CODE = 440;
 
+    //stores the type of operation/operation mode to be done
     private boolean operationType = CryptoThread.OPERATION_TYPE_ENCRYPTION;
     private Uri inputFileUri = null;
     private Uri outputFileUri = null;
 
     private Button encryptModeButton;
     private Button decryptModeButton;
+    //TODO either add ability to hide missing files textview, or remove these references
     private LinearLayout missingFilesLinearLayout;
     private ImageButton missingFilesHideImageButton;
     private TextView missingFilesTextView;
@@ -166,7 +170,7 @@ public class MainActivityFragment extends Fragment {
      * ask StorageAccessFramework to allow user to pick a directory
      */
     private void selectOutputFile() {
-        StorageAccessFrameworkHelper.safPickOutputFile(this, SELECT_OUTPUT_DIRECTORY_REQUEST_CODE);
+        StorageAccessFrameworkHelper.safPickOutputFile(this, SELECT_OUTPUT_DIRECTORY_REQUEST_CODE, getDefaultOutputFileName());
     }
 
     /*
@@ -193,8 +197,7 @@ public class MainActivityFragment extends Fragment {
         int contentURITextViewVisibility = View.GONE;
         boolean fileSelectButtonMinimize = false;
         if (uri != null) {
-            String path = uri.getLastPathSegment();
-            contentURIText = uri.getLastPathSegment();
+            contentURIText = getFileNameFromUri(uri);
             contentURITextViewVisibility = View.VISIBLE;
             fileSelectButtonMinimize = true;
         }
@@ -311,5 +314,50 @@ public class MainActivityFragment extends Fragment {
             valid = false;
         }
         return valid;
+    }
+
+    /*thank you stack overflow*/
+    private String getFileNameFromUri(Uri uri) {
+        String result = null;
+        if (uri.getScheme().equals("content")) {
+            Cursor cursor = getActivity().getContentResolver().query(uri, null, null, null, null);
+            try {
+                if (cursor != null && cursor.moveToFirst()) {
+                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                }
+            } finally {
+                cursor.close();
+            }
+        }
+        if (result == null) {
+            result = uri.getPath();
+            int cut = result.lastIndexOf('/');
+            if (cut != -1) {
+                result = result.substring(cut + 1);
+            }
+        }
+        return result;
+    }
+
+    /*return the default output filename based on the inputFileUri.
+    *if inputFileUri is null, returns null.
+    * if in encryption mode, append '.aes' to filename.
+    * if in decryption mode, and input filename ends with '.aes', remove '.aes'
+    * if in decryption mode and input filename does not end with '.aes', return empty string*/
+    private String getDefaultOutputFileName() {
+        String result = null;
+        if (inputFileUri != null) {
+            String fileName = getFileNameFromUri(inputFileUri);
+            if (operationType == CryptoThread.OPERATION_TYPE_ENCRYPTION) {
+                result = fileName.concat(".aes");
+            } else if (operationType == CryptoThread.OPERATION_TYPE_DECRYPTION) {
+                if (fileName.substring(fileName.lastIndexOf('.')).equals(".aes")) {
+                    result = fileName.substring(0, fileName.lastIndexOf('.'));
+                } else {
+                    result = "";
+                }
+            }
+        }
+        return result;
     }
 }
