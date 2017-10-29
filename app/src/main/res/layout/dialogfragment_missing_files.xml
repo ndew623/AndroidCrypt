@@ -10,29 +10,33 @@
         android:orientation="vertical">
 
         <TextView
-            android:text="@string/internal_storage_not_visible"
-            style="@style/MissingFilesHelpTextView" />
+            style="@style/MissingFilesHelpTextView"
+            android:text="@string/internal_storage_not_visible" />
 
         <ImageView
             style="@style/MissingFilesHelpImage"
             android:src="@mipmap/missing_files" />
 
         <TextView
-            android:text="@string/select_overflow_menu"
-            style="@style/MissingFilesHelpTextView" />
+            style="@style/MissingFilesHelpTextView"
+            android:text="@string/select_overflow_menu" />
 
         <ImageView
             style="@style/MissingFilesHelpImage"
             android:src="@mipmap/overflow_menu" />
+
         <TextView
-            android:text="@string/select_show_internal_storage"
-            style="@style/MissingFilesHelpTextView" />
+            style="@style/MissingFilesHelpTextView"
+            android:text="@string/select_show_internal_storage" />
+
         <ImageView
             style="@style/MissingFilesHelpImage"
             android:src="@mipmap/show_internal_storage" />
+
         <TextView
-            android:text="@string/internal_storage_visible"
-            style="@style/MissingFilesHelpTextView" />
+            style="@style/MissingFilesHelpTextView"
+            android:text="@string/internal_storage_visible" />
+
         <ImageView
             style="@style/MissingFilesHelpImage"
             android:src="@mipmap/found_files" />

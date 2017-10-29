@@ -18,6 +18,8 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,6 +38,9 @@ public class MainActivityFragment extends Fragment {
 
     private Button encryptModeButton;
     private Button decryptModeButton;
+    private LinearLayout missingFilesLinearLayout;
+    private ImageButton missingFilesHideImageButton;
+    private TextView missingFilesTextView;
     private TextView inputContentURITextView;
     private View inputContentURIUnderlineView;
     private TextView outputContentURITextView;
@@ -57,6 +62,9 @@ public class MainActivityFragment extends Fragment {
 
         encryptModeButton = (Button) view.findViewById(R.id.encryptModeButton);
         decryptModeButton = (Button) view.findViewById(R.id.decryptModeButton);
+        missingFilesLinearLayout = (LinearLayout) view.findViewById(R.id.missingFilesLinearLayout);
+        missingFilesHideImageButton = (ImageButton) view.findViewById(R.id.missingFilesHideImageButton);
+        missingFilesTextView = (TextView) view.findViewById(R.id.missingFilesTextView);
         inputContentURITextView = (TextView) view.findViewById(R.id.inputContentURITextView);
         inputContentURIUnderlineView = view.findViewById(R.id.inputContentURIUnderlineView);
         outputContentURITextView = (TextView) view.findViewById(R.id.outputContentURITextView);
@@ -68,6 +76,7 @@ public class MainActivityFragment extends Fragment {
         confirmPasswordEditText = (EditText) view.findViewById(R.id.confirmPasswordEditText);
         showPasswordCheckbox = (CheckBox) view.findViewById(R.id.showPasswordCheckbox);
 
+        missingFilesTextView.setOnClickListener(missingFilesViewsOnClickListener);
         showPasswordCheckbox.setOnCheckedChangeListener(showPasswordCheckBoxOnCheckedChangeListener);
         outputFileSelectButton.setOnClickListener(outputFileSelectButtonOnClickListener);
         inputFileSelectButton.setOnClickListener(inputFileSelectButtonOnClickListener);
@@ -94,6 +103,22 @@ public class MainActivityFragment extends Fragment {
         //set the default mode
         enableEncryptionMode();
     }
+
+    /*
+    * This onClickListener is for click on either the textview or hide button of the missing files help textview.
+     */
+    private View.OnClickListener missingFilesViewsOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            switch (view.getId()) {
+                case R.id.missingFilesHideImageButton:
+                    break;
+                case R.id.missingFilesTextView:
+                    ((MainActivity)getActivity()).showMissingFilesHelpDialog();
+                    break;
+            }
+        }
+    };
 
     private View.OnClickListener operationModeButtonsOnClickListener = new View.OnClickListener() {
         @Override
@@ -141,7 +166,7 @@ public class MainActivityFragment extends Fragment {
      * ask StorageAccessFramework to allow user to pick a directory
      */
     private void selectOutputFile() {
-        StorageAccessFrameworkHelper.safPickDirectory(this, SELECT_OUTPUT_DIRECTORY_REQUEST_CODE);
+        StorageAccessFrameworkHelper.safPickOutputFile(this, SELECT_OUTPUT_DIRECTORY_REQUEST_CODE);
     }
 
     /*

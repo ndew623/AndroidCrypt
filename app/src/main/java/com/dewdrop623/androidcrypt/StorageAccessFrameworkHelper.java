@@ -25,13 +25,23 @@ public class StorageAccessFrameworkHelper {
     }
 
     /**
-     *Pick a directory with the Storage Access Framework
+     *Pick an ouput file with the Storage Access Framework
      */
-    public static void safPickDirectory(MainActivityFragment mainActivityFragment, final int REQUEST_CODE) {
+    public static void safPickOutputFile(MainActivityFragment mainActivityFragment, final int REQUEST_CODE, String title) {
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("*/*");
+        if (title != null) {
+            intent.putExtra(Intent.EXTRA_TITLE, title);
+        }
         mainActivityFragment.startActivityForResult(intent, REQUEST_CODE);
+    }
+
+    /**
+     *Pick an ouput file with the Storage Access Framework
+     */
+    public static void safPickOutputFile(MainActivityFragment mainActivityFragment, final int REQUEST_CODE) {
+        safPickOutputFile(mainActivityFragment, REQUEST_CODE, null);
     }
 
     /*

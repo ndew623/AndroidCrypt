@@ -3,8 +3,10 @@ package com.dewdrop623.androidcrypt;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.res.ResourcesCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.View;
 
 public class MainActivity extends AppCompatActivity {
@@ -34,6 +36,14 @@ public class MainActivity extends AppCompatActivity {
     //Called by MainActivityFragment to change the icon when switching between encryption and decryption.
     public void setFABIcon(int drawableId) {
         fab.setImageDrawable(ResourcesCompat.getDrawable(getResources(), drawableId, null));
+    }
+
+    /*shows the dialog to help find internal storage in SAF. maybe called by MainActivity fragment or by the Help fragment*/
+    public void showMissingFilesHelpDialog() {
+        View missingFilesHelpLayout = getLayoutInflater().inflate(R.layout.dialogfragment_missing_files, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(missingFilesHelpLayout);
+        builder.show();
     }
 
     /*

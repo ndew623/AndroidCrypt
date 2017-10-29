@@ -160,4 +160,5 @@
     <string name="select_overflow_menu">2. To view internal storage, select the overflow menu when choosing a file.</string>
     <string name="select_show_internal_storage">3. Select the <i>Show internal storage</i> option.</string>
     <string name="internal_storage_visible">4. The device\'s internal storage should now be visible.</string>
+    <string name="missing_files_click_here"><u>Missing files? Click here.</u></string>
 </resources>
