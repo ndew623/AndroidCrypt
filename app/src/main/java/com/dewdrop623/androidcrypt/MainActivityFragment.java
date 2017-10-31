@@ -7,12 +7,16 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.text.InputType;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -60,6 +64,12 @@ public class MainActivityFragment extends Fragment {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
@@ -103,14 +113,29 @@ public class MainActivityFragment extends Fragment {
      * which is one of MainActivity's views
      * therefore, this method can be called by MainActivity at the end of its onCreate() method
      */
-    public void onPostMainActivityOnCreate() {
+    public void onMainActivityPostCreate() {
         //set the default mode
         enableEncryptionMode();
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_main, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_about:
+                ((MainActivity)getActivity()).displayAboutFragment();
+                return true;
+        }
+        return false;
+    }
+
     /*
-    * This onClickListener is for click on either the textview or hide button of the missing files help textview.
-     */
+            * This onClickListener is for click on either the textview or hide button of the missing files help textview.
+             */
     private View.OnClickListener missingFilesViewsOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {

@@ -1,17 +1,23 @@
 package com.dewdrop623.androidcrypt;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.os.PersistableBundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.View;
 
 public class MainActivity extends AppCompatActivity {
 
     private FloatingActionButton fab;
+    private MainActivityFragment mainActivityFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,17 +26,23 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        mainActivityFragment = new MainActivityFragment();
+        displayFragment(mainActivityFragment, false);
+
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                MainActivityFragment mainActivityFragment = getMainActivityFragment();
                 mainActivityFragment.actionButtonPressed();
             }
         });
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
         //Tell the fragment that MainActivity.onCreate() is completed
-        getMainActivityFragment().onPostMainActivityOnCreate();
+        mainActivityFragment.onMainActivityPostCreate();
     }
 
     //Called by MainActivityFragment to change the icon when switching between encryption and decryption.
@@ -47,10 +59,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /*
-    * Get the apps main fragment.
+    * Display the about fragment
      */
-    private MainActivityFragment getMainActivityFragment() {
-        return (MainActivityFragment) getSupportFragmentManager().findFragmentById(R.id.main_fragment);
+    public void displayAboutFragment() {
+        fab.setVisibility(View.GONE);
+        displayFragment(new AboutFragment(), true);
+    }
+
+    /*
+    * display the given fragment, called by returnToMainFragment and displayAboutFragment
+     */
+    private void displayFragment(Fragment fragment, boolean addToBackStack) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        if (addToBackStack) {
+            fragmentTransaction.addToBackStack(null);
+        }
+        fragmentTransaction.replace(R.id.main_fragment_container, fragment);
+        fragmentTransaction.commit();
     }
 
 }

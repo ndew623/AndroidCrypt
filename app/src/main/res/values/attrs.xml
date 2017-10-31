@@ -4,4 +4,9 @@
         <attr name="output_button" format="boolean"/>
         <attr name="minimized" format="boolean"/>
     </declare-styleable>
+    <declare-styleable name="IconAttributionView">
+        <attr name="icon_src" format="reference"/>
+        <attr name="creator_name" format="string"/>
+        <attr name="src_link" format="string"/>
+    </declare-styleable>
 </resources>

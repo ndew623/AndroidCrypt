@@ -166,4 +166,8 @@
     <string name="contact_info">For help or suggestions email <b>contact@dewdrop623.com</b></string>
     <string name="image_attribution">TODO: insert attribution links for any icons that were used.</string>
     <string name="version">v1.0</string>
+    <string name="action_about">About</string>
+    <string name="icon_made_by">Icon made by</string>
+    <string name="from">from</string>
+    <string name="flaticon_link"><u>www.flaticon.com</u></string>
 </resources>
