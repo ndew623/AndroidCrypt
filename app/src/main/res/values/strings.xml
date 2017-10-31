@@ -163,4 +163,7 @@
     <string name="missing_files_click_here"><u>Missing files? Click here.</u></string>
     <string name="passwords_do_not_match">Passwords do not match</string>
     <string name="the_input_and_output_files_must_be_different">The input and output files must be different</string>
+    <string name="contact_info">For help or suggestions email <b>contact@dewdrop623.com</b></string>
+    <string name="image_attribution">TODO: insert attribution links for any icons that were used.</string>
+    <string name="version">v1.0</string>
 </resources>

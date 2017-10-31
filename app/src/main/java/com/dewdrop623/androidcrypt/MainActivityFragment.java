@@ -354,7 +354,6 @@ public class MainActivityFragment extends Fragment {
      */
     private boolean isValidElsePrintErrors() {
         boolean valid = true;
-
         if (inputFileUri == null) {
             valid = false;
             showError(R.string.no_input_file_selected);
