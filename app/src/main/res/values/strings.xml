@@ -151,7 +151,7 @@
     <string name="error_utf16_encoding_is_not_supported">Error: UTF-16 encoding is not supported</string>
     <string name="error_cryto_operation_encountered_ioexception">Error: Crypto operation encountered an IOException</string>
     <string name="error_could_not_close_output_file">Error: Could not close output file</string>
-    <string name="no_output_file_selected">No output value selected</string>
+    <string name="no_output_file_selected">No output file selected</string>
     <string name="select_output_file">Select Output File</string>
     <string name="select_input_file">Select Input File</string>
     <string name="input_file">Input File</string>
@@ -161,4 +161,6 @@
     <string name="select_show_internal_storage">3. Select the <i>Show internal storage</i> option.</string>
     <string name="internal_storage_visible">4. The device\'s internal storage should now be visible.</string>
     <string name="missing_files_click_here"><u>Missing files? Click here.</u></string>
+    <string name="passwords_do_not_match">Passwords do not match</string>
+    <string name="the_input_and_output_files_must_be_different">The input and output files must be different</string>
 </resources>

@@ -223,17 +223,16 @@ public class MainActivityFragment extends Fragment {
      * called by MainActivity when the Floating Action Button is pressed.
      */
     public void actionButtonPressed() {
-        if (inputFileUri == null || outputFileUri == null) {
-            return ;
+        if (isValidElsePrintErrors()) {
+            Intent intent = new Intent(getContext(), CryptoService.class);
+            intent.putExtra(CryptoService.INPUT_URI_EXTRA_KEY, inputFileUri.toString());
+            intent.putExtra(CryptoService.OUTPUT_URI_EXTRA_KEY, outputFileUri.toString());
+            //TODO probably major security flaw to put encryption keys in an intent. research and change if necessary.
+            intent.putExtra(CryptoService.PASSWORD_EXTRA_KEY, passwordEditText.getText().toString());
+            intent.putExtra(CryptoService.VERSION_EXTRA_KEY, CryptoThread.VERSION_2);
+            intent.putExtra(CryptoService.OPERATION_TYPE_EXTRA_KEY, operationType);
+            getContext().startService(intent);
         }
-        Intent intent = new Intent(getContext(), CryptoService.class);
-        intent.putExtra(CryptoService.INPUT_URI_EXTRA_KEY, inputFileUri.toString());
-        intent.putExtra(CryptoService.OUTPUT_URI_EXTRA_KEY, outputFileUri.toString());
-        //TODO probably major security flaw to put encryption keys in an intent. research and change if necessary.
-        intent.putExtra(CryptoService.PASSWORD_EXTRA_KEY, passwordEditText.getText().toString());
-        intent.putExtra(CryptoService.VERSION_EXTRA_KEY, CryptoThread.VERSION_2);
-        intent.putExtra(CryptoService.OPERATION_TYPE_EXTRA_KEY, operationType);
-        getContext().startService(intent);
     }
 
     //check for the necessary permissions. destroy and recreate the activity if permissions are asked for so that the files (which couldn't be seen previously) will be displayed
@@ -304,18 +303,6 @@ public class MainActivityFragment extends Fragment {
         decryptModeButton.setBackground(ResourcesCompat.getDrawable(getResources(), decryptionDrawableId, null));
     }
 
-    /*
-    * check if user input is valid before trying to do an operation, return true if it is. Also, notify users of any issues.
-    * */
-    private boolean validationCheck() {
-        boolean valid = true;
-        if (inputFileUri == null) {
-            showError(R.string.no_input_file_selected);
-            valid = false;
-        }
-        return valid;
-    }
-
     /*thank you stack overflow*/
     private String getFileNameFromUri(Uri uri) {
         String result = null;
@@ -359,5 +346,28 @@ public class MainActivityFragment extends Fragment {
             }
         }
         return result;
+    }
+
+    /*
+    * returns true if the crypto operation can proceed and false otherwise.
+    * displays messages about any issues to the user
+     */
+    private boolean isValidElsePrintErrors() {
+        boolean valid = true;
+
+        if (inputFileUri == null) {
+            valid = false;
+            showError(R.string.no_input_file_selected);
+        } else if (outputFileUri == null) {
+            valid = false;
+            showError(R.string.no_output_file_selected);
+        } else if (!passwordEditText.getText().toString().equals(confirmPasswordEditText.getText().toString())) {
+            valid = false;
+            showError(R.string.passwords_do_not_match);
+        } else if (inputFileUri.equals(outputFileUri)) {
+            valid = false;
+            showError(R.string.the_input_and_output_files_must_be_different);
+        }
+        return valid;
     }
 }
