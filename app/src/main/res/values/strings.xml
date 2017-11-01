@@ -169,5 +169,14 @@
     <string name="action_about">About</string>
     <string name="icon_made_by">Icon made by</string>
     <string name="from">from</string>
-    <string name="flaticon_link"><u>www.flaticon.com</u></string>
+    <string name="flaticon_link"><u>https://www.flaticon.com/</u></string>
+    <string name="lock_unlock_icon_creator_name">SimpleIcon</string>
+    <string name="lock_unlock_icon_creator_link">https://www.flaticon.com/authors/simpleicon</string>
+    <string name="flaticon_displayed_link"><u>www.flaticon.com</u></string>
+    <string name="cc30_license_by"><u>CC 3.0 BY</u></string>
+    <string name="licensed_by">licensed by</string>
+    <string name="cc30_link">https://creativecommons.org/licenses/by/3.0/</string>
+    <string name="icons">Icons:</string>
+    <string name="select_folder_icon_creator_name">Elegant Themes</string>
+    <string name="select_folder_icon_creator_link">https://www.flaticon.com/authors/elegant-themes</string>
 </resources>

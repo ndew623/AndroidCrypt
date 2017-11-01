@@ -14,16 +14,11 @@ import android.webkit.WebView;
  */
 
 public class AboutFragment extends Fragment {
-    WebView aboutWebView;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_about, container, false);
-
-        aboutWebView = (WebView) view.findViewById(R.id.aboutWebView);
-        
-
-        return view;
+        return inflater.inflate(R.layout.fragment_about, container, false);
     }
 
 

@@ -234,6 +234,12 @@ public class MainActivityFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        ((MainActivity)getActivity()).setFabVisible(true);
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == SELECT_INPUT_FILE_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             setContentUri(data.getData(), false);

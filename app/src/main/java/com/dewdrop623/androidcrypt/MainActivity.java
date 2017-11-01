@@ -62,8 +62,12 @@ public class MainActivity extends AppCompatActivity {
     * Display the about fragment
      */
     public void displayAboutFragment() {
-        fab.setVisibility(View.GONE);
+        setFabVisible(false);
         displayFragment(new AboutFragment(), true);
+    }
+
+    public void setFabVisible(boolean visible) {
+        fab.setVisibility(visible?View.VISIBLE:View.GONE);
     }
 
     /*
