@@ -29,19 +29,32 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Arrays;
+
 /**
  * A placeholder fragment containing a simple view.
  */
 public class MainActivityFragment extends Fragment {
 
+    //Using static variables to store the password rather than savedInstanceState and Intent extras because of paranoia.
+    private static char[] password;
+
     private static final int SELECT_INPUT_FILE_REQUEST_CODE = 623;
     private static final int SELECT_OUTPUT_DIRECTORY_REQUEST_CODE = 8878;
     private static final int WRITE_FILE_PERMISSION_REQUEST_CODE = 440;
 
+    private static final String SAVED_INSTANCE_STATE_SHOW_PASSWORD="com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_";
+    private static final String SAVED_INSTANCE_STATE_OPERATION_MODE="com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_OPERATION_MODE";
+    private static final String SAVED_INSTANCE_STATE_INPUT_URI="com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_INPUT_URI";
+    private static final String SAVED_INSTANCE_STATE_OUTPUT_URI="com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_OUTPUT_URI";
+    private static final String SAVED_INSTANCE_STATE_="com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_";
+
     //stores the type of operation/operation mode to be done
-    private boolean operationType = CryptoThread.OPERATION_TYPE_ENCRYPTION;
+    private boolean operationMode = CryptoThread.OPERATION_TYPE_ENCRYPTION;
+    private boolean hasModeState = false;
     private Uri inputFileUri = null;
     private Uri outputFileUri = null;
+    private Bundle stateBundle;
 
     private Button encryptModeButton;
     private Button decryptModeButton;
@@ -97,25 +110,45 @@ public class MainActivityFragment extends Fragment {
         encryptModeButton.setOnClickListener(operationModeButtonsOnClickListener);
         decryptModeButton.setOnClickListener(operationModeButtonsOnClickListener);
 
-        setShowPassword(false);
-
         checkPermissions();
 
         //Hide the keyboard that automatically pops up.
         getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
+        if (stateBundle == null && savedInstanceState != null)
+        {
+            stateBundle = savedInstanceState;
+        }
+        restoreFromStateBundle(stateBundle);
+
         return view;
     }
 
+    //Store the current state when MainActivityFragment is added to back stack.
+    //onCreateView will be called when the MainActivityFragment is displayed again
+    @Override
+    public void onPause() {
+        super.onPause();
+        stateBundle = createOutStateBundle(null);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(createOutStateBundle(outState));
+    }
+
     /**
+     * TODO remove?
      * onCreateView apparently runs before MainActivity initializes its views in MainActivity.onCreate()
      * this is an issue because enableEncryptionMode() changes the icon on the Floating Action Button,
      * which is one of MainActivity's views
      * therefore, this method can be called by MainActivity at the end of its onCreate() method
      */
     public void onMainActivityPostCreate() {
-        //set the default mode
-        enableEncryptionMode();
+        if (isAdded() && !hasModeState) {
+            //set the default mode
+           // enableEncryptionMode();
+        }
     }
 
     @Override
@@ -243,9 +276,9 @@ public class MainActivityFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == SELECT_INPUT_FILE_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             setContentUri(data.getData(), false);
-        } else if (requestCode == SELECT_OUTPUT_DIRECTORY_REQUEST_CODE) {
+        } else if (requestCode == SELECT_OUTPUT_DIRECTORY_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             setContentUri(data.getData(), true);
-        } else {
+        } else if (resultCode != Activity.RESULT_CANCELED){
             showError(R.string.error_unexpected_response_from_saf);
         }
     }
@@ -258,10 +291,9 @@ public class MainActivityFragment extends Fragment {
             Intent intent = new Intent(getContext(), CryptoService.class);
             intent.putExtra(CryptoService.INPUT_URI_EXTRA_KEY, inputFileUri.toString());
             intent.putExtra(CryptoService.OUTPUT_URI_EXTRA_KEY, outputFileUri.toString());
-            //TODO probably major security flaw to put encryption keys in an intent. research and change if necessary.
-            intent.putExtra(CryptoService.PASSWORD_EXTRA_KEY, passwordEditText.getText().toString());
             intent.putExtra(CryptoService.VERSION_EXTRA_KEY, CryptoThread.VERSION_2);
-            intent.putExtra(CryptoService.OPERATION_TYPE_EXTRA_KEY, operationType);
+            intent.putExtra(CryptoService.OPERATION_TYPE_EXTRA_KEY, operationMode);
+            MainActivityFragment.password = passwordEditText.getText().toString().toCharArray();
             getContext().startService(intent);
         }
     }
@@ -304,26 +336,28 @@ public class MainActivityFragment extends Fragment {
 
     /**
      * Makes encryption mode active.
-     * Shows the confirm password entry field, changes the member variable operationType, and changes the icon on the Floating Action Button
+     * Shows the confirm password entry field, changes the member variable operationMode, and changes the icon on the Floating Action Button
      */
     private void enableEncryptionMode() {
         changeOperationTypeButtonAppearance(R.drawable.operation_mode_button_selected, R.drawable.operation_mode_button_selector);
-        operationType = CryptoThread.OPERATION_TYPE_ENCRYPTION;
+        operationMode = CryptoThread.OPERATION_TYPE_ENCRYPTION;
         confirmPasswordTextView.setVisibility(View.VISIBLE);
         confirmPasswordEditText.setVisibility(View.VISIBLE);
         ((MainActivity)getActivity()).setFABIcon(R.drawable.ic_lock);
+        hasModeState = true;
     }
 
     /**
      * Makes decryption mode active.
-     * Hides the confirm password entry field, changes the member variable operationType, and changes the icon on the Floating Action Button
+     * Hides the confirm password entry field, changes the member variable operationMode, and changes the icon on the Floating Action Button
      */
     private void enableDecryptionMode() {
         changeOperationTypeButtonAppearance(R.drawable.operation_mode_button_selector, R.drawable.operation_mode_button_selected);
-        operationType = CryptoThread.OPERATION_TYPE_DECRYPTION;
+        operationMode = CryptoThread.OPERATION_TYPE_DECRYPTION;
         confirmPasswordTextView.setVisibility(View.GONE);
         confirmPasswordEditText.setVisibility(View.GONE);
         ((MainActivity)getActivity()).setFABIcon(R.drawable.ic_unlock);
+        hasModeState = true;
     }
 
     /*
@@ -366,9 +400,9 @@ public class MainActivityFragment extends Fragment {
         String result = null;
         if (inputFileUri != null) {
             String fileName = getFileNameFromUri(inputFileUri);
-            if (operationType == CryptoThread.OPERATION_TYPE_ENCRYPTION) {
+            if (operationMode == CryptoThread.OPERATION_TYPE_ENCRYPTION) {
                 result = fileName.concat(".aes");
-            } else if (operationType == CryptoThread.OPERATION_TYPE_DECRYPTION) {
+            } else if (operationMode == CryptoThread.OPERATION_TYPE_DECRYPTION) {
                 if (fileName.substring(fileName.lastIndexOf('.')).equals(".aes")) {
                     result = fileName.substring(0, fileName.lastIndexOf('.'));
                 } else {
@@ -399,5 +433,70 @@ public class MainActivityFragment extends Fragment {
             showError(R.string.the_input_and_output_files_must_be_different);
         }
         return valid;
+    }
+
+    /*
+    * Get the password as a String and overwrite it in memory.
+    * Overwriting the char[] may be useless since the EditText returns a String and AESCrypt requires a string,
+    * but there isn't a good reason not to.
+     */
+    public static String getAndClearPassword() {
+        if (MainActivityFragment.password == null) {
+            return null;
+        }
+        String password = String.valueOf(MainActivityFragment.password);
+        Arrays.fill(MainActivityFragment.password, '\0');
+        MainActivityFragment.password = null;
+        return password;
+    }
+
+    /*
+    * Create a bundle that stores the state of MainActivityFragment and set MainActivityFragment.password
+    * If used in onSaveInstanceState: preserve whatever values Android may put in the outState bundle already by passing in as systemOutStateBundle
+    * If not called from onSaveInstanceState: pass null for systemOutStateBundle
+     */
+    private Bundle createOutStateBundle(Bundle systemOutStateBundle) {
+        Bundle outState;
+        if (systemOutStateBundle == null) {
+            outState = new Bundle();
+        } else {
+            outState = systemOutStateBundle;
+        }
+        outState.putBoolean(SAVED_INSTANCE_STATE_SHOW_PASSWORD, showPasswordCheckbox.isChecked());
+        outState.putBoolean(SAVED_INSTANCE_STATE_OPERATION_MODE, operationMode);
+        if (inputFileUri != null) {
+            outState.putString(SAVED_INSTANCE_STATE_INPUT_URI, inputFileUri.toString());
+        }
+        if (outputFileUri != null) {
+            outState.putString(SAVED_INSTANCE_STATE_OUTPUT_URI, outputFileUri.toString());
+        }
+        MainActivityFragment.password = passwordEditText.getText().toString().toCharArray();
+        return outState;
+    }
+
+    private void restoreFromStateBundle(Bundle stateBundle) {
+        if (stateBundle == null) {
+            setShowPassword(false);
+            enableEncryptionMode();
+        } else {
+            setShowPassword(stateBundle.getBoolean(SAVED_INSTANCE_STATE_SHOW_PASSWORD, false));
+            if (stateBundle.getBoolean(SAVED_INSTANCE_STATE_OPERATION_MODE, CryptoThread.OPERATION_TYPE_ENCRYPTION) == CryptoThread.OPERATION_TYPE_ENCRYPTION) {
+                enableEncryptionMode();
+            } else {
+                enableDecryptionMode();
+            }
+            String inputUriString = stateBundle.getString(SAVED_INSTANCE_STATE_INPUT_URI, null);
+            String outputUriString = stateBundle.getString(SAVED_INSTANCE_STATE_OUTPUT_URI, null);
+            if (inputUriString != null) {
+                setContentUri(Uri.parse(inputUriString), false);
+            }
+            if (outputUriString != null) {
+                setContentUri(Uri.parse(outputUriString), true);
+            }
+            String password = getAndClearPassword();
+            if (password != null) {
+                passwordEditText.setText(password);
+            }
+        }
     }
 }

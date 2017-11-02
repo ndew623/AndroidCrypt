@@ -17,7 +17,7 @@ import android.view.View;
 public class MainActivity extends AppCompatActivity {
 
     private FloatingActionButton fab;
-    private MainActivityFragment mainActivityFragment;
+    private static MainActivityFragment mainActivityFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,8 +26,10 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mainActivityFragment = new MainActivityFragment();
-        displayFragment(mainActivityFragment, false);
+        if (savedInstanceState == null) {
+            mainActivityFragment = new MainActivityFragment();
+            displayFragment(mainActivityFragment, false);
+        }
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -41,8 +43,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        //Tell the fragment that MainActivity.onCreate() is completed
-        mainActivityFragment.onMainActivityPostCreate();
+            //Tell mainActivityFragment to that onCreate is done and fragment is attached to activity.
+            mainActivityFragment.onMainActivityPostCreate();
     }
 
     //Called by MainActivityFragment to change the icon when switching between encryption and decryption.

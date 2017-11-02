@@ -22,7 +22,6 @@ public class CryptoService extends Service {
     //Keys for the intent extras
     public static final String INPUT_URI_EXTRA_KEY = "com.dewdrop623.androidcrypt.CryptoService.INPUT_URI_KEY";
     public static final String OUTPUT_URI_EXTRA_KEY = "com.dewdrop623.androidcrypt.CryptoService.OUTPUT_URI_EXTRA_KEY";
-    public static final String PASSWORD_EXTRA_KEY = "com.dewdrop623.androidcrypt.CryptoService.PASSWORD_EXTRA_KEY";
     public static final String VERSION_EXTRA_KEY = "com.dewdrop623.androidcrypt.CryptoService.VERSION_EXTRA_KEY";
     public static final String OPERATION_TYPE_EXTRA_KEY = "com.dewdrop623.androidcrypt.CryptoService.OPERATION_TYPE_EXTRA_KEY";
 
@@ -36,7 +35,7 @@ public class CryptoService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Uri inputUri = Uri.parse(intent.getStringExtra(INPUT_URI_EXTRA_KEY));
         Uri outputUri = Uri.parse(intent.getStringExtra(OUTPUT_URI_EXTRA_KEY));
-        String password = intent.getStringExtra(PASSWORD_EXTRA_KEY);
+        String password = MainActivityFragment.getAndClearPassword();
         int version = intent.getIntExtra(VERSION_EXTRA_KEY, CryptoThread.VERSION_2);
         boolean operationType = intent.getBooleanExtra(OPERATION_TYPE_EXTRA_KEY, CryptoThread.OPERATION_TYPE_DECRYPTION);
 
