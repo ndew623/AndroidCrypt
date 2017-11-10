@@ -16,9 +16,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 /**
- * Displays the attribution text and links for icons from www.flaticon.com
+ * Used in the about page. Displays the attribution text and links for icons from www.flaticon.com.
  */
-
 public class IconAttributionView extends RelativeLayout {
 
     private ImageView iconAttributionImageView;
@@ -98,7 +97,7 @@ public class IconAttributionView extends RelativeLayout {
 
     private void formatTextViews() {
         SpannableString creatorNameUnderlined = new SpannableString(iconCreatorName);
-        creatorNameUnderlined.setSpan(new UnderlineSpan(),0,creatorNameUnderlined.length(),0);
+        creatorNameUnderlined.setSpan(new UnderlineSpan(), 0, creatorNameUnderlined.length(), 0);
         iconCreatorTextView.setText(creatorNameUnderlined);
     }
 

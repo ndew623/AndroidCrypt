@@ -48,6 +48,8 @@ public class CryptoThread extends Thread {
     public void run() {
 
         InputStream inputStream = null;
+        OutputStream outputStream = null;
+
         //get the input stream
         try {
             inputStream = StorageAccessFrameworkHelper.getUriInputStream(cryptoService, inputUri);
@@ -56,7 +58,6 @@ public class CryptoThread extends Thread {
             cryptoService.showToastOnGuiThread(R.string.error_could_not_get_input_file);
         }
 
-        OutputStream outputStream = null;
         //get the output stream
         try {
             outputStream = StorageAccessFrameworkHelper.getUriOutputStream(cryptoService, outputUri);
@@ -65,34 +66,40 @@ public class CryptoThread extends Thread {
             cryptoService.showToastOnGuiThread(R.string.error_could_not_get_output_file);
         }
 
-        //call AESCrypt
-        try {
-            AESCrypt aesCrypt = new AESCrypt(password);
-            if (operationType == OPERATION_TYPE_ENCRYPTION) {
-                aesCrypt.encrypt(version, inputStream, outputStream);
-            } else {
-                aesCrypt.decrypt(inputStream.available(), inputStream, outputStream);
+        if (inputStream != null && outputStream != null) {
+            //call AESCrypt
+            try {
+                AESCrypt aesCrypt = new AESCrypt(password);
+                if (operationType == OPERATION_TYPE_ENCRYPTION) {
+                    //Encrypt
+                    aesCrypt.encrypt(version, inputStream, outputStream);
+                } else {
+                    //Decrypt
+                    long inputFileSize = StorageAccessFrameworkHelper.getFileSizeFromUri(inputUri, cryptoService);
+                    if (inputFileSize == 0) {
+                        inputFileSize = inputStream.available();
+                    }
+                    aesCrypt.decrypt(inputFileSize, inputStream, outputStream);
+                }
+            } catch (GeneralSecurityException gse) {
+                gse.printStackTrace();
+                cryptoService.showToastOnGuiThread(R.string.error_platform_does_not_support_the_required_cryptographic_methods);
+            } catch (UnsupportedEncodingException uee) {
+                uee.printStackTrace();
+                cryptoService.showToastOnGuiThread(R.string.error_utf16_encoding_is_not_supported);
+            } catch (IOException ioe) {
+                cryptoService.showToastOnGuiThread(ioe.getMessage());
+            } catch (NullPointerException npe) {
+                cryptoService.showToastOnGuiThread(npe.getMessage());
             }
-        } catch (GeneralSecurityException gse) {
-            gse.printStackTrace();
-            cryptoService.showToastOnGuiThread(R.string.error_platform_does_not_support_the_required_cryptographic_methods);
-        } catch (UnsupportedEncodingException uee) {
-            uee.printStackTrace();
-            cryptoService.showToastOnGuiThread(R.string.error_utf16_encoding_is_not_supported);
-        } catch (IOException ioe) {
-            cryptoService.showToastOnGuiThread(ioe.getMessage());
-        }
 
-        //close the streams
-        if (inputStream != null) {
+            //close the streams
             try {
                 inputStream.close();
             } catch (IOException ioe) {
                 ioe.printStackTrace();
                 cryptoService.showToastOnGuiThread(R.string.error_could_not_close_input_file);
             }
-        }
-        if (outputStream != null) {
             try {
                 outputStream.close();
             } catch (IOException ioe) {
@@ -102,5 +109,6 @@ public class CryptoThread extends Thread {
 
         //stop the service, and remove the notification
         cryptoService.stopForeground(true);
+        cryptoService.stopSelf();
     }
 }

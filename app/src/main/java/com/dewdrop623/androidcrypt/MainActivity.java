@@ -1,9 +1,6 @@
 package com.dewdrop623.androidcrypt;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.os.PersistableBundle;
-import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -17,7 +14,8 @@ import android.view.View;
 public class MainActivity extends AppCompatActivity {
 
     private FloatingActionButton fab;
-    private static MainActivityFragment mainActivityFragment;
+
+    private static final String MAINACTIVITYFRAGMENT_TAG = "com.dewdrop623.androidcrypt.MainActivity.MAINACTIVITYFRAGMENT_TAG";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,10 +24,15 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        final MainActivityFragment mainActivityFragment;
         if (savedInstanceState == null) {
             mainActivityFragment = new MainActivityFragment();
-            displayFragment(mainActivityFragment, false);
+            displayFragment(mainActivityFragment, false, MAINACTIVITYFRAGMENT_TAG);
+        } else {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            mainActivityFragment = (MainActivityFragment) fragmentManager.findFragmentByTag(MAINACTIVITYFRAGMENT_TAG);
         }
+
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -41,10 +44,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-            //Tell mainActivityFragment to that onCreate is done and fragment is attached to activity.
-            mainActivityFragment.onMainActivityPostCreate();
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
+    //choose whether the Floating Action Button should be visible or not
+    public void setFabVisible(boolean visible) {
+        fab.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
     //Called by MainActivityFragment to change the icon when switching between encryption and decryption.
@@ -65,23 +71,19 @@ public class MainActivity extends AppCompatActivity {
      */
     public void displayAboutFragment() {
         setFabVisible(false);
-        displayFragment(new AboutFragment(), true);
-    }
-
-    public void setFabVisible(boolean visible) {
-        fab.setVisibility(visible?View.VISIBLE:View.GONE);
+        displayFragment(new AboutFragment(), true, null);
     }
 
     /*
-    * display the given fragment, called by returnToMainFragment and displayAboutFragment
+    * display the given fragment
      */
-    private void displayFragment(Fragment fragment, boolean addToBackStack) {
+    private void displayFragment(Fragment fragment, boolean addToBackStack, String tag) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         if (addToBackStack) {
             fragmentTransaction.addToBackStack(null);
         }
-        fragmentTransaction.replace(R.id.main_fragment_container, fragment);
+        fragmentTransaction.replace(R.id.main_fragment_container, fragment, tag);
         fragmentTransaction.commit();
     }
 

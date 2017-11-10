@@ -7,10 +7,9 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
 
 /**
- * This fragment is the about page accessed via the action bar from MainActivityFragment
+ * This fragment is the about page accessed via the action bar from MainActivityFragment.
  */
 
 public class AboutFragment extends Fragment {
@@ -20,6 +19,4 @@ public class AboutFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_about, container, false);
     }
-
-
 }

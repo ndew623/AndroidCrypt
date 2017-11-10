@@ -1,18 +1,18 @@
 package com.dewdrop623.androidcrypt;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.OpenableColumns;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.text.InputType;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -36,18 +36,21 @@ import java.util.Arrays;
  */
 public class MainActivityFragment extends Fragment {
 
-    //Using static variables to store the password rather than savedInstanceState and Intent extras because of paranoia.
-    private static char[] password;
+    /*
+        Using static variables to store the password rather than savedInstanceState and Intent extras because of paranoia.
+        Putting the password as a String into the Android OS that way seems like asking for trouble.
+     */
+    private static char[] password = null;
 
     private static final int SELECT_INPUT_FILE_REQUEST_CODE = 623;
     private static final int SELECT_OUTPUT_DIRECTORY_REQUEST_CODE = 8878;
     private static final int WRITE_FILE_PERMISSION_REQUEST_CODE = 440;
 
-    private static final String SAVED_INSTANCE_STATE_SHOW_PASSWORD="com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_";
-    private static final String SAVED_INSTANCE_STATE_OPERATION_MODE="com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_OPERATION_MODE";
-    private static final String SAVED_INSTANCE_STATE_INPUT_URI="com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_INPUT_URI";
-    private static final String SAVED_INSTANCE_STATE_OUTPUT_URI="com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_OUTPUT_URI";
-    private static final String SAVED_INSTANCE_STATE_="com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_";
+    private static final String SAVED_INSTANCE_STATE_SHOW_PASSWORD = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_";
+    private static final String SAVED_INSTANCE_STATE_OPERATION_MODE = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_OPERATION_MODE";
+    private static final String SAVED_INSTANCE_STATE_INPUT_URI = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_INPUT_URI";
+    private static final String SAVED_INSTANCE_STATE_OUTPUT_URI = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_OUTPUT_URI";
+    private static final String SAVED_INSTANCE_STATE_ = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_";
 
     //stores the type of operation/operation mode to be done
     private boolean operationMode = CryptoThread.OPERATION_TYPE_ENCRYPTION;
@@ -55,15 +58,16 @@ public class MainActivityFragment extends Fragment {
     private Uri inputFileUri = null;
     private Uri outputFileUri = null;
     private Bundle stateBundle;
+    //see comment on this.onAttach(Context)
+    private Context context;
 
     private Button encryptModeButton;
     private Button decryptModeButton;
-    //TODO either add ability to hide missing files textview, or remove these references
-    private LinearLayout missingFilesLinearLayout;
-    private ImageButton missingFilesHideImageButton;
     private TextView missingFilesTextView;
+    private LinearLayout inputContentURILinearLayout;
     private TextView inputContentURITextView;
     private View inputContentURIUnderlineView;
+    private LinearLayout outputContentURILinearLayout;
     private TextView outputContentURITextView;
     private View outputContentURIUnderlineView;
     private FileSelectButton inputFileSelectButton;
@@ -89,11 +93,11 @@ public class MainActivityFragment extends Fragment {
 
         encryptModeButton = (Button) view.findViewById(R.id.encryptModeButton);
         decryptModeButton = (Button) view.findViewById(R.id.decryptModeButton);
-        missingFilesLinearLayout = (LinearLayout) view.findViewById(R.id.missingFilesLinearLayout);
-        missingFilesHideImageButton = (ImageButton) view.findViewById(R.id.missingFilesHideImageButton);
         missingFilesTextView = (TextView) view.findViewById(R.id.missingFilesTextView);
+        inputContentURILinearLayout = (LinearLayout) view.findViewById(R.id.inputContentURILinearLayout);
         inputContentURITextView = (TextView) view.findViewById(R.id.inputContentURITextView);
         inputContentURIUnderlineView = view.findViewById(R.id.inputContentURIUnderlineView);
+        outputContentURILinearLayout = (LinearLayout) view.findViewById(R.id.outputContentURILinearLayout);
         outputContentURITextView = (TextView) view.findViewById(R.id.outputContentURITextView);
         outputContentURIUnderlineView = view.findViewById(R.id.outputContentURIUnderlineView);
         inputFileSelectButton = (FileSelectButton) view.findViewById(R.id.selectInputFileButton);
@@ -115,8 +119,7 @@ public class MainActivityFragment extends Fragment {
         //Hide the keyboard that automatically pops up.
         getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-        if (stateBundle == null && savedInstanceState != null)
-        {
+        if (stateBundle == null && savedInstanceState != null) {
             stateBundle = savedInstanceState;
         }
         restoreFromStateBundle(stateBundle);
@@ -126,6 +129,7 @@ public class MainActivityFragment extends Fragment {
 
     //Store the current state when MainActivityFragment is added to back stack.
     //onCreateView will be called when the MainActivityFragment is displayed again
+    //onSaveInstance state won't necessarily do this when the view is hidden
     @Override
     public void onPause() {
         super.onPause();
@@ -133,22 +137,14 @@ public class MainActivityFragment extends Fragment {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(createOutStateBundle(outState));
+    public void onResume() {
+        super.onResume();
+        ((MainActivity) getActivity()).setFabVisible(true);
     }
 
-    /**
-     * TODO remove?
-     * onCreateView apparently runs before MainActivity initializes its views in MainActivity.onCreate()
-     * this is an issue because enableEncryptionMode() changes the icon on the Floating Action Button,
-     * which is one of MainActivity's views
-     * therefore, this method can be called by MainActivity at the end of its onCreate() method
-     */
-    public void onMainActivityPostCreate() {
-        if (isAdded() && !hasModeState) {
-            //set the default mode
-           // enableEncryptionMode();
-        }
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(createOutStateBundle(outState));
     }
 
     @Override
@@ -160,10 +156,34 @@ public class MainActivityFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_about:
-                ((MainActivity)getActivity()).displayAboutFragment();
+                ((MainActivity) getActivity()).displayAboutFragment();
                 return true;
         }
         return false;
+    }
+
+    /*
+    * Apparently there is a bug in Android that causes getActivity()/getContext() to return null sometimes (after a rotate in this case).
+    * This is a workaround.
+    */
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        this.context = context;
+    }
+
+    /*
+        The Storage Access Framework has a result for us. Let's do the appropriate actions with it.
+     */
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == SELECT_INPUT_FILE_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            setUriAndUpdateUI(data.getData(), false);
+        } else if (requestCode == SELECT_OUTPUT_DIRECTORY_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            setUriAndUpdateUI(data.getData(), true);
+        } else if (resultCode != Activity.RESULT_CANCELED) {
+            showError(R.string.error_unexpected_response_from_saf);
+        }
     }
 
     /*
@@ -176,7 +196,7 @@ public class MainActivityFragment extends Fragment {
                 case R.id.missingFilesHideImageButton:
                     break;
                 case R.id.missingFilesTextView:
-                    ((MainActivity)getActivity()).showMissingFilesHelpDialog();
+                    ((MainActivity) getActivity()).showMissingFilesHelpDialog();
                     break;
             }
         }
@@ -234,53 +254,42 @@ public class MainActivityFragment extends Fragment {
     /*
     * Set the inputFileUri or outputFileUri member variable and change UI. Pass null to clear the uri value and reset ui.
      */
-    private void setContentUri(Uri uri, boolean output) {
+    private void setUriAndUpdateUI(Uri uri, boolean output) {
         TextView contentURITextView;
         FileSelectButton fileSelectButton;
         View contentURIUnderlineView;
+        LinearLayout contentURILinearLayout;
 
         if (output) {
             outputFileUri = uri;
             contentURITextView = outputContentURITextView;
             fileSelectButton = outputFileSelectButton;
             contentURIUnderlineView = outputContentURIUnderlineView;
+            contentURILinearLayout = outputContentURILinearLayout;
         } else {
             inputFileUri = uri;
             contentURITextView = inputContentURITextView;
             fileSelectButton = inputFileSelectButton;
             contentURIUnderlineView = inputContentURIUnderlineView;
+            contentURILinearLayout = inputContentURILinearLayout;
         }
 
         String contentURIText = "";
         int contentURITextViewVisibility = View.GONE;
         boolean fileSelectButtonMinimize = false;
+        int gravity = Gravity.CENTER;
         if (uri != null) {
-            contentURIText = getFileNameFromUri(uri);
+            contentURIText = StorageAccessFrameworkHelper.getFileNameFromUri(uri, context);
             contentURITextViewVisibility = View.VISIBLE;
             fileSelectButtonMinimize = true;
+            gravity = Gravity.START | Gravity.CENTER_VERTICAL;
         }
 
         contentURITextView.setText(contentURIText);
         contentURITextView.setVisibility(contentURITextViewVisibility);
         fileSelectButton.setMinimized(fileSelectButtonMinimize);
         contentURIUnderlineView.setVisibility(contentURITextViewVisibility);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        ((MainActivity)getActivity()).setFabVisible(true);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == SELECT_INPUT_FILE_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            setContentUri(data.getData(), false);
-        } else if (requestCode == SELECT_OUTPUT_DIRECTORY_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            setContentUri(data.getData(), true);
-        } else if (resultCode != Activity.RESULT_CANCELED){
-            showError(R.string.error_unexpected_response_from_saf);
-        }
+        contentURILinearLayout.setGravity(gravity);
     }
 
     /**
@@ -288,20 +297,21 @@ public class MainActivityFragment extends Fragment {
      */
     public void actionButtonPressed() {
         if (isValidElsePrintErrors()) {
-            Intent intent = new Intent(getContext(), CryptoService.class);
+            //Can't use getContext() or getActivity(). See comment on this.onAttach(Context)
+            Intent intent = new Intent(context, CryptoService.class);
             intent.putExtra(CryptoService.INPUT_URI_EXTRA_KEY, inputFileUri.toString());
             intent.putExtra(CryptoService.OUTPUT_URI_EXTRA_KEY, outputFileUri.toString());
             intent.putExtra(CryptoService.VERSION_EXTRA_KEY, CryptoThread.VERSION_2);
             intent.putExtra(CryptoService.OPERATION_TYPE_EXTRA_KEY, operationMode);
-            MainActivityFragment.password = passwordEditText.getText().toString().toCharArray();
-            getContext().startService(intent);
+            //MainActivityFragment.password = passwordEditText.getText().toString().toCharArray();
+            context.startService(intent);
         }
     }
 
     //check for the necessary permissions. destroy and recreate the activity if permissions are asked for so that the files (which couldn't be seen previously) will be displayed
     private void checkPermissions() {
-        if(ContextCompat.checkSelfPermission(getContext(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED ) {
-            ActivityCompat.requestPermissions(getActivity(), new String[] {android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_FILE_PERMISSION_REQUEST_CODE);
+        if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_FILE_PERMISSION_REQUEST_CODE);
         }
     }
 
@@ -309,18 +319,14 @@ public class MainActivityFragment extends Fragment {
     * Display an error to the user.
     * */
     private void showError(String error) {
-        Toast.makeText(getContext(), error, Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
     }
 
     /*
     * Display an error to the user.
     * */
     private void showError(int stringId) {
-        showError(getString(stringId));
-    }
-
-    private MainActivityFragment referenceToThisForAnonymousClassButtonListeners() {
-        return this;
+        showError(context.getString(stringId));
     }
 
     private void setShowPassword(boolean showPassword) {
@@ -343,7 +349,7 @@ public class MainActivityFragment extends Fragment {
         operationMode = CryptoThread.OPERATION_TYPE_ENCRYPTION;
         confirmPasswordTextView.setVisibility(View.VISIBLE);
         confirmPasswordEditText.setVisibility(View.VISIBLE);
-        ((MainActivity)getActivity()).setFABIcon(R.drawable.ic_lock);
+        ((MainActivity) getActivity()).setFABIcon(R.drawable.ic_lock);
         hasModeState = true;
     }
 
@@ -356,7 +362,7 @@ public class MainActivityFragment extends Fragment {
         operationMode = CryptoThread.OPERATION_TYPE_DECRYPTION;
         confirmPasswordTextView.setVisibility(View.GONE);
         confirmPasswordEditText.setVisibility(View.GONE);
-        ((MainActivity)getActivity()).setFABIcon(R.drawable.ic_unlock);
+        ((MainActivity) getActivity()).setFABIcon(R.drawable.ic_unlock);
         hasModeState = true;
     }
 
@@ -368,28 +374,6 @@ public class MainActivityFragment extends Fragment {
         decryptModeButton.setBackground(ResourcesCompat.getDrawable(getResources(), decryptionDrawableId, null));
     }
 
-    /*thank you stack overflow*/
-    private String getFileNameFromUri(Uri uri) {
-        String result = null;
-        if (uri.getScheme().equals("content")) {
-            Cursor cursor = getActivity().getContentResolver().query(uri, null, null, null, null);
-            try {
-                if (cursor != null && cursor.moveToFirst()) {
-                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
-                }
-            } finally {
-                cursor.close();
-            }
-        }
-        if (result == null) {
-            result = uri.getPath();
-            int cut = result.lastIndexOf('/');
-            if (cut != -1) {
-                result = result.substring(cut + 1);
-            }
-        }
-        return result;
-    }
 
     /*return the default output filename based on the inputFileUri.
     *if inputFileUri is null, returns null.
@@ -399,7 +383,7 @@ public class MainActivityFragment extends Fragment {
     private String getDefaultOutputFileName() {
         String result = null;
         if (inputFileUri != null) {
-            String fileName = getFileNameFromUri(inputFileUri);
+            String fileName = StorageAccessFrameworkHelper.getFileNameFromUri(inputFileUri, context);
             if (operationMode == CryptoThread.OPERATION_TYPE_ENCRYPTION) {
                 result = fileName.concat(".aes");
             } else if (operationMode == CryptoThread.OPERATION_TYPE_DECRYPTION) {
@@ -437,7 +421,7 @@ public class MainActivityFragment extends Fragment {
 
     /*
     * Get the password as a String and overwrite it in memory.
-    * Overwriting the char[] may be useless since the EditText returns a String and AESCrypt requires a string,
+    * Overwriting the char[] here may be useless since the EditText returns the password as a String and AESCrypt requires it as a String,
     * but there isn't a good reason not to.
      */
     public static String getAndClearPassword() {
@@ -452,8 +436,9 @@ public class MainActivityFragment extends Fragment {
 
     /*
     * Create a bundle that stores the state of MainActivityFragment and set MainActivityFragment.password
-    * If used in onSaveInstanceState: preserve whatever values Android may put in the outState bundle already by passing in as systemOutStateBundle
+    * If used in onSaveInstanceState: preserve whatever values Android may put in the outState bundle already by passing it in as systemOutStateBundle
     * If not called from onSaveInstanceState: pass null for systemOutStateBundle
+    * Sets the static char[] to the password in passwordEditText.
      */
     private Bundle createOutStateBundle(Bundle systemOutStateBundle) {
         Bundle outState;
@@ -474,6 +459,10 @@ public class MainActivityFragment extends Fragment {
         return outState;
     }
 
+    /*
+    * Given a bundle from createOutStateBundle, restore the state of the fragment.
+    * Retrieves and clears the password from the char[] MainActivityFragment.password
+    * */
     private void restoreFromStateBundle(Bundle stateBundle) {
         if (stateBundle == null) {
             setShowPassword(false);
@@ -488,10 +477,10 @@ public class MainActivityFragment extends Fragment {
             String inputUriString = stateBundle.getString(SAVED_INSTANCE_STATE_INPUT_URI, null);
             String outputUriString = stateBundle.getString(SAVED_INSTANCE_STATE_OUTPUT_URI, null);
             if (inputUriString != null) {
-                setContentUri(Uri.parse(inputUriString), false);
+                setUriAndUpdateUI(Uri.parse(inputUriString), false);
             }
             if (outputUriString != null) {
-                setContentUri(Uri.parse(outputUriString), true);
+                setUriAndUpdateUI(Uri.parse(outputUriString), true);
             }
             String password = getAndClearPassword();
             if (password != null) {

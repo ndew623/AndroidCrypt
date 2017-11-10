@@ -33,14 +33,20 @@ public class CryptoService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
         Uri inputUri = Uri.parse(intent.getStringExtra(INPUT_URI_EXTRA_KEY));
         Uri outputUri = Uri.parse(intent.getStringExtra(OUTPUT_URI_EXTRA_KEY));
-        String password = MainActivityFragment.getAndClearPassword();
         int version = intent.getIntExtra(VERSION_EXTRA_KEY, CryptoThread.VERSION_2);
+        String password = MainActivityFragment.getAndClearPassword();
         boolean operationType = intent.getBooleanExtra(OPERATION_TYPE_EXTRA_KEY, CryptoThread.OPERATION_TYPE_DECRYPTION);
 
-        CryptoThread cryptoThread = new CryptoThread(this, inputUri, outputUri, password, version, operationType);
-        cryptoThread.start();
+        if (password != null) {
+            CryptoThread cryptoThread = new CryptoThread(this, inputUri, outputUri, password, version, operationType);
+            cryptoThread.start();
+        } else {
+            showToastOnGuiThread(R.string.error_null_password);
+            stopSelf();
+        }
 
         return START_STICKY;
     }
@@ -72,6 +78,9 @@ public class CryptoService extends Service {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
+    /*
+    * Create the notification that is displayed while the operation is ongoing.
+     */
     //TODO, this notification should change appearance for encryption and decryption
     //TODO this notification should display the current progress
     private Notification buildNotification() {
@@ -79,6 +88,6 @@ public class CryptoService extends Service {
         Intent resultIntent = new Intent(this, MainActivity.class);
 
         builder.setSmallIcon(R.drawable.ic_lock).setContentTitle(getString(R.string.app_name)).setContentText("placeholder notification");
-        return  builder.build();
+        return builder.build();
     }
 }

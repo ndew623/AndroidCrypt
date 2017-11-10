@@ -4,18 +4,16 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.support.v4.content.res.ResourcesCompat;
 import android.util.AttributeSet;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 /**
- * Button to open Storage Access Framework.
+ * Used for the input/output file buttons in MainActivityFragment.
  */
-
 public class FileSelectButton extends LinearLayout {
 
-    private boolean outputButton = false;
-    private boolean minimized = false;
+    private boolean isOutputButton = false;
+    private boolean isMinimized = false;
 
     private TextView textView;
     private LinearLayout linearLayout;
@@ -37,9 +35,9 @@ public class FileSelectButton extends LinearLayout {
         attrSetUp(context, attrs);
     }
 
-    public void setMinimized(boolean minimized) {
-        this.minimized = minimized;
-        if (minimized) {
+    public void setMinimized(boolean isMinimized) {
+        this.isMinimized = isMinimized;
+        if (isMinimized) {
             textView.setVisibility(GONE);
             linearLayout.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.minimized_file_select_button_selector, null));
         } else {
@@ -49,16 +47,16 @@ public class FileSelectButton extends LinearLayout {
     }
 
     public boolean isMinimized() {
-        return minimized;
+        return isMinimized;
     }
 
     public boolean isOutputButton() {
-        return outputButton;
+        return isOutputButton;
     }
 
-    public void setOutputButton(boolean outputButton) {
-        this.outputButton = outputButton;
-        if (outputButton) {
+    public void setOutputButton(boolean isOutputButton) {
+        this.isOutputButton = isOutputButton;
+        if (isOutputButton) {
             textView.setText(getContext().getString(R.string.select_output_file));
         } else {
             textView.setText(getContext().getString(R.string.select_input_file));
