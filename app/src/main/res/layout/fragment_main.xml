@@ -52,9 +52,9 @@
             android:id="@+id/inputContentURILinearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
             android:gravity="center"
-            android:orientation="horizontal"
-            android:layout_marginTop="4dp">
+            android:orientation="horizontal">
 
             <com.dewdrop623.androidcrypt.FileSelectButton
                 android:id="@+id/selectInputFileButton"
@@ -76,7 +76,7 @@
         <View
             android:id="@+id/inputContentURIUnderlineView"
             style="@style/ContentURIUnderlineView"
-            android:layout_marginBottom="28dp"/>
+            android:layout_marginBottom="28dp" />
 
         <LinearLayout
             android:id="@+id/outputContentURILinearLayout"
@@ -106,7 +106,7 @@
         <View
             android:id="@+id/outputContentURIUnderlineView"
             style="@style/ContentURIUnderlineView"
-            android:layout_marginBottom="12dp"/>
+            android:layout_marginBottom="12dp" />
 
         <EditText
             android:id="@+id/passwordEditText"

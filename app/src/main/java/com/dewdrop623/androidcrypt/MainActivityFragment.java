@@ -51,7 +51,6 @@ public class MainActivityFragment extends Fragment {
     private static final String SAVED_INSTANCE_STATE_OPERATION_MODE = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_OPERATION_MODE";
     private static final String SAVED_INSTANCE_STATE_INPUT_URI = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_INPUT_URI";
     private static final String SAVED_INSTANCE_STATE_OUTPUT_URI = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_OUTPUT_URI";
-    private static final String SAVED_INSTANCE_STATE_ = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_";
 
     //stores the type of operation/operation mode to be done
     private boolean operationMode = CryptoThread.OPERATION_TYPE_ENCRYPTION;

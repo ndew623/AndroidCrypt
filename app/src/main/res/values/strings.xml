@@ -180,4 +180,6 @@
     <string name="select_folder_icon_creator_name">Elegant Themes</string>
     <string name="select_folder_icon_creator_link">https://www.flaticon.com/authors/elegant-themes</string>
     <string name="error_null_password">Error: null password</string>
+    <string name="version_1">Version 1</string>
+    <string name="version_2">Version 2</string>
 </resources>
