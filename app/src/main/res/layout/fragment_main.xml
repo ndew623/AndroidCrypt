@@ -42,23 +42,19 @@
             android:id="@+id/missingFilesTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="-16dp"
             android:paddingEnd="8dp"
             android:paddingStart="8dp"
-            android:paddingTop="16dp"
+            android:paddingTop="24dp"
             android:text="@string/missing_files_click_here"
             android:textColor="#00F" />
-
-        <TextView
-            style="@style/SectionTitleTextView"
-            android:text="@string/input_file" />
 
         <LinearLayout
             android:id="@+id/inputContentURILinearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_marginTop="4dp">
 
             <com.dewdrop623.androidcrypt.FileSelectButton
                 android:id="@+id/selectInputFileButton"
@@ -79,11 +75,8 @@
 
         <View
             android:id="@+id/inputContentURIUnderlineView"
-            style="@style/ContentURIUnderlineView" />
-
-        <TextView
-            style="@style/SectionTitleTextView"
-            android:text="@string/output_file" />
+            style="@style/ContentURIUnderlineView"
+            android:layout_marginBottom="28dp"/>
 
         <LinearLayout
             android:id="@+id/outputContentURILinearLayout"
@@ -112,24 +105,18 @@
 
         <View
             android:id="@+id/outputContentURIUnderlineView"
-            style="@style/ContentURIUnderlineView" />
-
-        <TextView
-            style="@style/SectionTitleTextView"
-            android:text="@string/password" />
+            style="@style/ContentURIUnderlineView"
+            android:layout_marginBottom="12dp"/>
 
         <EditText
             android:id="@+id/passwordEditText"
-            style="@style/PasswordEditText" />
-
-        <TextView
-            android:id="@+id/confirmPasswordTextView"
-            style="@style/SectionTitleTextView"
-            android:text="@string/confirm_password" />
+            style="@style/PasswordEditText"
+            android:hint="@string/password" />
 
         <EditText
             android:id="@+id/confirmPasswordEditText"
-            style="@style/PasswordEditText" />
+            style="@style/PasswordEditText"
+            android:hint="@string/confirm_password" />
 
         <CheckBox
             android:id="@+id/showPasswordCheckbox"

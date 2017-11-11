@@ -37,6 +37,8 @@
         <item name="android:maxLines">1</item>
         <item name="android:gravity">center</item>
         <item name="android:inputType">text</item>
+        <item name="android:padding">8dp</item>
+        <item name="android:layout_marginTop">20dp</item>
     </style>
 
     <style name="SectionTitleTextView">
@@ -67,7 +69,7 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">1.5dp</item>
         <item name="android:background">@color/colorAccent</item>
-        <item name="android:visibility">gone</item>
+        <item name="android:visibility">invisible</item>
     </style>
 
     <style name="MissingFilesHelpImage">

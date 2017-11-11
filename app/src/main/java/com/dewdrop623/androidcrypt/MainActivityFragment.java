@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,6 +13,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.text.InputType;
+import android.text.SpannableString;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -24,7 +26,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -73,7 +74,6 @@ public class MainActivityFragment extends Fragment {
     private FileSelectButton inputFileSelectButton;
     private FileSelectButton outputFileSelectButton;
     private EditText passwordEditText;
-    private TextView confirmPasswordTextView;
     private EditText confirmPasswordEditText;
     private CheckBox showPasswordCheckbox;
 
@@ -103,11 +103,10 @@ public class MainActivityFragment extends Fragment {
         inputFileSelectButton = (FileSelectButton) view.findViewById(R.id.selectInputFileButton);
         outputFileSelectButton = (FileSelectButton) view.findViewById(R.id.selectOutputFileButton);
         passwordEditText = (EditText) view.findViewById(R.id.passwordEditText);
-        confirmPasswordTextView = (TextView) view.findViewById(R.id.confirmPasswordTextView);
         confirmPasswordEditText = (EditText) view.findViewById(R.id.confirmPasswordEditText);
         showPasswordCheckbox = (CheckBox) view.findViewById(R.id.showPasswordCheckbox);
 
-        missingFilesTextView.setOnClickListener(missingFilesViewsOnClickListener);
+        missingFilesTextView.setOnClickListener(missingFilesTextViewOnClickListener);
         showPasswordCheckbox.setOnCheckedChangeListener(showPasswordCheckBoxOnCheckedChangeListener);
         outputFileSelectButton.setOnClickListener(outputFileSelectButtonOnClickListener);
         inputFileSelectButton.setOnClickListener(inputFileSelectButtonOnClickListener);
@@ -189,16 +188,10 @@ public class MainActivityFragment extends Fragment {
     /*
             * This onClickListener is for click on either the textview or hide button of the missing files help textview.
              */
-    private View.OnClickListener missingFilesViewsOnClickListener = new View.OnClickListener() {
+    private View.OnClickListener missingFilesTextViewOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            switch (view.getId()) {
-                case R.id.missingFilesHideImageButton:
-                    break;
-                case R.id.missingFilesTextView:
-                    ((MainActivity) getActivity()).showMissingFilesHelpDialog();
-                    break;
-            }
+            ((MainActivity) getActivity()).showMissingFilesHelpDialog();
         }
     };
 
@@ -259,36 +252,41 @@ public class MainActivityFragment extends Fragment {
         FileSelectButton fileSelectButton;
         View contentURIUnderlineView;
         LinearLayout contentURILinearLayout;
-
+        String contentURITextPrefix;
         if (output) {
             outputFileUri = uri;
             contentURITextView = outputContentURITextView;
             fileSelectButton = outputFileSelectButton;
             contentURIUnderlineView = outputContentURIUnderlineView;
             contentURILinearLayout = outputContentURILinearLayout;
+            contentURITextPrefix = getString(R.string.output_file).concat(": ");
         } else {
             inputFileUri = uri;
             contentURITextView = inputContentURITextView;
             fileSelectButton = inputFileSelectButton;
             contentURIUnderlineView = inputContentURIUnderlineView;
             contentURILinearLayout = inputContentURILinearLayout;
+            contentURITextPrefix = getString(R.string.input_file).concat(": ");
         }
 
         String contentURIText = "";
         int contentURITextViewVisibility = View.GONE;
+        int contentURIUnderlineViewVisibility = View.INVISIBLE;
         boolean fileSelectButtonMinimize = false;
         int gravity = Gravity.CENTER;
         if (uri != null) {
             contentURIText = StorageAccessFrameworkHelper.getFileNameFromUri(uri, context);
             contentURITextViewVisibility = View.VISIBLE;
+            contentURIUnderlineViewVisibility = View.VISIBLE;
             fileSelectButtonMinimize = true;
             gravity = Gravity.START | Gravity.CENTER_VERTICAL;
         }
-
-        contentURITextView.setText(contentURIText);
+        SpannableString contentURISpannableString = new SpannableString(contentURITextPrefix.concat(contentURIText));
+        contentURISpannableString.setSpan(new android.text.style.ForegroundColorSpan(Color.GRAY),0 , contentURITextPrefix.length(), 0);
+        contentURITextView.setText(contentURISpannableString);
         contentURITextView.setVisibility(contentURITextViewVisibility);
         fileSelectButton.setMinimized(fileSelectButtonMinimize);
-        contentURIUnderlineView.setVisibility(contentURITextViewVisibility);
+        contentURIUnderlineView.setVisibility(contentURIUnderlineViewVisibility);
         contentURILinearLayout.setGravity(gravity);
     }
 
@@ -347,7 +345,6 @@ public class MainActivityFragment extends Fragment {
     private void enableEncryptionMode() {
         changeOperationTypeButtonAppearance(R.drawable.operation_mode_button_selected, R.drawable.operation_mode_button_selector);
         operationMode = CryptoThread.OPERATION_TYPE_ENCRYPTION;
-        confirmPasswordTextView.setVisibility(View.VISIBLE);
         confirmPasswordEditText.setVisibility(View.VISIBLE);
         ((MainActivity) getActivity()).setFABIcon(R.drawable.ic_lock);
         hasModeState = true;
@@ -360,7 +357,6 @@ public class MainActivityFragment extends Fragment {
     private void enableDecryptionMode() {
         changeOperationTypeButtonAppearance(R.drawable.operation_mode_button_selector, R.drawable.operation_mode_button_selected);
         operationMode = CryptoThread.OPERATION_TYPE_DECRYPTION;
-        confirmPasswordTextView.setVisibility(View.GONE);
         confirmPasswordEditText.setVisibility(View.GONE);
         ((MainActivity) getActivity()).setFABIcon(R.drawable.ic_unlock);
         hasModeState = true;
