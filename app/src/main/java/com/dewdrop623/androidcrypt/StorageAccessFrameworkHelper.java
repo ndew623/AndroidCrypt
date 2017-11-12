@@ -14,7 +14,11 @@ import java.io.OutputStream;
  * provides access to the StorageAccessFramework
  */
 
-public class StorageAccessFrameworkHelper {
+public final class StorageAccessFrameworkHelper {
+
+    private StorageAccessFrameworkHelper(){
+
+    }
 
     /*
     * start an Storage Access Framework activity for selecting the input file

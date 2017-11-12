@@ -75,6 +75,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /*
+    * Display the settings fragment
+    */
+    public void displaySettingsFragment() {
+        setFabVisible(false);
+        displayFragment(new SettingsFragment(), true, null);
+    }
+
+    /*
     * display the given fragment
      */
     private void displayFragment(Fragment fragment, boolean addToBackStack, String tag) {

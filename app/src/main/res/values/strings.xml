@@ -182,4 +182,5 @@
     <string name="error_null_password">Error: null password</string>
     <string name="version_1">Version 1</string>
     <string name="version_2">Version 2</string>
+    <string name="aescrypt_version">AESCrypt Version</string>
 </resources>

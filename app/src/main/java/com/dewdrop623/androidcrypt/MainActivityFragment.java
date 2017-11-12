@@ -156,6 +156,9 @@ public class MainActivityFragment extends Fragment {
             case R.id.action_about:
                 ((MainActivity) getActivity()).displayAboutFragment();
                 return true;
+            case R.id.action_settings:
+                ((MainActivity) getActivity()).displaySettingsFragment();
+                return true;
         }
         return false;
     }
@@ -298,9 +301,9 @@ public class MainActivityFragment extends Fragment {
             Intent intent = new Intent(context, CryptoService.class);
             intent.putExtra(CryptoService.INPUT_URI_EXTRA_KEY, inputFileUri.toString());
             intent.putExtra(CryptoService.OUTPUT_URI_EXTRA_KEY, outputFileUri.toString());
-            intent.putExtra(CryptoService.VERSION_EXTRA_KEY, CryptoThread.VERSION_2);
+            intent.putExtra(CryptoService.VERSION_EXTRA_KEY, SettingsHelper.getAESCryptVersion(getContext()));
             intent.putExtra(CryptoService.OPERATION_TYPE_EXTRA_KEY, operationMode);
-            //MainActivityFragment.password = passwordEditText.getText().toString().toCharArray();
+            MainActivityFragment.password = passwordEditText.getText().toString().toCharArray();
             context.startService(intent);
         }
     }

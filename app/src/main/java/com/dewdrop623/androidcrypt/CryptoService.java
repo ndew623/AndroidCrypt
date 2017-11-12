@@ -36,7 +36,7 @@ public class CryptoService extends Service {
 
         Uri inputUri = Uri.parse(intent.getStringExtra(INPUT_URI_EXTRA_KEY));
         Uri outputUri = Uri.parse(intent.getStringExtra(OUTPUT_URI_EXTRA_KEY));
-        int version = intent.getIntExtra(VERSION_EXTRA_KEY, CryptoThread.VERSION_2);
+        int version = intent.getIntExtra(VERSION_EXTRA_KEY, SettingsHelper.AESCRYPT_DEFAULT_VERSION);
         String password = MainActivityFragment.getAndClearPassword();
         boolean operationType = intent.getBooleanExtra(OPERATION_TYPE_EXTRA_KEY, CryptoThread.OPERATION_TYPE_DECRYPTION);
 
