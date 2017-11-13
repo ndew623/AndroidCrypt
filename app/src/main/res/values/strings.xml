@@ -183,4 +183,5 @@
     <string name="version_1">Version 1</string>
     <string name="version_2">Version 2</string>
     <string name="aescrypt_version">AESCrypt Version</string>
+    <string name="another_operation_is_already_in_progress">Another operation is already in progress</string>
 </resources>

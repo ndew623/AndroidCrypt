@@ -15,6 +15,8 @@
  */
 package es.vocali.util;
 
+import com.dewdrop623.androidcrypt.CryptoThread;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -76,7 +78,6 @@ public class AESCrypt {
 	private SecretKeySpec aesKey1;
 	private IvParameterSpec ivSpec2;
 	private SecretKeySpec aesKey2;
-
 
 	/*******************
 	 * PRIVATE METHODS *
@@ -348,6 +349,9 @@ public class AESCrypt {
 				hmac.update(text);
 				out.write(text);	// Crypted file data block.
 				last = len;
+
+				//dewdrop623: LINE ADDED FOR PROGRESS BARS
+				CryptoThread.updateProgress(CryptoThread.OPERATION_TYPE_ENCRYPTION, len);
 			}
 			last &= 0x0f;
 			out.write(last);	// Last block size mod 16.
@@ -487,6 +491,9 @@ public class AESCrypt {
 					len = (last > 0 ? last : BLOCK_SIZE);
 				}
 				out.write(text, 0, len);
+
+				//dewdrop623: LINE ADDED FOR PROGRESS BARS
+				CryptoThread.updateProgress(CryptoThread.OPERATION_TYPE_DECRYPTION, len);
 			}
 			out.write(cipher.doFinal());
 

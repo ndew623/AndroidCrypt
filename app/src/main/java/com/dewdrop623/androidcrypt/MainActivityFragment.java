@@ -413,6 +413,8 @@ public class MainActivityFragment extends Fragment {
         } else if (inputFileUri.equals(outputFileUri)) {
             valid = false;
             showError(R.string.the_input_and_output_files_must_be_different);
+        } else if (CryptoThread.operationInProgress) {
+            showError(R.string.another_operation_is_already_in_progress);
         }
         return valid;
     }

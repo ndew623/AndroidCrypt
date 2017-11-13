@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
+import java.util.HashMap;
 
 import es.vocali.util.AESCrypt;
 
@@ -17,6 +18,9 @@ import es.vocali.util.AESCrypt;
 
 public class CryptoThread extends Thread {
 
+    //Do not do more than one operation at once.
+    public static boolean operationInProgress = false;
+
     /*
     * Constants.
      */
@@ -24,6 +28,16 @@ public class CryptoThread extends Thread {
     public static final boolean OPERATION_TYPE_DECRYPTION = false;
     public static final int VERSION_1 = 1;
     public static final int VERSION_2 = 2;
+
+    private static HashMap<String, ProgressDisplayer> progressDiplayers = new HashMap<>();
+    public interface ProgressDisplayer {
+        void update(boolean operationType, int progress);
+    }
+
+    private static long twoPercentOfFileSize = 0;
+    private static long lastUpdateAtByteNumber = 0;
+    private static long totalBytesReadForProgress = 0;
+    private static long fileSize = 0;
 
     private CryptoService cryptoService;
     private Uri inputUri;
@@ -46,10 +60,9 @@ public class CryptoThread extends Thread {
 
     @Override
     public void run() {
-
+        operationInProgress = true;
         InputStream inputStream = null;
         OutputStream outputStream = null;
-
         //get the input stream
         try {
             inputStream = StorageAccessFrameworkHelper.getUriInputStream(cryptoService, inputUri);
@@ -69,17 +82,18 @@ public class CryptoThread extends Thread {
         if (inputStream != null && outputStream != null) {
             //call AESCrypt
             try {
+                fileSize = StorageAccessFrameworkHelper.getFileSizeFromUri(inputUri, cryptoService);
+                if (fileSize == 0) {
+                    fileSize = inputStream.available();
+                }
+                twoPercentOfFileSize = (long) (fileSize*.02f);
                 AESCrypt aesCrypt = new AESCrypt(password);
                 if (operationType == OPERATION_TYPE_ENCRYPTION) {
                     //Encrypt
                     aesCrypt.encrypt(version, inputStream, outputStream);
                 } else {
                     //Decrypt
-                    long inputFileSize = StorageAccessFrameworkHelper.getFileSizeFromUri(inputUri, cryptoService);
-                    if (inputFileSize == 0) {
-                        inputFileSize = inputStream.available();
-                    }
-                    aesCrypt.decrypt(inputFileSize, inputStream, outputStream);
+                    aesCrypt.decrypt(fileSize, inputStream, outputStream);
                 }
             } catch (GeneralSecurityException gse) {
                 gse.printStackTrace();
@@ -110,5 +124,30 @@ public class CryptoThread extends Thread {
         //stop the service, and remove the notification
         cryptoService.stopForeground(true);
         cryptoService.stopSelf();
+        operationInProgress = false;
+    }
+
+    public static void updateProgress(boolean operationType, long bytesRead) {
+        totalBytesReadForProgress += bytesRead;
+        if (totalBytesReadForProgress - lastUpdateAtByteNumber > twoPercentOfFileSize) {
+            lastUpdateAtByteNumber = totalBytesReadForProgress;
+            updateProgressDisplayers(operationType, totalBytesReadForProgress, fileSize);
+        }
+    }
+
+    //for each progress displayer: if not null: update, else remove it from progressDisplayers because it is null.
+    private static void updateProgressDisplayers(boolean operationType, long workDone, long totalWork) {
+        int progress = (int) ((workDone*100)/totalWork);
+        for(HashMap.Entry<String, ProgressDisplayer> progressDisplayer : progressDiplayers.entrySet()) {
+            if (progressDisplayer.getValue() != null) {
+                progressDisplayer.getValue().update(operationType, progress);
+            } else {
+                progressDiplayers.remove(progressDisplayer.getKey());
+            }
+        }
+    }
+
+    public static void registerForProgressUpdate(String id, ProgressDisplayer progressDisplayer) {
+        progressDiplayers.put(id, progressDisplayer);
     }
 }
