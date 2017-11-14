@@ -351,7 +351,7 @@ public class AESCrypt {
 				last = len;
 
 				//dewdrop623: LINE ADDED FOR PROGRESS BARS
-				CryptoThread.updateProgress(CryptoThread.OPERATION_TYPE_ENCRYPTION, len);
+				CryptoThread.updateProgressOnInterval(len);
 			}
 			last &= 0x0f;
 			out.write(last);	// Last block size mod 16.
@@ -493,7 +493,7 @@ public class AESCrypt {
 				out.write(text, 0, len);
 
 				//dewdrop623: LINE ADDED FOR PROGRESS BARS
-				CryptoThread.updateProgress(CryptoThread.OPERATION_TYPE_DECRYPTION, len);
+				CryptoThread.updateProgressOnInterval(len);
 			}
 			out.write(cipher.doFinal());
 

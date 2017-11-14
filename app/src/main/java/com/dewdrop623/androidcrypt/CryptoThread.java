@@ -20,6 +20,7 @@ public class CryptoThread extends Thread {
 
     //Do not do more than one operation at once.
     public static boolean operationInProgress = false;
+    private static CryptoThread staticThis;
 
     /*
     * Constants.
@@ -39,12 +40,15 @@ public class CryptoThread extends Thread {
     private static long totalBytesReadForProgress = 0;
     private static long fileSize = 0;
 
-    private CryptoService cryptoService;
+    private static CryptoService cryptoService;
+    private static boolean operationType;
+
+    private static InputStream inputStream;
+    private static OutputStream outputStream;
     private Uri inputUri;
     private Uri outputUri;
     private String password;
     private int version;
-    private boolean operationType;
 
     /**
      * Takes a cryptoService, input and output uris, the password, a version (use VERSION_X constants), and operation type (defined by the OPERATION_TYPE_X constants)
@@ -56,13 +60,17 @@ public class CryptoThread extends Thread {
         this.password = password;
         this.version = version;
         this.operationType = operationType;
+        staticThis = this;
     }
 
     @Override
     public void run() {
         operationInProgress = true;
-        InputStream inputStream = null;
-        OutputStream outputStream = null;
+        lastUpdateAtByteNumber = 0;
+        totalBytesReadForProgress = 0;
+
+        inputStream = null;
+        outputStream = null;
         //get the input stream
         try {
             inputStream = StorageAccessFrameworkHelper.getUriInputStream(cryptoService, inputUri);
@@ -108,18 +116,11 @@ public class CryptoThread extends Thread {
             }
 
             //close the streams
-            try {
-                inputStream.close();
-            } catch (IOException ioe) {
-                ioe.printStackTrace();
-                cryptoService.showToastOnGuiThread(R.string.error_could_not_close_input_file);
-            }
-            try {
-                outputStream.close();
-            } catch (IOException ioe) {
-                cryptoService.showToastOnGuiThread(R.string.error_could_not_close_output_file);
-            }
+            closeStreams();
         }
+
+        //Send out one last progress update. It is important that ProgressDisplayers get the final update at 100%.
+        updateProgressDisplayers(totalBytesReadForProgress, fileSize);
 
         //stop the service, and remove the notification
         cryptoService.stopForeground(true);
@@ -127,16 +128,45 @@ public class CryptoThread extends Thread {
         operationInProgress = false;
     }
 
-    public static void updateProgress(boolean operationType, long bytesRead) {
+    public static void cancel() {
+        staticThis.interrupt();
+        updateProgressDisplayers(1,1);
+        if (cryptoService != null) {
+            cryptoService.stopForeground(true);
+            cryptoService.stopSelf();
+        }
+        closeStreams();
+        operationInProgress = false;
+    }
+
+    private static void closeStreams() {
+        if (inputStream != null) {
+            try {
+                inputStream.close();
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+                cryptoService.showToastOnGuiThread(R.string.error_could_not_close_input_file);
+            }
+        }
+        if (outputStream != null) {
+            try {
+                outputStream.close();
+            } catch (IOException ioe) {
+                cryptoService.showToastOnGuiThread(R.string.error_could_not_close_output_file);
+            }
+        }
+    }
+
+    public static void updateProgressOnInterval(long bytesRead) {
         totalBytesReadForProgress += bytesRead;
         if (totalBytesReadForProgress - lastUpdateAtByteNumber > twoPercentOfFileSize) {
             lastUpdateAtByteNumber = totalBytesReadForProgress;
-            updateProgressDisplayers(operationType, totalBytesReadForProgress, fileSize);
+            updateProgressDisplayers(totalBytesReadForProgress, fileSize);
         }
     }
 
     //for each progress displayer: if not null: update, else remove it from progressDisplayers because it is null.
-    private static void updateProgressDisplayers(boolean operationType, long workDone, long totalWork) {
+    private static void updateProgressDisplayers(long workDone, long totalWork) {
         int progress = (int) ((workDone*100)/totalWork);
         for(HashMap.Entry<String, ProgressDisplayer> progressDisplayer : progressDiplayers.entrySet()) {
             if (progressDisplayer.getValue() != null) {

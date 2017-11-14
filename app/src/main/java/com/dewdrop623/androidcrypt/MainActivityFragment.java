@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -27,6 +28,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,7 +37,7 @@ import java.util.Arrays;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment {
+public class MainActivityFragment extends Fragment implements CryptoThread.ProgressDisplayer{
 
     /*
         Using static variables to store the password rather than savedInstanceState and Intent extras because of paranoia.
@@ -46,6 +48,8 @@ public class MainActivityFragment extends Fragment {
     private static final int SELECT_INPUT_FILE_REQUEST_CODE = 623;
     private static final int SELECT_OUTPUT_DIRECTORY_REQUEST_CODE = 8878;
     private static final int WRITE_FILE_PERMISSION_REQUEST_CODE = 440;
+
+    private static final String PROGRESS_DISPLAYER_ID = "com.dewdrop623.androidcrypt.MainActivityFragment.PROGRESS_DISPLAYER_ID";
 
     private static final String SAVED_INSTANCE_STATE_SHOW_PASSWORD = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_";
     private static final String SAVED_INSTANCE_STATE_OPERATION_MODE = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_OPERATION_MODE";
@@ -75,6 +79,9 @@ public class MainActivityFragment extends Fragment {
     private EditText passwordEditText;
     private EditText confirmPasswordEditText;
     private CheckBox showPasswordCheckbox;
+    private LinearLayout progressDisplayLinearLayout;
+    private ProgressBar progressDisplayProgressBar;
+    private Button progressDispayCancelButton;
 
     public MainActivityFragment() {
     }
@@ -104,6 +111,9 @@ public class MainActivityFragment extends Fragment {
         passwordEditText = (EditText) view.findViewById(R.id.passwordEditText);
         confirmPasswordEditText = (EditText) view.findViewById(R.id.confirmPasswordEditText);
         showPasswordCheckbox = (CheckBox) view.findViewById(R.id.showPasswordCheckbox);
+        progressDisplayLinearLayout = (LinearLayout) view.findViewById(R.id.progressDisplayLinearLayout);
+        progressDisplayProgressBar = (ProgressBar) view.findViewById(R.id.progressDisplayProgressBar);
+        progressDispayCancelButton = (Button) view.findViewById(R.id.progressDisplayCancelButton);
 
         missingFilesTextView.setOnClickListener(missingFilesTextViewOnClickListener);
         showPasswordCheckbox.setOnCheckedChangeListener(showPasswordCheckBoxOnCheckedChangeListener);
@@ -111,6 +121,7 @@ public class MainActivityFragment extends Fragment {
         inputFileSelectButton.setOnClickListener(inputFileSelectButtonOnClickListener);
         encryptModeButton.setOnClickListener(operationModeButtonsOnClickListener);
         decryptModeButton.setOnClickListener(operationModeButtonsOnClickListener);
+        progressDispayCancelButton.setOnClickListener(progressDispayCancelButtonOnClickListener);
 
         checkPermissions();
 
@@ -121,6 +132,8 @@ public class MainActivityFragment extends Fragment {
             stateBundle = savedInstanceState;
         }
         restoreFromStateBundle(stateBundle);
+
+        CryptoThread.registerForProgressUpdate(PROGRESS_DISPLAYER_ID, this);
 
         return view;
     }
@@ -188,8 +201,24 @@ public class MainActivityFragment extends Fragment {
     }
 
     /*
-            * This onClickListener is for click on either the textview or hide button of the missing files help textview.
-             */
+    * Implementation of ProgressDisplayer interface. Called by CryptoThread to show progress.
+    * Has to be done on the gui thread.
+     */
+    @Override
+    public void update(final boolean operationType, final int progress) {
+        final Context context = getContext();
+        new Handler(context.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                progressDisplayLinearLayout.setVisibility(progress==100?View.GONE:View.VISIBLE);
+                progressDisplayProgressBar.setProgress(progress);
+            }
+        });
+    }
+
+    /*
+         * This onClickListener is for click on help textview.
+         */
     private View.OnClickListener missingFilesTextViewOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
@@ -229,6 +258,12 @@ public class MainActivityFragment extends Fragment {
         @Override
         public void onClick(View view) {
             selectOutputFile();
+        }
+    };
+    private View.OnClickListener progressDispayCancelButtonOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            CryptoThread.cancel();
         }
     };
 
@@ -414,6 +449,7 @@ public class MainActivityFragment extends Fragment {
             valid = false;
             showError(R.string.the_input_and_output_files_must_be_different);
         } else if (CryptoThread.operationInProgress) {
+            valid = false;
             showError(R.string.another_operation_is_already_in_progress);
         }
         return valid;
