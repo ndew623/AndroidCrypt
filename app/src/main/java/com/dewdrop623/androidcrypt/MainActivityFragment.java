@@ -156,7 +156,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
     @Override
     public void onResume() {
         super.onResume();
-        ((MainActivity) getActivity()).setFabVisible(true);
+        ((MainActivity) getActivity()).returnedToMainFragment();
     }
 
     @Override
@@ -173,10 +173,10 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_about:
-                ((MainActivity) getActivity()).displayAboutFragment();
+                ((MainActivity) getActivity()).displayFragmentScreen(new AboutFragment(), getString(R.string.action_about));
                 return true;
             case R.id.action_settings:
-                ((MainActivity) getActivity()).displaySettingsFragment();
+                ((MainActivity) getActivity()).displayFragmentScreen(new SettingsFragment(), getString(R.string.action_settings));
                 return true;
         }
         return false;

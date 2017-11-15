@@ -9,6 +9,7 @@ import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 
 public class MainActivity extends AppCompatActivity {
@@ -27,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
         final MainActivityFragment mainActivityFragment;
         if (savedInstanceState == null) {
             mainActivityFragment = new MainActivityFragment();
-            displayFragment(mainActivityFragment, false, MAINACTIVITYFRAGMENT_TAG);
+            attachFragment(mainActivityFragment, false, MAINACTIVITYFRAGMENT_TAG);
         } else {
             FragmentManager fragmentManager = getSupportFragmentManager();
             mainActivityFragment = (MainActivityFragment) fragmentManager.findFragmentByTag(MAINACTIVITYFRAGMENT_TAG);
@@ -67,25 +68,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /*
-    * Display the about fragment
+    Called to display things like SettingsFragment and AboutFragment.
      */
-    public void displayAboutFragment() {
+    public void displayFragmentScreen(Fragment fragment, String title) {
         setFabVisible(false);
-        displayFragment(new AboutFragment(), true, null);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        attachFragment(fragment, true, null);
+        if (title != null) {
+            getSupportActionBar().setTitle(title);
+        }
     }
 
     /*
-    * Display the settings fragment
-    */
-    public void displaySettingsFragment() {
-        setFabVisible(false);
-        displayFragment(new SettingsFragment(), true, null);
+    * Called by MainActivityFragment's onResume. Bring the FAB back, remove the back arrow from the action bar, change the title
+    * */
+    public void returnedToMainFragment() {
+        setFabVisible(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        getSupportActionBar().setTitle(R.string.app_name);
     }
 
     /*
     * display the given fragment
      */
-    private void displayFragment(Fragment fragment, boolean addToBackStack, String tag) {
+    private void attachFragment(Fragment fragment, boolean addToBackStack, String tag) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         if (addToBackStack) {
@@ -95,4 +101,12 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction.commit();
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }
