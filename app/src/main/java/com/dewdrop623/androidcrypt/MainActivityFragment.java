@@ -56,9 +56,9 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
     private static final String SAVED_INSTANCE_STATE_INPUT_URI = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_INPUT_URI";
     private static final String SAVED_INSTANCE_STATE_OUTPUT_URI = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_OUTPUT_URI";
 
-    //stores the type of operation/operation mode to be done
+    //stores the type of operation to be done
     private boolean operationMode = CryptoThread.OPERATION_TYPE_ENCRYPTION;
-    private boolean hasModeState = false;
+
     private Uri inputFileUri = null;
     private Uri outputFileUri = null;
     private Bundle stateBundle;
@@ -80,6 +80,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
     private EditText confirmPasswordEditText;
     private CheckBox showPasswordCheckbox;
     private LinearLayout progressDisplayLinearLayout;
+    private TextView progressDisplayTextView;
     private ProgressBar progressDisplayProgressBar;
     private Button progressDispayCancelButton;
 
@@ -112,6 +113,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         confirmPasswordEditText = (EditText) view.findViewById(R.id.confirmPasswordEditText);
         showPasswordCheckbox = (CheckBox) view.findViewById(R.id.showPasswordCheckbox);
         progressDisplayLinearLayout = (LinearLayout) view.findViewById(R.id.progressDisplayLinearLayout);
+        progressDisplayTextView = (TextView) view.findViewById(R.id.progressDisplayTextView);
         progressDisplayProgressBar = (ProgressBar) view.findViewById(R.id.progressDisplayProgressBar);
         progressDispayCancelButton = (Button) view.findViewById(R.id.progressDisplayCancelButton);
 
@@ -134,6 +136,10 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         restoreFromStateBundle(stateBundle);
 
         CryptoThread.registerForProgressUpdate(PROGRESS_DISPLAYER_ID, this);
+
+        if (CryptoThread.operationInProgress) {
+            update(CryptoThread.getCurrentOperationType(), CryptoThread.requestProgressUpdate());
+        }
 
         return view;
     }
@@ -207,13 +213,20 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
     @Override
     public void update(final boolean operationType, final int progress) {
         final Context context = getContext();
-        new Handler(context.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                progressDisplayLinearLayout.setVisibility(progress==100?View.GONE:View.VISIBLE);
-                progressDisplayProgressBar.setProgress(progress);
-            }
-        });
+        if (context != null) {
+            new Handler(context.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+                    progressDisplayLinearLayout.setVisibility(progress == 100 ? View.GONE : View.VISIBLE);
+                    progressDisplayProgressBar.setProgress(progress);
+                    if (operationType == CryptoThread.OPERATION_TYPE_ENCRYPTION) {
+                        progressDisplayTextView.setText(R.string.encrypting);
+                    } else {
+                        progressDisplayTextView.setText(R.string.decrypting);
+                    }
+                }
+            });
+        }
     }
 
     /*
@@ -384,7 +397,6 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         operationMode = CryptoThread.OPERATION_TYPE_ENCRYPTION;
         confirmPasswordEditText.setVisibility(View.VISIBLE);
         ((MainActivity) getActivity()).setFABIcon(R.drawable.ic_lock);
-        hasModeState = true;
     }
 
     /**
@@ -396,7 +408,6 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         operationMode = CryptoThread.OPERATION_TYPE_DECRYPTION;
         confirmPasswordEditText.setVisibility(View.GONE);
         ((MainActivity) getActivity()).setFABIcon(R.drawable.ic_unlock);
-        hasModeState = true;
     }
 
     /*
@@ -420,7 +431,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
             if (operationMode == CryptoThread.OPERATION_TYPE_ENCRYPTION) {
                 result = fileName.concat(".aes");
             } else if (operationMode == CryptoThread.OPERATION_TYPE_DECRYPTION) {
-                if (fileName.substring(fileName.lastIndexOf('.')).equals(".aes")) {
+                if (fileName.lastIndexOf('.') != -1 && fileName.substring(fileName.lastIndexOf('.')).equals(".aes")) {
                     result = fileName.substring(0, fileName.lastIndexOf('.'));
                 } else {
                     result = "";
@@ -442,7 +453,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         } else if (outputFileUri == null) {
             valid = false;
             showError(R.string.no_output_file_selected);
-        } else if (!passwordEditText.getText().toString().equals(confirmPasswordEditText.getText().toString())) {
+        } else if (operationMode == CryptoThread.OPERATION_TYPE_ENCRYPTION && !passwordEditText.getText().toString().equals(confirmPasswordEditText.getText().toString())) {
             valid = false;
             showError(R.string.passwords_do_not_match);
         } else if (inputFileUri.equals(outputFileUri)) {

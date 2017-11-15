@@ -20,7 +20,6 @@ public class CryptoThread extends Thread {
 
     //Do not do more than one operation at once.
     public static boolean operationInProgress = false;
-    private static CryptoThread staticThis;
 
     /*
     * Constants.
@@ -40,11 +39,11 @@ public class CryptoThread extends Thread {
     private static long totalBytesReadForProgress = 0;
     private static long fileSize = 0;
 
-    private static CryptoService cryptoService;
+    private CryptoService cryptoService;
     private static boolean operationType;
 
-    private static InputStream inputStream;
-    private static OutputStream outputStream;
+    private InputStream inputStream;
+    private OutputStream outputStream;
     private Uri inputUri;
     private Uri outputUri;
     private String password;
@@ -60,7 +59,6 @@ public class CryptoThread extends Thread {
         this.password = password;
         this.version = version;
         this.operationType = operationType;
-        staticThis = this;
     }
 
     @Override
@@ -69,6 +67,8 @@ public class CryptoThread extends Thread {
         lastUpdateAtByteNumber = 0;
         totalBytesReadForProgress = 0;
 
+        //Send out an initial update for 0 progress.
+        updateProgressDisplayers(0, 1);
         inputStream = null;
         outputStream = null;
         //get the input stream
@@ -114,32 +114,9 @@ public class CryptoThread extends Thread {
             } catch (NullPointerException npe) {
                 cryptoService.showToastOnGuiThread(npe.getMessage());
             }
-
-            //close the streams
-            closeStreams();
         }
 
-        //Send out one last progress update. It is important that ProgressDisplayers get the final update at 100%.
-        updateProgressDisplayers(totalBytesReadForProgress, fileSize);
-
-        //stop the service, and remove the notification
-        cryptoService.stopForeground(true);
-        cryptoService.stopSelf();
-        operationInProgress = false;
-    }
-
-    public static void cancel() {
-        staticThis.interrupt();
-        updateProgressDisplayers(1,1);
-        if (cryptoService != null) {
-            cryptoService.stopForeground(true);
-            cryptoService.stopSelf();
-        }
-        closeStreams();
-        operationInProgress = false;
-    }
-
-    private static void closeStreams() {
+        //close the streams
         if (inputStream != null) {
             try {
                 inputStream.close();
@@ -155,6 +132,14 @@ public class CryptoThread extends Thread {
                 cryptoService.showToastOnGuiThread(R.string.error_could_not_close_output_file);
             }
         }
+
+        //Send out one last progress update. It is important that ProgressDisplayers get the final update at 100%. Even if the operation was canceled.
+        updateProgressDisplayers(fileSize, fileSize);
+
+        //stop the service, and remove the notification
+        cryptoService.stopForeground(true);
+        cryptoService.stopSelf();
+        operationInProgress = false;
     }
 
     public static void updateProgressOnInterval(long bytesRead) {
@@ -179,5 +164,22 @@ public class CryptoThread extends Thread {
 
     public static void registerForProgressUpdate(String id, ProgressDisplayer progressDisplayer) {
         progressDiplayers.put(id, progressDisplayer);
+    }
+    //Called by the cancel button in MainActivityFragment.
+    public static void cancel() {
+        operationInProgress = false;
+    }
+
+    //Called by MainActivityFragment on initialization if CryptoThread.operationInProgress == true
+    //otherwise the progress bar won't appear until an update is sent out, which is not guaranteed to be quickly
+    public static int requestProgressUpdate() {
+        if (operationInProgress) {
+            return (int) ((totalBytesReadForProgress * 100) / fileSize);
+        } else {
+            return 0;
+        }
+    }
+    public static boolean getCurrentOperationType() {
+        return operationType;
     }
 }

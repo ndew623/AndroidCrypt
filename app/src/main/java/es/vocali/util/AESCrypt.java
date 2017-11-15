@@ -350,8 +350,12 @@ public class AESCrypt {
 				out.write(text);	// Crypted file data block.
 				last = len;
 
-				//dewdrop623: LINE ADDED FOR PROGRESS BARS
-				CryptoThread.updateProgressOnInterval(len);
+				//dewdrop623: modified for progress bar and operation cancel functionality
+				if (CryptoThread.operationInProgress) {
+					CryptoThread.updateProgressOnInterval(len);
+				} else {
+					return;
+				}
 			}
 			last &= 0x0f;
 			out.write(last);	// Last block size mod 16.
@@ -492,8 +496,12 @@ public class AESCrypt {
 				}
 				out.write(text, 0, len);
 
-				//dewdrop623: LINE ADDED FOR PROGRESS BARS
-				CryptoThread.updateProgressOnInterval(len);
+				//dewdrop623: modified for progress bar and operation cancel functionality
+				if (CryptoThread.operationInProgress) {
+					CryptoThread.updateProgressOnInterval(len);
+				} else {
+					return;
+				}
 			}
 			out.write(cipher.doFinal());
 
