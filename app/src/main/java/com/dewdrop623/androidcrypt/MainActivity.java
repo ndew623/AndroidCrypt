@@ -96,6 +96,9 @@ public class MainActivity extends AppCompatActivity {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         if (addToBackStack) {
             fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.setCustomAnimations(R.anim.slide_in_right, android.R.anim.fade_out, android.R.anim.slide_in_left, android.R.anim.fade_out);
+        } else {
+            fragmentTransaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.slide_in_left, android.R.anim.fade_out);
         }
         fragmentTransaction.replace(R.id.main_fragment_container, fragment, tag);
         fragmentTransaction.commit();

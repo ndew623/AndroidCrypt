@@ -33,7 +33,7 @@ public class CryptoService extends Service implements CryptoThread.ProgressDispl
     @Override
     public void onCreate() {
         super.onCreate();
-        startForeground(START_FOREGROUND_ID, buildProgressNotification(CryptoThread.OPERATION_TYPE_ENCRYPTION,-1));
+        startForeground(START_FOREGROUND_ID, buildProgressNotification(CryptoThread.OPERATION_TYPE_ENCRYPTION,-1, R.string.app_name));
     }
 
     @Override
@@ -89,7 +89,7 @@ public class CryptoService extends Service implements CryptoThread.ProgressDispl
     * Create the notification that is displayed while the operation is ongoing.
     * if progress < 0: displayed without progress bar
      */
-    private Notification buildProgressNotification(boolean operationType, int progress) {
+    private Notification buildProgressNotification(boolean operationType, int progress, int completedMessageStringId) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
 
         Intent resultIntent = new Intent(this, MainActivity.class);
@@ -100,9 +100,12 @@ public class CryptoService extends Service implements CryptoThread.ProgressDispl
         if (progress < 0) {
             builder.setContentTitle(getString(R.string.app_name));
             builder.setContentText(getString(R.string.operation_in_progress));
-        } else {
+        } else if (progress < 100) {
             builder.setContentTitle(operationType == CryptoThread.OPERATION_TYPE_ENCRYPTION?getString(R.string.encrypting):getString(R.string.decrypting));
             builder.setProgress(100, progress, false);
+        } else {
+            builder.setContentTitle(getString(R.string.app_name));
+            builder.setContentText(getString(completedMessageStringId));
         }
         return builder.build();
     }
@@ -110,8 +113,8 @@ public class CryptoService extends Service implements CryptoThread.ProgressDispl
     //Implementation of CryptoThread.ProgressDisplayers interface. Called by CryptoThread to update the progress.
     //progress is out of 100.
     @Override
-    public void update(boolean operationType, int progress) {
+    public void update(boolean operationType, int progress, int completedMessageStringId) {
         NotificationManagerCompat notificationManager = (NotificationManagerCompat) NotificationManagerCompat.from(this);
-        notificationManager.notify(START_FOREGROUND_ID, buildProgressNotification(operationType, progress));
+        notificationManager.notify(START_FOREGROUND_ID, buildProgressNotification(operationType, progress, completedMessageStringId));
     }
 }

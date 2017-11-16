@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,6 +16,9 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.text.InputType;
 import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
+import android.text.style.StyleSpan;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -82,7 +86,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
     private LinearLayout progressDisplayLinearLayout;
     private TextView progressDisplayTextView;
     private ProgressBar progressDisplayProgressBar;
-    private Button progressDispayCancelButton;
+    private LinearLayout progressDispayCancelButton;
 
     public MainActivityFragment() {
     }
@@ -115,7 +119,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         progressDisplayLinearLayout = (LinearLayout) view.findViewById(R.id.progressDisplayLinearLayout);
         progressDisplayTextView = (TextView) view.findViewById(R.id.progressDisplayTextView);
         progressDisplayProgressBar = (ProgressBar) view.findViewById(R.id.progressDisplayProgressBar);
-        progressDispayCancelButton = (Button) view.findViewById(R.id.progressDisplayCancelButton);
+        progressDispayCancelButton = (LinearLayout) view.findViewById(R.id.progressDisplayCancelButtonLinearLayout);
 
         missingFilesTextView.setOnClickListener(missingFilesTextViewOnClickListener);
         showPasswordCheckbox.setOnCheckedChangeListener(showPasswordCheckBoxOnCheckedChangeListener);
@@ -138,7 +142,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         CryptoThread.registerForProgressUpdate(PROGRESS_DISPLAYER_ID, this);
 
         if (CryptoThread.operationInProgress) {
-            update(CryptoThread.getCurrentOperationType(), CryptoThread.requestProgressUpdate());
+            update(CryptoThread.getCurrentOperationType(), CryptoThread.getProgressUpdate(), CryptoThread.getCompletedMessageStringId());
         }
 
         return view;
@@ -211,7 +215,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
     * Has to be done on the gui thread.
      */
     @Override
-    public void update(final boolean operationType, final int progress) {
+    public void update(final boolean operationType, final int progress, final int completedMessageStringId) {
         final Context context = getContext();
         if (context != null) {
             new Handler(context.getMainLooper()).post(new Runnable() {
@@ -332,7 +336,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
             gravity = Gravity.START | Gravity.CENTER_VERTICAL;
         }
         SpannableString contentURISpannableString = new SpannableString(contentURITextPrefix.concat(contentURIText));
-        contentURISpannableString.setSpan(new android.text.style.ForegroundColorSpan(Color.GRAY),0 , contentURITextPrefix.length(), 0);
+        contentURISpannableString.setSpan(new ForegroundColorSpan(Color.GRAY),0 , contentURITextPrefix.length(), 0);
         contentURITextView.setText(contentURISpannableString);
         contentURITextView.setVisibility(contentURITextViewVisibility);
         fileSelectButton.setMinimized(fileSelectButtonMinimize);

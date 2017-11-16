@@ -29,9 +29,10 @@ public class CryptoThread extends Thread {
     public static final int VERSION_1 = 1;
     public static final int VERSION_2 = 2;
 
+
     private static HashMap<String, ProgressDisplayer> progressDiplayers = new HashMap<>();
     public interface ProgressDisplayer {
-        void update(boolean operationType, int progress);
+        void update(boolean operationType, int progress, int completedMessageStringId);
     }
 
     private static long twoPercentOfFileSize = 0;
@@ -48,6 +49,7 @@ public class CryptoThread extends Thread {
     private Uri outputUri;
     private String password;
     private int version;
+    private static int completedMessageStringId = R.string.done;
 
     /**
      * Takes a cryptoService, input and output uris, the password, a version (use VERSION_X constants), and operation type (defined by the OPERATION_TYPE_X constants)
@@ -66,6 +68,12 @@ public class CryptoThread extends Thread {
         operationInProgress = true;
         lastUpdateAtByteNumber = 0;
         totalBytesReadForProgress = 0;
+
+        if (operationType == OPERATION_TYPE_ENCRYPTION) {
+            completedMessageStringId = R.string.encryption_completed;
+        } else {
+            completedMessageStringId = R.string.decryption_completed;
+        }
 
         //Send out an initial update for 0 progress.
         updateProgressDisplayers(0, 1);
@@ -136,9 +144,8 @@ public class CryptoThread extends Thread {
         //Send out one last progress update. It is important that ProgressDisplayers get the final update at 100%. Even if the operation was canceled.
         updateProgressDisplayers(fileSize, fileSize);
 
-        //stop the service, and remove the notification
-        cryptoService.stopForeground(true);
-        cryptoService.stopSelf();
+        //stop the service
+        cryptoService.stopForeground(false);
         operationInProgress = false;
     }
 
@@ -155,7 +162,7 @@ public class CryptoThread extends Thread {
         int progress = (int) ((workDone*100)/totalWork);
         for(HashMap.Entry<String, ProgressDisplayer> progressDisplayer : progressDiplayers.entrySet()) {
             if (progressDisplayer.getValue() != null) {
-                progressDisplayer.getValue().update(operationType, progress);
+                progressDisplayer.getValue().update(operationType, progress, completedMessageStringId);
             } else {
                 progressDiplayers.remove(progressDisplayer.getKey());
             }
@@ -167,12 +174,17 @@ public class CryptoThread extends Thread {
     }
     //Called by the cancel button in MainActivityFragment.
     public static void cancel() {
+        if (operationType == OPERATION_TYPE_ENCRYPTION) {
+            completedMessageStringId = R.string.encryption_canceled;
+        } else {
+            completedMessageStringId = R.string.decryption_canceled;
+        }
         operationInProgress = false;
     }
 
     //Called by MainActivityFragment on initialization if CryptoThread.operationInProgress == true
     //otherwise the progress bar won't appear until an update is sent out, which is not guaranteed to be quickly
-    public static int requestProgressUpdate() {
+    public static int getProgressUpdate() {
         if (operationInProgress) {
             return (int) ((totalBytesReadForProgress * 100) / fileSize);
         } else {
@@ -181,5 +193,8 @@ public class CryptoThread extends Thread {
     }
     public static boolean getCurrentOperationType() {
         return operationType;
+    }
+    public static int getCompletedMessageStringId() {
+        return completedMessageStringId;
     }
 }

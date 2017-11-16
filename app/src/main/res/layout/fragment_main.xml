@@ -127,25 +127,48 @@
 
         <LinearLayout
             android:id="@+id/progressDisplayLinearLayout"
-            android:visibility="gone"
-            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
             <TextView
                 android:id="@+id/progressDisplayTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
+
             <ProgressBar
                 android:id="@+id/progressDisplayProgressBar"
-                android:indeterminate="false"
+                style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                style="?android:attr/progressBarStyleHorizontal"/>
-            <Button
-                android:id="@+id/progressDisplayCancelButton"
-                android:text="@string/cancel"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:indeterminate="false" />
+
+            <LinearLayout
+                android:id="@+id/progressDisplayCancelButtonLinearLayout"
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="5dp"
+                 >
+                <ImageView
+                    app:srcCompat="@drawable/ic_cancel"
+                    android:tint="@android:color/darker_gray"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:scaleX="0.8"
+                    android:scaleY="0.8"/>
+                <TextView
+                    android:text="@string/cancel"
+                    android:textAllCaps="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:paddingStart="3dp"
+                    android:paddingEnd="3dp"
+                    android:textColor="@android:color/darker_gray"/>
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 </ScrollView>
