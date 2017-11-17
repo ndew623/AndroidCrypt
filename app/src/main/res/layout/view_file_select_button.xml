@@ -19,5 +19,5 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        app:srcCompat="@drawable/ic_select_folder" />
+        app:srcCompat="@drawable/ic_file_search" />
 </LinearLayout>

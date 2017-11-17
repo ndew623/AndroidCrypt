@@ -38,8 +38,25 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
+            app:creator_link="@string/launcher_icon_creator_link"
+            app:creator_name="@string/launcher_icon_creator_name"
+            app:src_name="@string/iconarchive_name"
+            app:src_link="@string/iconarchive_link"
+            app:license_link="@string/freeware_license_link"
+            app:license_name="@string/freeware_license_name"
+            app:icon_src="@mipmap/ic_launcher"
+            app:tint_grey="false" />
+
+        <com.dewdrop623.androidcrypt.IconAttributionView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
             app:creator_link="@string/lock_unlock_icon_creator_link"
             app:creator_name="@string/lock_unlock_icon_creator_name"
+            app:src_name="@string/flaticon_displayed_link"
+            app:src_link="@string/flaticon_link"
+            app:license_link="@string/cc30_link"
+            app:license_name="@string/cc30_license_name"
             app:icon_src="@drawable/ic_lock" />
 
         <com.dewdrop623.androidcrypt.IconAttributionView
@@ -48,15 +65,23 @@
             android:layout_marginBottom="8dp"
             app:creator_link="@string/lock_unlock_icon_creator_link"
             app:creator_name="@string/lock_unlock_icon_creator_name"
+            app:src_name="@string/flaticon_displayed_link"
+            app:src_link="@string/flaticon_link"
+            app:license_link="@string/cc30_link"
+            app:license_name="@string/cc30_license_name"
             app:icon_src="@drawable/ic_unlock" />
 
         <com.dewdrop623.androidcrypt.IconAttributionView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            app:creator_link="@string/select_folder_icon_creator_link"
-            app:creator_name="@string/select_folder_icon_creator_name"
-            app:icon_src="@drawable/ic_select_folder" />
+            app:creator_link="@string/file_search_icon_creator_link"
+            app:creator_name="@string/file_search_icon_creator_name"
+            app:src_name="@string/flaticon_displayed_link"
+            app:src_link="@string/flaticon_link"
+            app:license_link="@string/cc30_link"
+            app:license_name="@string/cc30_license_name"
+            app:icon_src="@drawable/ic_file_search" />
     </LinearLayout>
 
 </ScrollView>

@@ -8,5 +8,10 @@
         <attr name="icon_src" format="reference"/>
         <attr name="creator_name" format="string"/>
         <attr name="creator_link" format="string"/>
+        <attr name="src_name" format="string"/>
+        <attr name="src_link" format="string"/>
+        <attr name="tint_grey" format="boolean"/>
+        <attr name="license_name" format="string"/>
+        <attr name="license_link" format="string"/>
     </declare-styleable>
 </resources>

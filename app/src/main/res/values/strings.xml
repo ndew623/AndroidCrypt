@@ -173,7 +173,7 @@
     <string name="lock_unlock_icon_creator_name">SimpleIcon</string>
     <string name="lock_unlock_icon_creator_link">https://www.flaticon.com/authors/simpleicon</string>
     <string name="flaticon_displayed_link"><u>www.flaticon.com</u></string>
-    <string name="cc30_license_by"><u>CC 3.0 BY</u></string>
+    <string name="cc30_license_name"><u>CC 3.0 BY</u></string>
     <string name="licensed_by">licensed by</string>
     <string name="cc30_link">https://creativecommons.org/licenses/by/3.0/</string>
     <string name="icons">Icons:</string>
@@ -190,4 +190,12 @@
     <string name="encryption_canceled">Encryption canceled</string>
     <string name="decryption_canceled">Decryption canceled</string>
     <string name="xcancel">X CANCEL</string>
+    <string name="file_search_icon_creator_name">Freepik</string>
+    <string name="file_search_icon_creator_link">http://www.freepik.com</string>
+    <string name="launcher_icon_creator_link">http://graphicloads.com/</string>
+    <string name="launcher_icon_creator_name">GraphicLoads</string>
+    <string name="freeware_license_name">Freeware</string>
+    <string name="freeware_license_link">http://www.iconarchive.com/show/flat-finance-icons-by-graphicloads/lock-icon.html</string>
+    <string name="iconarchive_name">Icon Archive</string>
+    <string name="iconarchive_link">http://www.iconarchive.com/</string>
 </resources>

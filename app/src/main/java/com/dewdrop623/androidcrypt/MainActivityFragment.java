@@ -221,7 +221,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
             new Handler(context.getMainLooper()).post(new Runnable() {
                 @Override
                 public void run() {
-                    progressDisplayLinearLayout.setVisibility(progress == 100 ? View.GONE : View.VISIBLE);
+                    progressDisplayLinearLayout.setVisibility(progress == 100 ? View.INVISIBLE : View.VISIBLE);
                     progressDisplayProgressBar.setProgress(progress);
                     if (operationType == CryptoThread.OPERATION_TYPE_ENCRYPTION) {
                         progressDisplayTextView.setText(R.string.encrypting);
@@ -390,6 +390,10 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         }
         passwordEditText.setInputType(inputType);
         confirmPasswordEditText.setInputType(inputType);
+
+        //Fix the typeface. Android wants to change it to a monospace font when showPassword==false. This makes the edittext hint change appearance.
+        passwordEditText.setTypeface(Typeface.DEFAULT);
+        confirmPasswordEditText.setTypeface(Typeface.DEFAULT);
     }
 
     /**

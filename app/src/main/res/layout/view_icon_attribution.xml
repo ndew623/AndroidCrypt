@@ -7,8 +7,7 @@
         android:id="@+id/iconAttributionImageView"
         android:layout_width="25dp"
         android:layout_height="25dp"
-        android:layout_centerHorizontal="true"
-        android:tint="@android:color/darker_gray" />
+        android:layout_centerHorizontal="true"/>
 
     <LinearLayout
         android:id="@+id/iconAttributionLinearLayoutOne"
@@ -45,11 +44,10 @@
             android:text="@string/from" />
 
         <TextView
-            android:id="@+id/flatIconLinkTextView"
+            android:id="@+id/srcLinkTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5sp"
-            android:text="@string/flaticon_displayed_link"
             android:textColor="#00F" />
     </LinearLayout>
 
@@ -67,11 +65,10 @@
             android:text="@string/licensed_by" />
 
         <TextView
-            android:id="@+id/cc30LinkTextView"
+            android:id="@+id/licenseLinkTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5sp"
-            android:text="@string/cc30_license_by"
             android:textColor="#00F" />
     </LinearLayout>
 

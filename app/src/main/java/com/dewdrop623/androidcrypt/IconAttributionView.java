@@ -7,6 +7,7 @@ import android.content.res.TypedArray;
 import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
 import android.util.AttributeSet;
@@ -22,11 +23,17 @@ public class IconAttributionView extends RelativeLayout {
 
     private ImageView iconAttributionImageView;
     private TextView iconCreatorTextView;
-    private TextView flatIconLinkTextView;
-    private TextView cc30LinkTextView;
+    private TextView srcLinkTextView;
+    private TextView licenseLinkTextView;
 
     private String iconCreatorLink;
     private String iconCreatorName;
+
+    private String srcName;
+    private String srcLink;
+
+    private String licenseName;
+    private String licenseLink;
 
     public IconAttributionView(Context context) {
         super(context);
@@ -56,17 +63,24 @@ public class IconAttributionView extends RelativeLayout {
         inflate(context, R.layout.view_icon_attribution, this);
         iconAttributionImageView = (ImageView) findViewById(R.id.iconAttributionImageView);
         iconCreatorTextView = (TextView) findViewById(R.id.iconCreatorTextView);
-        flatIconLinkTextView = (TextView) findViewById(R.id.flatIconLinkTextView);
-        cc30LinkTextView = (TextView) findViewById(R.id.cc30LinkTextView);
+        srcLinkTextView = (TextView) findViewById(R.id.srcLinkTextView);
+        licenseLinkTextView = (TextView) findViewById(R.id.licenseLinkTextView);
     }
 
     private void attrSetUp(Context context, AttributeSet attrs) {
         TypedArray attributesArray = context.getTheme().obtainStyledAttributes(attrs, R.styleable.IconAttributionView, 0, 0);
         try {
             iconAttributionImageView.setImageDrawable(attributesArray.getDrawable(R.styleable.IconAttributionView_icon_src));
-            iconCreatorTextView.setText(attributesArray.getText(R.styleable.IconAttributionView_creator_name));
-            iconCreatorLink = attributesArray.getString(R.styleable.IconAttributionView_creator_link);
             iconCreatorName = attributesArray.getString(R.styleable.IconAttributionView_creator_name);
+            iconCreatorLink = attributesArray.getString(R.styleable.IconAttributionView_creator_link);
+            srcName = attributesArray.getString(R.styleable.IconAttributionView_src_name);
+            srcLink = attributesArray.getString(R.styleable.IconAttributionView_src_link);
+            licenseName = attributesArray.getString(R.styleable.IconAttributionView_license_name);
+            licenseLink = attributesArray.getString(R.styleable.IconAttributionView_license_link);
+            boolean tintGrey = attributesArray.getBoolean(R.styleable.IconAttributionView_tint_grey, true);
+            if (tintGrey) {
+                iconAttributionImageView.setColorFilter(ContextCompat.getColor(context, android.R.color.darker_gray), android.graphics.PorterDuff.Mode.SRC_IN);
+            }
             setUpOnClickListeners(context);
             formatTextViews();
         } finally {
@@ -81,16 +95,16 @@ public class IconAttributionView extends RelativeLayout {
                 openUrlWithImplicitIntent(context, iconCreatorLink);
             }
         });
-        flatIconLinkTextView.setOnClickListener(new OnClickListener() {
+        srcLinkTextView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                openUrlWithImplicitIntent(context, context.getString(R.string.flaticon_link));
+                openUrlWithImplicitIntent(context, srcLink);
             }
         });
-        cc30LinkTextView.setOnClickListener(new OnClickListener() {
+        licenseLinkTextView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                openUrlWithImplicitIntent(context, context.getString(R.string.cc30_link));
+                openUrlWithImplicitIntent(context, licenseLink);
             }
         });
     }
@@ -99,6 +113,12 @@ public class IconAttributionView extends RelativeLayout {
         SpannableString creatorNameUnderlined = new SpannableString(iconCreatorName);
         creatorNameUnderlined.setSpan(new UnderlineSpan(), 0, creatorNameUnderlined.length(), 0);
         iconCreatorTextView.setText(creatorNameUnderlined);
+        SpannableString srcNameUnderlined = new SpannableString(srcName);
+        srcNameUnderlined.setSpan(new UnderlineSpan(), 0, srcNameUnderlined.length(), 0);
+        srcLinkTextView.setText(srcNameUnderlined);
+        SpannableString licenseNameUnderlined = new SpannableString(licenseName);
+        licenseNameUnderlined.setSpan(new UnderlineSpan(), 0, licenseName.length(), 0);
+        licenseLinkTextView.setText(licenseNameUnderlined);
     }
 
     private void openUrlWithImplicitIntent(Context context, String url) {
