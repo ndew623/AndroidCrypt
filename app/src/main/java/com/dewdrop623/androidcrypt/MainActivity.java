@@ -1,6 +1,7 @@
 package com.dewdrop623.androidcrypt;
 
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -15,7 +16,9 @@ import android.view.View;
 public class MainActivity extends AppCompatActivity {
 
     private FloatingActionButton fab;
+    private boolean mainActivityFragmentOnTop = true;
 
+    private static final String MAINACITIVITYFRAGMENT_ON_TOP_KEY = "com.dewdrop623.androidcrypt.MainActivity.MAINACTIVITYFRAGMENT_ON_TOP_KEY";
     private static final String MAINACTIVITYFRAGMENT_TAG = "com.dewdrop623.androidcrypt.MainActivity.MAINACTIVITYFRAGMENT_TAG";
 
     @Override
@@ -32,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             FragmentManager fragmentManager = getSupportFragmentManager();
             mainActivityFragment = (MainActivityFragment) fragmentManager.findFragmentByTag(MAINACTIVITYFRAGMENT_TAG);
+            mainActivityFragmentOnTop = savedInstanceState.getBoolean(MAINACITIVITYFRAGMENT_ON_TOP_KEY, true);
         }
 
 
@@ -42,10 +46,13 @@ public class MainActivity extends AppCompatActivity {
                 mainActivityFragment.actionButtonPressed();
             }
         });
+        setFabVisible(mainActivityFragmentOnTop);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(!mainActivityFragmentOnTop);
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        outState.putBoolean(MAINACITIVITYFRAGMENT_ON_TOP_KEY, mainActivityFragmentOnTop);
         super.onSaveInstanceState(outState);
     }
 
@@ -70,19 +77,21 @@ public class MainActivity extends AppCompatActivity {
     /*
     Called to display things like SettingsFragment and AboutFragment.
      */
-    public void displayFragmentScreen(Fragment fragment, String title) {
+    public void displaySecondaryFragmentScreen(Fragment fragment, String title) {
         setFabVisible(false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         attachFragment(fragment, true, null);
         if (title != null) {
             getSupportActionBar().setTitle(title);
         }
+        mainActivityFragmentOnTop = false;
     }
 
     /*
     * Called by MainActivityFragment's onResume. Bring the FAB back, remove the back arrow from the action bar, change the title
     * */
     public void returnedToMainFragment() {
+        mainActivityFragmentOnTop = true;
         setFabVisible(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         getSupportActionBar().setTitle(R.string.app_name);

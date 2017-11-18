@@ -17,8 +17,6 @@ import android.support.v4.content.res.ResourcesCompat;
 import android.text.InputType;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
-import android.text.style.RelativeSizeSpan;
-import android.text.style.StyleSpan;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -177,10 +175,10 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_about:
-                ((MainActivity) getActivity()).displayFragmentScreen(new AboutFragment(), getString(R.string.action_about));
+                ((MainActivity) getActivity()).displaySecondaryFragmentScreen(new AboutFragment(), getString(R.string.action_about));
                 return true;
             case R.id.action_settings:
-                ((MainActivity) getActivity()).displayFragmentScreen(new SettingsFragment(), getString(R.string.action_settings));
+                ((MainActivity) getActivity()).displaySecondaryFragmentScreen(new SettingsFragment(), getString(R.string.action_settings));
                 return true;
         }
         return false;
