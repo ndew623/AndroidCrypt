@@ -16,7 +16,6 @@ public class FileSelectButton extends LinearLayout {
     private boolean isMinimized = false;
 
     private TextView textView;
-    private LinearLayout linearLayout;
 
     public FileSelectButton(Context context) {
         super(context);
@@ -39,10 +38,10 @@ public class FileSelectButton extends LinearLayout {
         this.isMinimized = isMinimized;
         if (isMinimized) {
             textView.setVisibility(GONE);
-            linearLayout.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.minimized_file_select_button_selector, null));
+            this.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
         } else {
             textView.setVisibility(VISIBLE);
-            linearLayout.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.file_select_button_selector, null));
+            this.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
         }
     }
 
@@ -66,7 +65,6 @@ public class FileSelectButton extends LinearLayout {
     private void constructorTasks(Context context) {
         inflate(context, R.layout.view_file_select_button, this);
         textView = (TextView) findViewById(R.id.fileSelectButtonTextView);
-        linearLayout = (LinearLayout) findViewById(R.id.fileSelectButtonLinearLayout);
     }
 
     private void attrSetUp(Context context, AttributeSet attrs) {

@@ -35,7 +35,8 @@ public class CryptoThread extends Thread {
         void update(boolean operationType, int progress, int completedMessageStringId);
     }
 
-    private static long twoPercentOfFileSize = 0;
+    private static final long updateIntervalInBytes = 4096;
+
     private static long lastUpdateAtByteNumber = 0;
     private static long totalBytesReadForProgress = 0;
     private static long fileSize = 0;
@@ -102,7 +103,6 @@ public class CryptoThread extends Thread {
                 if (fileSize == 0) {
                     fileSize = inputStream.available();
                 }
-                twoPercentOfFileSize = (long) (fileSize*.02f);
                 AESCrypt aesCrypt = new AESCrypt(password);
                 if (operationType == OPERATION_TYPE_ENCRYPTION) {
                     //Encrypt
@@ -151,7 +151,7 @@ public class CryptoThread extends Thread {
 
     public static void updateProgressOnInterval(long bytesRead) {
         totalBytesReadForProgress += bytesRead;
-        if (totalBytesReadForProgress - lastUpdateAtByteNumber > twoPercentOfFileSize) {
+        if (totalBytesReadForProgress - lastUpdateAtByteNumber > updateIntervalInBytes) {
             lastUpdateAtByteNumber = totalBytesReadForProgress;
             updateProgressDisplayers(totalBytesReadForProgress, fileSize);
         }

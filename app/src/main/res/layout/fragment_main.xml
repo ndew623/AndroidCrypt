@@ -12,28 +12,28 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="15dp"
-            android:layout_marginStart="15dp"
             android:layout_marginTop="15dp"
             android:gravity="center">
 
             <Button
                 android:id="@+id/encryptModeButton"
                 android:layout_width="0dp"
-                android:layout_height="38dp"
-                android:layout_marginEnd="10dp"
-                android:layout_marginRight="10dp"
+                android:layout_height="60dp"
                 android:layout_weight="1"
                 android:background="@drawable/operation_mode_button_selector"
+                android:gravity="end|center_vertical"
+                android:paddingEnd="8dp"
                 android:text="@string/encrypt"
                 android:textColor="#FFF" />
 
             <Button
                 android:id="@+id/decryptModeButton"
                 android:layout_width="0dp"
-                android:layout_height="38dp"
+                android:layout_height="60dp"
                 android:layout_weight="1"
                 android:background="@drawable/operation_mode_button_selector"
+                android:gravity="start|center_vertical"
+                android:paddingStart="8dp"
                 android:text="@string/decrypt"
                 android:textColor="#FFF" />
         </LinearLayout>
@@ -58,7 +58,7 @@
 
             <com.dewdrop623.androidcrypt.FileSelectButton
                 android:id="@+id/selectInputFileButton"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:minimized="false"
                 app:output_button="false" />
@@ -87,7 +87,7 @@
 
             <com.dewdrop623.androidcrypt.FileSelectButton
                 android:id="@+id/selectOutputFileButton"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:minimized="false"
                 app:output_button="true" />
@@ -146,28 +146,29 @@
 
             <LinearLayout
                 android:id="@+id/progressDisplayCancelButtonLinearLayout"
-                android:orientation="horizontal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:paddingTop="5dp"
-                 >
+                android:orientation="horizontal"
+                android:paddingTop="5dp">
+
                 <ImageView
-                    app:srcCompat="@drawable/ic_cancel"
-                    android:tint="@android:color/darker_gray"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:scaleX="0.8"
-                    android:scaleY="0.8"/>
+                    android:scaleY="0.8"
+                    android:tint="@android:color/darker_gray"
+                    app:srcCompat="@drawable/ic_cancel" />
+
                 <TextView
-                    android:text="@string/cancel"
-                    android:textAllCaps="true"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="18sp"
-                    android:paddingStart="3dp"
                     android:paddingEnd="3dp"
-                    android:textColor="@android:color/darker_gray"/>
+                    android:paddingStart="3dp"
+                    android:text="@string/cancel"
+                    android:textAllCaps="true"
+                    android:textColor="@android:color/darker_gray"
+                    android:textSize="18sp" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

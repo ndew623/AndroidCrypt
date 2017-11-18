@@ -335,11 +335,11 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
             fileSelectButtonMinimize = true;
             gravity = Gravity.START | Gravity.CENTER_VERTICAL;
         }
+        fileSelectButton.setMinimized(fileSelectButtonMinimize);
         SpannableString contentURISpannableString = new SpannableString(contentURITextPrefix.concat(contentURIText));
         contentURISpannableString.setSpan(new ForegroundColorSpan(Color.GRAY),0 , contentURITextPrefix.length(), 0);
         contentURITextView.setText(contentURISpannableString);
         contentURITextView.setVisibility(contentURITextViewVisibility);
-        fileSelectButton.setMinimized(fileSelectButtonMinimize);
         contentURIUnderlineView.setVisibility(contentURIUnderlineViewVisibility);
         contentURILinearLayout.setGravity(gravity);
     }
@@ -404,6 +404,8 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         changeOperationTypeButtonAppearance(R.drawable.operation_mode_button_selected, R.drawable.operation_mode_button_selector);
         operationMode = CryptoThread.OPERATION_TYPE_ENCRYPTION;
         confirmPasswordEditText.setVisibility(View.VISIBLE);
+        encryptModeButton.setTextColor(ContextCompat.getColor(context, android.R.color.white));
+        decryptModeButton.setTextColor(ContextCompat.getColor(context, android.R.color.darker_gray));
         ((MainActivity) getActivity()).setFABIcon(R.drawable.ic_lock);
     }
 
@@ -414,7 +416,9 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
     private void enableDecryptionMode() {
         changeOperationTypeButtonAppearance(R.drawable.operation_mode_button_selector, R.drawable.operation_mode_button_selected);
         operationMode = CryptoThread.OPERATION_TYPE_DECRYPTION;
-        confirmPasswordEditText.setVisibility(View.GONE);
+        confirmPasswordEditText.setVisibility(View.INVISIBLE);
+        encryptModeButton.setTextColor(ContextCompat.getColor(context, android.R.color.darker_gray));
+        decryptModeButton.setTextColor(ContextCompat.getColor(context, android.R.color.white));
         ((MainActivity) getActivity()).setFABIcon(R.drawable.ic_unlock);
     }
 

@@ -45,7 +45,7 @@ public class CryptoService extends Service implements CryptoThread.ProgressDispl
         String password = MainActivityFragment.getAndClearPassword();
         boolean operationType = intent.getBooleanExtra(OPERATION_TYPE_EXTRA_KEY, CryptoThread.OPERATION_TYPE_DECRYPTION);
 
-        CryptoThread.registerForProgressUpdate(PROGRESS_DISPLA..YER_ID, this);
+        CryptoThread.registerForProgressUpdate(PROGRESS_DISPLAYER_ID, this);
 
         if (password != null) {
             CryptoThread cryptoThread = new CryptoThread(this, inputUri, outputUri, password, version, operationType);
