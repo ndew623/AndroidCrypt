@@ -39,7 +39,7 @@ import java.util.Arrays;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment implements CryptoThread.ProgressDisplayer{
+public class MainActivityFragment extends Fragment implements CryptoThread.ProgressDisplayer {
 
     /*
         Using static variables to store the password rather than savedInstanceState and Intent extras because of paranoia.
@@ -139,6 +139,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
 
         CryptoThread.registerForProgressUpdate(PROGRESS_DISPLAYER_ID, this);
 
+        //Check if there is an operation in progress. If there is, get an update show the progress bar and cancel button immediately, rather than waiting for CryptoThread to push an update.
         if (CryptoThread.operationInProgress) {
             update(CryptoThread.getCurrentOperationType(), CryptoThread.getProgressUpdate(), CryptoThread.getCompletedMessageStringId());
         }
@@ -155,6 +156,9 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         stateBundle = createOutStateBundle(null);
     }
 
+    /*
+    * Let MainActivity know that the user has returned to this fragment.
+    * */
     @Override
     public void onResume() {
         super.onResume();
@@ -297,7 +301,8 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
     }
 
     /*
-    * Set the inputFileUri or outputFileUri member variable and change UI. Pass null to clear the uri value and reset ui.
+    * Set the inputFileUri (output == false) or outputFileUri (output == true) member variable and change UI of the file select buttons.
+    * Pass null to clear the uri value and reset ui.
      */
     private void setUriAndUpdateUI(Uri uri, boolean output) {
         TextView contentURITextView;
@@ -335,7 +340,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         }
         fileSelectButton.setMinimized(fileSelectButtonMinimize);
         SpannableString contentURISpannableString = new SpannableString(contentURITextPrefix.concat(contentURIText));
-        contentURISpannableString.setSpan(new ForegroundColorSpan(Color.GRAY),0 , contentURITextPrefix.length(), 0);
+        contentURISpannableString.setSpan(new ForegroundColorSpan(Color.GRAY), 0, contentURITextPrefix.length(), 0);
         contentURITextView.setText(contentURISpannableString);
         contentURITextView.setVisibility(contentURITextViewVisibility);
         contentURIUnderlineView.setVisibility(contentURIUnderlineViewVisibility);
@@ -366,14 +371,14 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
     }
 
     /*
-    * Display an error to the user.
+    * Display an error to the user via toast.
     * */
     private void showError(String error) {
         Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
     }
 
     /*
-    * Display an error to the user.
+    * Display an error to the user via toast.
     * */
     private void showError(int stringId) {
         showError(context.getString(stringId));
@@ -389,14 +394,14 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         passwordEditText.setInputType(inputType);
         confirmPasswordEditText.setInputType(inputType);
 
-        //Fix the typeface. Android wants to change it to a monospace font when showPassword==false. This makes the edittext hint change appearance.
+        //Fix the typeface. Android wants to change it to a monospace font everytime showPassword is set to false. This makes the edittext hint change appearance... and it looks ugly.
         passwordEditText.setTypeface(Typeface.DEFAULT);
         confirmPasswordEditText.setTypeface(Typeface.DEFAULT);
     }
 
     /**
      * Makes encryption mode active.
-     * Shows the confirm password entry field, changes the member variable operationMode, and changes the icon on the Floating Action Button
+     * Shows the confirm password entry field, changes the member variable operationMode, updates appearance of operation mode buttons, and changes the icon on the Floating Action Button
      */
     private void enableEncryptionMode() {
         changeOperationTypeButtonAppearance(R.drawable.operation_mode_button_selected, R.drawable.operation_mode_button_selector);
@@ -409,7 +414,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
 
     /**
      * Makes decryption mode active.
-     * Hides the confirm password entry field, changes the member variable operationMode, and changes the icon on the Floating Action Button
+     * Hides the confirm password entry field, changes the member variable operationMode, updates appearance of operation mode buttons, and changes the icon on the Floating Action Button
      */
     private void enableDecryptionMode() {
         changeOperationTypeButtonAppearance(R.drawable.operation_mode_button_selector, R.drawable.operation_mode_button_selected);

@@ -3,7 +3,6 @@ package com.dewdrop623.androidcrypt;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -33,12 +32,24 @@ public class CryptoService extends Service implements CryptoThread.ProgressDispl
     @Override
     public void onCreate() {
         super.onCreate();
-        startForeground(START_FOREGROUND_ID, buildProgressNotification(CryptoThread.OPERATION_TYPE_ENCRYPTION,-1, R.string.app_name));
+        startForeground(START_FOREGROUND_ID, buildProgressNotification(CryptoThread.OPERATION_TYPE_ENCRYPTION, -1, R.string.app_name));
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
+        /*
+        * If the user closes the activity (swiping out of recents) immediately after an operation is started, this method will get called a second time, but intent == null.
+        * Don't know why. Don't know how it doesn't trigger breakpoints, but intent==null means a NullPointerException. So this if condition handles that edge case.
+        * You might think that CryptoThread will still be running after it was started the first time this method was called.
+        * You'd be wrong. It starts, but stops when this method is called again, irregardless of this if condition.
+        * It is probably a bug in Android since doing this to other applications that use services causes the same problem for them.
+        * */
+        if (intent == null) {
+            //if stopForeground isn't called here, a sticky notification appears that cannot be closed (there is no operation in progress) without force quitting the app.
+            stopForeground(true);
+            return START_NOT_STICKY;
+        }
         Uri inputUri = Uri.parse(intent.getStringExtra(INPUT_URI_EXTRA_KEY));
         Uri outputUri = Uri.parse(intent.getStringExtra(OUTPUT_URI_EXTRA_KEY));
         int version = intent.getIntExtra(VERSION_EXTRA_KEY, SettingsHelper.AESCRYPT_DEFAULT_VERSION);
@@ -81,7 +92,7 @@ public class CryptoService extends Service implements CryptoThread.ProgressDispl
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
+        // TO(never)DO: Return the communication channel to the service.
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
@@ -95,13 +106,13 @@ public class CryptoService extends Service implements CryptoThread.ProgressDispl
         Intent resultIntent = new Intent(this, MainActivity.class);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, resultIntent, 0);
 
-        builder.setSmallIcon(operationType == CryptoThread.OPERATION_TYPE_ENCRYPTION?R.drawable.ic_lock:R.drawable.ic_unlock).setContentIntent(resultPendingIntent);
+        builder.setSmallIcon(operationType == CryptoThread.OPERATION_TYPE_ENCRYPTION ? R.drawable.ic_lock : R.drawable.ic_unlock).setContentIntent(resultPendingIntent);
 
         if (progress < 0) {
             builder.setContentTitle(getString(R.string.app_name));
             builder.setContentText(getString(R.string.operation_in_progress));
         } else if (progress < 100) {
-            builder.setContentTitle(operationType == CryptoThread.OPERATION_TYPE_ENCRYPTION?getString(R.string.encrypting):getString(R.string.decrypting));
+            builder.setContentTitle(operationType == CryptoThread.OPERATION_TYPE_ENCRYPTION ? getString(R.string.encrypting) : getString(R.string.decrypting));
             builder.setProgress(100, progress, false);
         } else {
             builder.setContentTitle(getString(R.string.app_name));

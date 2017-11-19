@@ -31,6 +31,7 @@ public class CryptoThread extends Thread {
 
 
     private static HashMap<String, ProgressDisplayer> progressDiplayers = new HashMap<>();
+
     public interface ProgressDisplayer {
         void update(boolean operationType, int progress, int completedMessageStringId);
     }
@@ -44,8 +45,6 @@ public class CryptoThread extends Thread {
     private CryptoService cryptoService;
     private static boolean operationType;
 
-    private InputStream inputStream;
-    private OutputStream outputStream;
     private Uri inputUri;
     private Uri outputUri;
     private String password;
@@ -78,8 +77,8 @@ public class CryptoThread extends Thread {
 
         //Send out an initial update for 0 progress.
         updateProgressDisplayers(0, 1);
-        inputStream = null;
-        outputStream = null;
+        InputStream inputStream = null;
+        OutputStream outputStream = null;
         //get the input stream
         try {
             inputStream = StorageAccessFrameworkHelper.getUriInputStream(cryptoService, inputUri);
@@ -159,8 +158,8 @@ public class CryptoThread extends Thread {
 
     //for each progress displayer: if not null: update, else remove it from progressDisplayers because it is null.
     private static void updateProgressDisplayers(long workDone, long totalWork) {
-        int progress = (int) ((workDone*100)/totalWork);
-        for(HashMap.Entry<String, ProgressDisplayer> progressDisplayer : progressDiplayers.entrySet()) {
+        int progress = (int) ((workDone * 100) / totalWork);
+        for (HashMap.Entry<String, ProgressDisplayer> progressDisplayer : progressDiplayers.entrySet()) {
             if (progressDisplayer.getValue() != null) {
                 progressDisplayer.getValue().update(operationType, progress, completedMessageStringId);
             } else {
@@ -172,6 +171,7 @@ public class CryptoThread extends Thread {
     public static void registerForProgressUpdate(String id, ProgressDisplayer progressDisplayer) {
         progressDiplayers.put(id, progressDisplayer);
     }
+
     //Called by the cancel button in MainActivityFragment.
     public static void cancel() {
         if (operationType == OPERATION_TYPE_ENCRYPTION) {
@@ -191,9 +191,11 @@ public class CryptoThread extends Thread {
             return 0;
         }
     }
+
     public static boolean getCurrentOperationType() {
         return operationType;
     }
+
     public static int getCompletedMessageStringId() {
         return completedMessageStringId;
     }

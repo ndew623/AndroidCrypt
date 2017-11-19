@@ -23,10 +23,11 @@ public final class SettingsHelper {
 
     private static SharedPreferences getSharedPreferencesFile(Context context) {
         if (sharedPreferences == null) {
-            sharedPreferences = context.getSharedPreferences(SHARED_PREFERENCES_FILE,0);
+            sharedPreferences = context.getSharedPreferences(SHARED_PREFERENCES_FILE, 0);
         }
         return sharedPreferences;
     }
+
     private static void sharedPreferencesPutInt(Context context, String key, int value) {
         getSharedPreferencesFile(context).edit().putInt(key, value).apply();
     }

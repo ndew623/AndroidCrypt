@@ -11,12 +11,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * provides access to the StorageAccessFramework
+ * StorageAccessFrameworkHelper provides an interface to the StorageAccessFramework.
  */
 
 public final class StorageAccessFrameworkHelper {
 
-    private StorageAccessFrameworkHelper(){
+    private StorageAccessFrameworkHelper() {
 
     }
 

@@ -1,7 +1,6 @@
 package com.dewdrop623.androidcrypt;
 
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -115,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        //back button was pressed in a secondary fragment like aboutfragment or settingsfragment
         if (item.getItemId() == android.R.id.home) {
             onBackPressed();
             return true;
