@@ -1,39 +1,16 @@
 <resources>
     <string name="app_name">AndroidCrypt</string>
     <string name="delete">Delete</string>
-    <string name="deleting">Deleting</string>
     <string name="cancel">Cancel</string>
-    <string name="create_folder">Create Folder</string>
-    <string name="creating_folder">Creating Folder</string>
-    <string name="create">Create</string>
     <string name="encrypt">Encrypt</string>
     <string name="encrypting">Encrypting</string>
-    <string name="ok">Ok</string>
-    <string name="enter_password">Enter password</string>
     <string name="confirm_password">Confirm password</string>
-    <string name="enter_output_file">Enter output file</string>
     <string name="no_match">The passwords do not match</string>
     <string name="cannot_be_empty">cannot be empty</string>
-    <string name="file_name">File name</string>
     <string name="password">Password</string>
     <string name="decrypt">Decrypt</string>
     <string name="decrypting">Decrypting</string>
-    <string name="move_here">Move Here</string>
-    <string name="copy_here">Copy Here</string>
-    <string name="copy">Copy</string>
-    <string name="move">Move</string>
-    <string name="rename">Rename</string>
-    <string name="copying">Copying</string>
-    <string name="moving">Moving</string>
-    <string name="renaming">Renaming</string>
-    <string name="title_activity_question_dialog">QuestionDialog</string>
-    <string name="no">No</string>
-    <string name="yes">Yes</string>
-    <string name="overwrite">Overwrite</string>
-    <string name="remember_answer_for_the_next">Remember answer for the next</string>
-    <string name="could_not_find_directory">Could not find directory</string>
     <string name="invalid_filename">Invalid filename</string>
-    <string name="try_again">Try again</string>
     <string name="directory_not_writable">Directory not writable</string>
     <string name="directory_not_readable">Directory not readable</string>
     <string name="file_does_not_exist">File does not exist</string>
@@ -45,105 +22,14 @@
     <string name="general_security_exception">General Security Exception</string>
     <string name="unsupported_encoding_exception">Unsupported Encoding Exception</string>
     <string name="ioexception">IO Exception</string>
-    <string name="wrong">Wrong</string>
     <string name="wrong_password_question">Wrong password?</string>
     <string name="home">Home</string>
-    <string name="error_moving_file">Error moving file</string>
-    <string name="output_could_not_be_validated">Output could not be validated.</string>
-    <string name="add_favorite">Add Favorite</string>
-    <string name="favorites">Favorites</string>
-    <string name="close_favorites">Close favorites</string>
-    <string name="remove_favorite">Remove Favorite</string>
-    <string name="preappend_filename_does_not_exist">does not exist</string>
-    <string name="favorite">Favorite</string>
-    <string name="unfavorite">Unfavorite</string>
-    <string name="mountpoints">Mountpoints</string>
-    <string name="file_operation">File operation</string>
-    <string name="stop">Stop</string>
     <string name="show_password">Show password</string>
-    <string name="enter_desination_directory">Enter destination directory</string>
-    <string name="destination_is_not_a_directory">Desination is not a directory</string>
-    <string name="destination_does_not_exist">Destination does not exist</string>
-    <string name="parent_folder">Parent folder</string>
-    <string name="file_size">File size</string>
-    <string name="last_modified">Last modified</string>
-    <string name="readable">Readable</string>
-    <string name="writable">Writable</string>
     <string name="title_activity_settings">Settings</string>
 
-    <!-- Strings related to Settings -->
-
-    <!-- Example General settings -->
-    <string name="pref_header_general">General</string>
-
-    <string name="pref_title_social_recommendations">Enable social recommendations</string>
-    <string name="pref_description_social_recommendations">Recommendations for people to contact
-        based on your message history
-    </string>
-
-
-
-    <!-- Example settings for Data & Sync -->
-    <string name="pref_header_data_sync">Data &amp; sync</string>
-
-    <string name="pref_title_sync_frequency">Sync frequency</string>
-    <string-array name="pref_sync_frequency_titles">
-        <item>15 minutes</item>
-        <item>30 minutes</item>
-        <item>1 hour</item>
-        <item>3 hours</item>
-        <item>6 hours</item>
-        <item>Never</item>
-    </string-array>
-    <string-array name="pref_sync_frequency_values">
-        <item>15</item>
-        <item>30</item>
-        <item>60</item>
-        <item>180</item>
-        <item>360</item>
-        <item>-1</item>
-    </string-array>
-
-    <string-array name="list_preference_entries">
-        <item>Entry 1</item>
-        <item>Entry 2</item>
-        <item>Entry 3</item>
-    </string-array>
-
-    <string-array name="list_preference_entry_values">
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-    </string-array>
-
-    <string-array name="multi_select_list_preference_default_value" />
-
-    <string name="pref_title_system_sync_settings">System sync settings</string>
-
-    <!-- Example settings for Notifications -->
-    <string name="pref_header_notifications">Notifications</string>
-
-    <string name="pref_title_new_message_notifications">New message notifications</string>
-
-    <string name="pref_title_ringtone">Ringtone</string>
-    <string name="pref_ringtone_silent">Silent</string>
-
-    <string name="pref_title_vibrate">Vibrate</string>
-    <string name="startingDirectory">Starting directory</string>
-    <string name="defaults">Defaults</string>
-    <string name="are_you_sure">Are you sure?</string>
-    <string name="are_you_sure_you_want_to_reset_everything_to_defaults">Are you sure you want to reset everything to defaults?</string>
-    <string name="refresh">Refresh</string>
-    <string name="view_type">View type</string>
-    <string name="icon_view">Icon view</string>
-    <string name="list_view">List view</string>
-    <string name="title_activity_main">MainActivity</string>
     <string name="action_settings">Settings</string>
-    <string name="enter_input_file">Enter input file</string>
     <string name="error_unexpected_response_from_saf">Error: Unexpected response from Storage Access Framework</string>
     <string name="no_input_file_selected">No input file selected</string>
-    <string name="manually_enter_file_path">Manually Enter File Path</string>
-    <string name="select_file">Select File</string>
     <string name="error_could_not_get_input_file">Error: Could not get input file</string>
     <string name="error_could_not_close_input_file">Error: Could not close input file</string>
     <string name="error_could_not_get_output_file">Error: Could not get output file</string>
