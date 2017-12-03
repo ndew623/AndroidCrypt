@@ -42,7 +42,7 @@ public class CryptoService extends Service implements CryptoThread.ProgressDispl
         * If the user closes the activity (swiping out of recents) immediately after an operation is started, this method will get called a second time, but intent == null.
         * Don't know why. Don't know how it doesn't trigger breakpoints, but intent==null means a NullPointerException. So this if condition handles that edge case.
         * You might think that CryptoThread will still be running after it was started the first time this method was called.
-        * You'd be wrong. It starts, but stops when this method is called again, irregardless of this if condition.
+        * You'd be wrong. It starts, but stops when this method is called again, regardless of this if condition.
         * It is probably a bug in Android since doing this to other applications that use services causes the same problem for them.
         * */
         if (intent == null) {
