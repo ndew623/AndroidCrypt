@@ -15,20 +15,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:orientation="horizontal">
+        android:orientation="vertical">
 
         <RadioButton
             android:id="@+id/version1RadioButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingEnd="16dp"
-            android:text="@string/version_1" />
+            android:text="@string/version_1_radio_button_text" />
 
         <RadioButton
             android:id="@+id/version2RadioButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/version_2" />
+            android:text="@string/version_2_radio_button_text" />
     </RadioGroup>
 
 </LinearLayout>

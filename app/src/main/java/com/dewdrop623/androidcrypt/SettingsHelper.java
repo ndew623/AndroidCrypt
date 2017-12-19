@@ -13,6 +13,8 @@ public final class SettingsHelper {
 
     private static final String AESCRYPT_VERSION_PREF = "com.dewdrop623.androidcrypt.SettingsHelper.AESCRYPT_VERSION_PREF";
 
+    private static final String SHOW_INTERNAL_STORAGE_HELP = "com.dewdrop623.androidcrypt.SettingsHelper.SHOW_INTERNAL_STORAGE_HELP";
+
     public static final int AESCRYPT_DEFAULT_VERSION = CryptoThread.VERSION_2;
 
     private static SharedPreferences sharedPreferences;
@@ -32,6 +34,10 @@ public final class SettingsHelper {
         getSharedPreferencesFile(context).edit().putInt(key, value).apply();
     }
 
+    private static void sharedPreferencesPutBoolean(Context context, String key, boolean value) {
+        getSharedPreferencesFile(context).edit().putBoolean(key, value).apply();
+    }
+
     public static void setAESCryptVersion(Context context, int version) {
         if (version != CryptoThread.VERSION_1 && version != CryptoThread.VERSION_2) {
             version = AESCRYPT_DEFAULT_VERSION;
@@ -39,7 +45,15 @@ public final class SettingsHelper {
         sharedPreferencesPutInt(context, AESCRYPT_VERSION_PREF, version);
     }
 
+    public static void setShowInternalStorageHelp(Context context, boolean show) {
+        sharedPreferencesPutBoolean(context, SHOW_INTERNAL_STORAGE_HELP, show);
+    }
+
     public static int getAESCryptVersion(Context context) {
         return getSharedPreferencesFile(context).getInt(AESCRYPT_VERSION_PREF, AESCRYPT_DEFAULT_VERSION);
+    }
+
+    public static boolean getShowInternalStorageHelp(Context context) {
+        return getSharedPreferencesFile(context).getBoolean(SHOW_INTERNAL_STORAGE_HELP, true);
     }
 }

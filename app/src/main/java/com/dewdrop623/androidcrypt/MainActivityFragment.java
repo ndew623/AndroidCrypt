@@ -41,6 +41,9 @@ import java.util.Arrays;
  */
 public class MainActivityFragment extends Fragment implements CryptoThread.ProgressDisplayer {
 
+    public static final String CALLBACK_SELECT_OUTPUT_FILE = "com.dewdrop623.androidcrypt.MainActivityFragment.CALLBACK_SELECT_OUTPUT_FILE";
+    public static final String CALLBACK_SELECT_INPUT_FILE = "com.dewdrop623.androidcrypt.MainActivityFragment.CALLBACK_SELECT_INPUT_FILE";
+
     /*
         Using static variables to store the password rather than savedInstanceState and Intent extras because of paranoia.
         Putting the password as a String into the Android OS that way seems like asking for trouble.
@@ -53,7 +56,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
 
     private static final String PROGRESS_DISPLAYER_ID = "com.dewdrop623.androidcrypt.MainActivityFragment.PROGRESS_DISPLAYER_ID";
 
-    private static final String SAVED_INSTANCE_STATE_SHOW_PASSWORD = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_";
+    private static final String SAVED_INSTANCE_STATE_SHOW_PASSWORD = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_SHOW_PASSWORD";
     private static final String SAVED_INSTANCE_STATE_OPERATION_MODE = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_OPERATION_MODE";
     private static final String SAVED_INSTANCE_STATE_INPUT_URI = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_INPUT_URI";
     private static final String SAVED_INSTANCE_STATE_OUTPUT_URI = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_OUTPUT_URI";
@@ -241,7 +244,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
     private View.OnClickListener missingFilesTextViewOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            ((MainActivity) getActivity()).showMissingFilesHelpDialog();
+            ((MainActivity) getActivity()).showMissingFilesHelpDialog(false, (MainActivityFragment) getParentFragment(), null);
         }
     };
 
@@ -269,14 +272,14 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
     private View.OnClickListener inputFileSelectButtonOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            selectInputFile();
+            selectInputFile(false);
         }
     };
 
     private View.OnClickListener outputFileSelectButtonOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            selectOutputFile();
+            selectOutputFile(false);
         }
     };
     private View.OnClickListener progressDispayCancelButtonOnClickListener = new View.OnClickListener() {
@@ -288,16 +291,36 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
 
     /**
      * ask StorageAccessFramework to allow user to pick a file
+     * if:
+     * -dont show this again has not been selected from the show internal storage help dialog
+     * and:
+     * -this is not a callback from that same help dialog
+     * then:
+     * show that dialog before selecting a file
      */
-    private void selectInputFile() {
-        StorageAccessFrameworkHelper.safPickFile(this, SELECT_INPUT_FILE_REQUEST_CODE);
+    public void selectInputFile(boolean callback) {
+        if (SettingsHelper.getShowInternalStorageHelp(getContext()) && !callback) {
+            ((MainActivity) getActivity()).showMissingFilesHelpDialog(true, this, CALLBACK_SELECT_INPUT_FILE);
+        } else {
+            StorageAccessFrameworkHelper.safPickFile(this, SELECT_INPUT_FILE_REQUEST_CODE);
+        }
     }
 
     /**
      * ask StorageAccessFramework to allow user to pick a directory
+     * if:
+     * -dont show this again has not been selected from the show internal storage help dialog
+     * and:
+     * -this is not a callback from that same help dialog
+     * then:
+     * show that dialog before selecting a file
      */
-    private void selectOutputFile() {
-        StorageAccessFrameworkHelper.safPickOutputFile(this, SELECT_OUTPUT_DIRECTORY_REQUEST_CODE, getDefaultOutputFileName());
+    public void selectOutputFile(boolean callback) {
+        if (SettingsHelper.getShowInternalStorageHelp(getContext()) && !callback) {
+            ((MainActivity) getActivity()).showMissingFilesHelpDialog(true, this, CALLBACK_SELECT_OUTPUT_FILE);
+        } else {
+            StorageAccessFrameworkHelper.safPickOutputFile(this, SELECT_OUTPUT_DIRECTORY_REQUEST_CODE, getDefaultOutputFileName());
+        }
     }
 
     /*

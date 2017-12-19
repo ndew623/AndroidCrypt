@@ -40,5 +40,12 @@
         <ImageView
             style="@style/MissingFilesHelpImage"
             android:src="@mipmap/found_files" />
+
+        <CheckBox
+            android:id="@+id/dontShowAgainCheckbox"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/dont_show_this_again"
+            android:visibility="gone" />
     </LinearLayout>
 </ScrollView>

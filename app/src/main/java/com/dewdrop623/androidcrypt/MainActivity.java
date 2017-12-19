@@ -1,5 +1,7 @@
 package com.dewdrop623.androidcrypt;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -11,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CheckBox;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -65,11 +68,33 @@ public class MainActivity extends AppCompatActivity {
         fab.setImageDrawable(ResourcesCompat.getDrawable(getResources(), drawableId, null));
     }
 
-    /*shows the dialog to help find internal storage in SAF. maybe called by MainActivity fragment or by the Help fragment*/
-    public void showMissingFilesHelpDialog() {
-        View missingFilesHelpLayout = getLayoutInflater().inflate(R.layout.dialogfragment_missing_files, null);
+    /*shows the dialog to help find internal storage in SAF.
+    * showCheckbox - show the dont show this again checkbox.
+    * callback - decide which method to call (if any) in mainActivityFragment when the dialog is dismissed*/
+    public void showMissingFilesHelpDialog(boolean showCheckbox, final MainActivityFragment mainActivityFragment, final String callback) {
+        final View missingFilesHelpLayout = getLayoutInflater().inflate(R.layout.dialogfragment_missing_files, null);
+        if (showCheckbox) {
+            ((CheckBox)missingFilesHelpLayout.findViewById(R.id.dontShowAgainCheckbox)).setVisibility(View.VISIBLE);
+        }
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(missingFilesHelpLayout);
+        builder.setPositiveButton(R.string.ok, null);
+        final Context onDismissListenerContext = this;
+        builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                if (((CheckBox)missingFilesHelpLayout.findViewById(R.id.dontShowAgainCheckbox)).isChecked()) {
+                    SettingsHelper.setShowInternalStorageHelp(onDismissListenerContext, false);
+                }
+                if (callback != null) {
+                    if (callback.equals(MainActivityFragment.CALLBACK_SELECT_INPUT_FILE)) {
+                        mainActivityFragment.selectInputFile(true);
+                    } else if (callback.equals(MainActivityFragment.CALLBACK_SELECT_OUTPUT_FILE)) {
+                        mainActivityFragment.selectOutputFile(true);
+                    }
+                }
+            }
+        });
         builder.show();
     }
 
