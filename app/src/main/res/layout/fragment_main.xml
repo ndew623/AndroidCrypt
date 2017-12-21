@@ -38,15 +38,6 @@
                 android:textColor="#FFF" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/missingFilesTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingEnd="8dp"
-            android:paddingStart="8dp"
-            android:paddingTop="24dp"
-            android:text="@string/missing_files_click_here"
-            android:textColor="#00F" />
 
         <LinearLayout
             android:id="@+id/inputContentURILinearLayout"

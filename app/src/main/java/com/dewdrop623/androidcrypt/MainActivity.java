@@ -1,19 +1,21 @@
 package com.dewdrop623.androidcrypt;
 
-import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.res.ResourcesCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.CheckBox;
+
+import com.dewdrop623.androidcrypt.FilePicker.FilePicker;
+import com.dewdrop623.androidcrypt.FilePicker.IconFilePicker;
+import com.dewdrop623.androidcrypt.FilePicker.ListFilePicker;
+
+import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -22,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String MAINACITIVITYFRAGMENT_ON_TOP_KEY = "com.dewdrop623.androidcrypt.MainActivity.MAINACTIVITYFRAGMENT_ON_TOP_KEY";
     private static final String MAINACTIVITYFRAGMENT_TAG = "com.dewdrop623.androidcrypt.MainActivity.MAINACTIVITYFRAGMENT_TAG";
+    private static final String FILEPICKERFRAGMENT_TAG = "com.dewdrop623.androidcrypt.MainActivity.FILEPICKERFRAGMENT_TAG";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
             attachFragment(mainActivityFragment, false, MAINACTIVITYFRAGMENT_TAG);
         } else {
             FragmentManager fragmentManager = getSupportFragmentManager();
-            mainActivityFragment = (MainActivityFragment) fragmentManager.findFragmentByTag(MAINACTIVITYFRAGMENT_TAG);
+            mainActivityFragment = getMainActivityFragment();
             mainActivityFragmentOnTop = savedInstanceState.getBoolean(MAINACITIVITYFRAGMENT_ON_TOP_KEY, true);
         }
 
@@ -50,6 +53,14 @@ public class MainActivity extends AppCompatActivity {
         });
         setFabVisible(mainActivityFragmentOnTop);
         getSupportActionBar().setDisplayHomeAsUpEnabled(!mainActivityFragmentOnTop);
+    }
+
+    private MainActivityFragment getMainActivityFragment() {
+        return (MainActivityFragment) getSupportFragmentManager().findFragmentByTag(MAINACTIVITYFRAGMENT_TAG);
+    }
+
+    private FilePicker getFilePickerFragment() {
+        return (FilePicker) getSupportFragmentManager().findFragmentByTag(FILEPICKERFRAGMENT_TAG);
     }
 
     @Override
@@ -68,43 +79,37 @@ public class MainActivity extends AppCompatActivity {
         fab.setImageDrawable(ResourcesCompat.getDrawable(getResources(), drawableId, null));
     }
 
-    /*shows the dialog to help find internal storage in SAF.
-    * showCheckbox - show the dont show this again checkbox.
-    * callback - decide which method to call (if any) in mainActivityFragment when the dialog is dismissed*/
-    public void showMissingFilesHelpDialog(boolean showCheckbox, final MainActivityFragment mainActivityFragment, final String callback) {
-        final View missingFilesHelpLayout = getLayoutInflater().inflate(R.layout.dialogfragment_missing_files, null);
-        if (showCheckbox) {
-            ((CheckBox)missingFilesHelpLayout.findViewById(R.id.dontShowAgainCheckbox)).setVisibility(View.VISIBLE);
+    /**
+     * Called by MainActivityFragment when the user is picking an input or output file.
+     */
+    public void pickFile(boolean isOutput) {
+        FilePicker filePicker = null;
+        int filePickerType = SettingsHelper.getFilePickerType(this);
+        if (filePickerType == SettingsHelper.FILE_ICON_VIEWER) {
+            filePicker = new IconFilePicker();
+        } else if (filePickerType == SettingsHelper.FILE_LIST_VIEWER) {
+            filePicker = new ListFilePicker();
         }
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setView(missingFilesHelpLayout);
-        builder.setPositiveButton(R.string.ok, null);
-        final Context onDismissListenerContext = this;
-        builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                if (((CheckBox)missingFilesHelpLayout.findViewById(R.id.dontShowAgainCheckbox)).isChecked()) {
-                    SettingsHelper.setShowInternalStorageHelp(onDismissListenerContext, false);
-                }
-                if (callback != null) {
-                    if (callback.equals(MainActivityFragment.CALLBACK_SELECT_INPUT_FILE)) {
-                        mainActivityFragment.selectInputFile(true);
-                    } else if (callback.equals(MainActivityFragment.CALLBACK_SELECT_OUTPUT_FILE)) {
-                        mainActivityFragment.selectOutputFile(true);
-                    }
-                }
-            }
-        });
-        builder.show();
+        String title = isOutput?getString(R.string.choose_input_file):getString(R.string.choose_output_file);
+        Bundle args = new Bundle();
+        args.putBoolean(FilePicker.IS_OUTPUT_KEY, isOutput);
+        filePicker.setArguments(args);
+        displaySecondaryFragmentScreen(filePicker, title, FILEPICKERFRAGMENT_TAG);
     }
 
-    /*
-    Called to display things like SettingsFragment and AboutFragment.
+    public void filePicked(File file, boolean isOutput) {
+        getMainActivityFragment().setFileAndUpdateUI(file, isOutput);
+        getMainActivityFragment().saveStateAsMemberVariable();
+    }
+
+    /**
+     * Called to display things like SettingsFragment and AboutFragment, or by pickFile to display
+     * the file picker.
      */
-    public void displaySecondaryFragmentScreen(Fragment fragment, String title) {
+    public void displaySecondaryFragmentScreen(Fragment fragment, String title, String tag) {
         setFabVisible(false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        attachFragment(fragment, true, null);
+        attachFragment(fragment, true, tag);
         if (title != null) {
             getSupportActionBar().setTitle(title);
         }
@@ -112,7 +117,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /*
-    * Called by MainActivityFragment's onResume. Bring the FAB back, remove the back arrow from the action bar, change the title
+    * Called by MainActivityFragment's onResume.
+    * Replace the fragment with itself so that the UI will update
+    * Bring the FAB back, remove the back arrow from the action bar, change the title
     * */
     public void returnedToMainFragment() {
         mainActivityFragmentOnTop = true;
@@ -141,9 +148,28 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         //back button was pressed in a secondary fragment like aboutfragment or settingsfragment
         if (item.getItemId() == android.R.id.home) {
-            onBackPressed();
+            superOnBackPressed();
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        FilePicker filePicker = getFilePickerFragment();
+        if (filePicker != null && filePicker.isVisible()) {
+            filePicker.onBackPressed();
+        } else {
+            superOnBackPressed();
+        }
+    }
+
+    /**
+     * Used to implement back button behavior, even when FilePicker is visible.
+     * e.g. FilePicker usually goes up a directory in response to back button, unless it is at the
+     * file system root.
+     */
+    public void superOnBackPressed() {
+        super.onBackPressed();
     }
 }

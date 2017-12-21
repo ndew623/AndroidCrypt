@@ -82,6 +82,50 @@
             app:license_link="@string/cc30_link"
             app:license_name="@string/cc30_license_name"
             app:icon_src="@drawable/ic_file_search" />
+        <com.dewdrop623.androidcrypt.IconAttributionView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            app:creator_link="@string/home_icon_creator_link"
+            app:creator_name="@string/home_icon_creator_name"
+            app:src_name="@string/flaticon_displayed_link"
+            app:src_link="@string/flaticon_link"
+            app:license_link="@string/cc30_link"
+            app:license_name="@string/cc30_license_name"
+            app:icon_src="@drawable/ic_home" />
+        <com.dewdrop623.androidcrypt.IconAttributionView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            app:creator_link="@string/refresh_icon_creator_link"
+            app:creator_name="@string/refresh_icon_creator_name"
+            app:src_name="@string/flaticon_displayed_link"
+            app:src_link="@string/flaticon_link"
+            app:license_link="@string/cc30_link"
+            app:license_name="@string/cc30_license_name"
+            app:icon_src="@drawable/ic_refresh" />
+        <com.dewdrop623.androidcrypt.IconAttributionView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            app:creator_link="@string/folder_icon_creator_link"
+            app:creator_name="@string/folder_icon_creator_name"
+            app:src_name="@string/flaticon_displayed_link"
+            app:src_link="@string/flaticon_link"
+            app:license_link="@string/cc30_link"
+            app:license_name="@string/cc30_license_name"
+            app:icon_src="@drawable/ic_folder" />
+        <com.dewdrop623.androidcrypt.IconAttributionView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            app:creator_link="@string/file_icon_creator_link"
+            app:creator_name="@string/file_icon_creator_name"
+            app:src_name="@string/flaticon_displayed_link"
+            app:src_link="@string/flaticon_link"
+            app:license_link="@string/cc30_link"
+            app:license_name="@string/cc30_license_name"
+            app:icon_src="@drawable/ic_file" />
     </LinearLayout>
 
 </ScrollView>

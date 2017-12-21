@@ -1,7 +1,8 @@
 package com.dewdrop623.androidcrypt;
 
-import android.net.Uri;
-
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -45,8 +46,8 @@ public class CryptoThread extends Thread {
     private CryptoService cryptoService;
     private static boolean operationType;
 
-    private Uri inputUri;
-    private Uri outputUri;
+    private File inputFile;
+    private File outputFile;
     private String password;
     private int version;
     private static int completedMessageStringId = R.string.done;
@@ -54,10 +55,10 @@ public class CryptoThread extends Thread {
     /**
      * Takes a cryptoService, input and output uris, the password, a version (use VERSION_X constants), and operation type (defined by the OPERATION_TYPE_X constants)
      */
-    public CryptoThread(CryptoService cryptoService, Uri inputUri, Uri outputUri, String password, int version, boolean operationType) {
+    public CryptoThread(CryptoService cryptoService, File inputFile, File outputFile, String password, int version, boolean operationType) {
         this.cryptoService = cryptoService;
-        this.inputUri = inputUri;
-        this.outputUri = outputUri;
+        this.inputFile = inputFile;
+        this.outputFile = outputFile;
         this.password = password;
         this.version = version;
         this.operationType = operationType;
@@ -81,7 +82,7 @@ public class CryptoThread extends Thread {
         OutputStream outputStream = null;
         //get the input stream
         try {
-            inputStream = StorageAccessFrameworkHelper.getUriInputStream(cryptoService, inputUri);
+            inputStream = new FileInputStream(inputFile);
         } catch (IOException ioe) {
             ioe.printStackTrace();
             cryptoService.showToastOnGuiThread(R.string.error_could_not_get_input_file);
@@ -89,7 +90,7 @@ public class CryptoThread extends Thread {
 
         //get the output stream
         try {
-            outputStream = StorageAccessFrameworkHelper.getUriOutputStream(cryptoService, outputUri);
+            outputStream = new FileOutputStream(outputFile);
         } catch (IOException ioe) {
             ioe.printStackTrace();
             cryptoService.showToastOnGuiThread(R.string.error_could_not_get_output_file);
@@ -98,10 +99,7 @@ public class CryptoThread extends Thread {
         if (inputStream != null && outputStream != null) {
             //call AESCrypt
             try {
-                fileSize = StorageAccessFrameworkHelper.getFileSizeFromUri(inputUri, cryptoService);
-                if (fileSize == 0) {
-                    fileSize = inputStream.available();
-                }
+                fileSize = inputFile.length();
                 AESCrypt aesCrypt = new AESCrypt(password);
                 if (operationType == OPERATION_TYPE_ENCRYPTION) {
                     //Encrypt
@@ -185,11 +183,13 @@ public class CryptoThread extends Thread {
     //Called by MainActivityFragment on initialization if CryptoThread.operationInProgress == true
     //otherwise the progress bar won't appear until an update is sent out, which is not guaranteed to be quickly
     public static int getProgressUpdate() {
-        if (operationInProgress) {
-            return (int) ((totalBytesReadForProgress * 100) / fileSize);
-        } else {
-            return 0;
+        int progress = 0;
+        if (fileSize == 0) {
+            progress = 100;
+        } else if (operationInProgress) {
+            progress = (int) ((totalBytesReadForProgress * 100) / fileSize);
         }
+        return progress;
     }
 
     public static boolean getCurrentOperationType() {

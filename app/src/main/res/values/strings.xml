@@ -46,12 +46,11 @@
     <string name="select_overflow_menu">2. To view internal storage, select the overflow menu when choosing a file.</string>
     <string name="select_show_internal_storage">3. Select the <i>Show internal storage</i> option.</string>
     <string name="internal_storage_visible">4. The device\'s internal storage should now be visible.</string>
-    <string name="missing_files_click_here"><u>Can\'t find internal storage? Click here.</u></string>
     <string name="passwords_do_not_match">Passwords do not match</string>
     <string name="the_input_and_output_files_must_be_different">The input and output files must be different</string>
     <string name="contact_info">For help or suggestions email <b>contact@dewdrop623.com</b></string>
     <string name="image_attribution">TODO: insert attribution links for any icons that were used.</string>
-    <string name="version">v1.0</string>
+    <string name="version">v1.2</string>
     <string name="action_about">About</string>
     <string name="icon_made_by">Icon made by</string>
     <string name="from">from</string>
@@ -62,9 +61,7 @@
     <string name="cc30_license_name"><u>CC 3.0 BY</u></string>
     <string name="licensed_by">licensed by</string>
     <string name="cc30_link">https://creativecommons.org/licenses/by/3.0/</string>
-    <string name="icons">Icons:</string>
-    <string name="select_folder_icon_creator_name">Elegant Themes</string>
-    <string name="select_folder_icon_creator_link">https://www.flaticon.com/authors/elegant-themes</string>
+    <string name="icons">Icons</string>
     <string name="error_null_password">Error: null password</string>
     <string name="version_1_radio_button_text">AESCrypt version 1 (Not recommended. For legacy support only.)</string>
     <string name="version_2_radio_button_text">AESCrypt version 2 (Recommmended.)</string>
@@ -86,4 +83,18 @@
     <string name="iconarchive_link">http://www.iconarchive.com/</string>
     <string name="dont_show_this_again">Don\'t show this again</string>
     <string name="ok">Ok</string>
+    <string name="refresh">Refresh</string>
+    <string name="choose_file">Choose File</string>
+    <string name="file_picker_display">File Picker Display</string>
+    <string name="list">List</string>
+    <string name="home_icon_creator_name">Lyolya</string>
+    <string name="home_icon_creator_link">https://www.flaticon.com/authors/lyolya</string>
+    <string name="refresh_icon_creator_link">https://www.flaticon.com/authors/gregor-cresnar</string>
+    <string name="refresh_icon_creator_name">Gregor Cresnar</string>
+    <string name="folder_icon_creator_link">https://www.flaticon.com/authors/madebyoliver</string>
+    <string name="folder_icon_creator_name">Madebyoliver</string>
+    <string name="file_icon_creator_link">https://www.flaticon.com/authors/madebyoliver</string>
+    <string name="file_icon_creator_name">Madebyoliver</string>
+    <string name="choose_input_file">Choose input file</string>
+    <string name="choose_output_file">Choose output file</string>
 </resources>

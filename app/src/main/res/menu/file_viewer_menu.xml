@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:title="@string/home"
+        android:id="@+id/home_button"
+        android:icon="@drawable/ic_home"
+        app:showAsAction="ifRoom"
+        android:orderInCategory="1"/>
+    <item
+        android:title="@string/refresh"
+        android:id="@+id/refresh_button"
+        android:icon="@drawable/ic_refresh"
+        app:showAsAction="ifRoom"
+        android:orderInCategory="75"
+        />
+</menu>
