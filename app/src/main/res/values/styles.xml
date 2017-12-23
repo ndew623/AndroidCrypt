@@ -42,7 +42,7 @@
         <item name="android:layout_marginTop">28dp</item>
     </style>
 
-    <style name="ContentURITextView">
+    <style name="FilePathTextView">
         <item name="android:textColor">#000</item>
         <item name="android:textSize">20sp</item>
         <item name="android:layout_width">0dp</item>
@@ -54,22 +54,12 @@
         <item name="android:paddingEnd">8dp</item>
     </style>
 
-    <style name="ContentURIUnderlineView">
+    <style name="FilePathUnderlineView">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">1.5dp</item>
         <item name="android:background">@color/colorAccent</item>
         <item name="android:visibility">invisible</item>
     </style>
 
-    <style name="MissingFilesHelpImage">
-        <item name="android:layout_width">250dp</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginBottom">12dp</item>
-    </style>
-    <style name="MissingFilesHelpTextView">
-        <item name="android:padding">12dp</item>
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-    </style>
 
 </resources>

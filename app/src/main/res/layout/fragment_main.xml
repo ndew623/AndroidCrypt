@@ -40,7 +40,7 @@
 
 
         <LinearLayout
-            android:id="@+id/inputContentURILinearLayout"
+            android:id="@+id/inputFilePathLinearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
@@ -59,18 +59,18 @@
                 android:layout_height="wrap_content">
 
                 <TextView
-                    android:id="@+id/inputContentURITextView"
-                    style="@style/ContentURITextView" />
+                    android:id="@+id/inputFilePathTextView"
+                    style="@style/FilePathTextView" />
             </HorizontalScrollView>
         </LinearLayout>
 
         <View
-            android:id="@+id/inputContentURIUnderlineView"
-            style="@style/ContentURIUnderlineView"
+            android:id="@+id/inputFilePathUnderlineView"
+            style="@style/FilePathUnderlineView"
             android:layout_marginBottom="28dp" />
 
         <LinearLayout
-            android:id="@+id/outputContentURILinearLayout"
+            android:id="@+id/outputFilePathLinearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -88,15 +88,15 @@
                 android:layout_height="wrap_content">
 
                 <TextView
-                    android:id="@+id/outputContentURITextView"
-                    style="@style/ContentURITextView" />
+                    android:id="@+id/outputFilePathTextView"
+                    style="@style/FilePathTextView" />
             </HorizontalScrollView>
 
         </LinearLayout>
 
         <View
-            android:id="@+id/outputContentURIUnderlineView"
-            style="@style/ContentURIUnderlineView"
+            android:id="@+id/outputFilePathUnderlineView"
+            style="@style/FilePathUnderlineView"
             android:layout_marginBottom="12dp" />
 
         <EditText

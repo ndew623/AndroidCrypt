@@ -26,9 +26,9 @@ public class IconFilePicker extends FilePicker {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_file_viewer, container, false);
+        View view = inflater.inflate(R.layout.fragment_file_picker, container, false);
         fileListView = (GridView) view.findViewById(R.id.fileGridView);
-        initializeFileViewerWithViewAndFileListAdapterGetViewCallback(view, fileListAdapterGetViewCallback);
+        initializeFilePickerWithViewAndFileListAdapterGetViewCallback(view, fileListAdapterGetViewCallback);
         return view;
     }
 

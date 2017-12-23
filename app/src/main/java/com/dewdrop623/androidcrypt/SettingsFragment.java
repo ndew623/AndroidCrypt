@@ -6,12 +6,16 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.RadioGroup;
 
 /**
  * Settings Fragment contains the settings page UI.
  */
 public class SettingsFragment extends Fragment {
+
+    private EditText sdCardRootEditText;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -41,6 +45,18 @@ public class SettingsFragment extends Fragment {
         }
         filePickerDisplayRadioGroup.setOnCheckedChangeListener(filePickerDisplayRadioGroupOnCheckedChangedListener);
 
+        sdCardRootEditText = (EditText) view.findViewById(R.id.sdCardRootEditText);
+        Button sdCardRootEditButton = (Button) view.findViewById(R.id.sdCardRootEditButton);
+        sdCardRootEditButton.setOnClickListener(sdCardRootEditButtonOnClickListener);
+
+        String sdCardRoot = SettingsHelper.getSdcardRoot(getContext());
+        if (sdCardRoot != null) {
+            sdCardRootEditText.setText(sdCardRoot);
+        } else {
+            sdCardRootEditText.setText(R.string.not_set);
+            sdCardRootEditButton.setText(R.string.set);
+        }
+
         return view;
     }
 
@@ -69,6 +85,13 @@ public class SettingsFragment extends Fragment {
                     SettingsHelper.setFilePickerType(getContext(), SettingsHelper.FILE_LIST_VIEWER);
                     break;
             }
+        }
+    };
+
+    private View.OnClickListener sdCardRootEditButtonOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            //TODO something
         }
     };
 }

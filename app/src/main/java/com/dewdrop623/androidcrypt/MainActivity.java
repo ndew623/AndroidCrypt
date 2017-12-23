@@ -19,12 +19,14 @@ import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
 
+
     private FloatingActionButton fab;
     private boolean mainActivityFragmentOnTop = true;
 
     private static final String MAINACITIVITYFRAGMENT_ON_TOP_KEY = "com.dewdrop623.androidcrypt.MainActivity.MAINACTIVITYFRAGMENT_ON_TOP_KEY";
     private static final String MAINACTIVITYFRAGMENT_TAG = "com.dewdrop623.androidcrypt.MainActivity.MAINACTIVITYFRAGMENT_TAG";
     private static final String FILEPICKERFRAGMENT_TAG = "com.dewdrop623.androidcrypt.MainActivity.FILEPICKERFRAGMENT_TAG";
+    private static final String TITLE_KEY = "com.dewdrop623.androidcrypt.MainActivity.TITLE_KEY";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +43,10 @@ public class MainActivity extends AppCompatActivity {
             FragmentManager fragmentManager = getSupportFragmentManager();
             mainActivityFragment = getMainActivityFragment();
             mainActivityFragmentOnTop = savedInstanceState.getBoolean(MAINACITIVITYFRAGMENT_ON_TOP_KEY, true);
+            CharSequence title = savedInstanceState.getCharSequence(TITLE_KEY, null);
+            if (title != null) {
+                getSupportActionBar().setTitle(title);
+            }
         }
 
 
@@ -66,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putBoolean(MAINACITIVITYFRAGMENT_ON_TOP_KEY, mainActivityFragmentOnTop);
+        outState.putCharSequence(TITLE_KEY, getSupportActionBar().getTitle());
         super.onSaveInstanceState(outState);
     }
 
@@ -81,8 +88,10 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Called by MainActivityFragment when the user is picking an input or output file.
+     * initialFolder - the file picker opens with this directory
+     * defaultOutputFilename - if isOutput this will be filled in the output name field, otherwise it can be null
      */
-    public void pickFile(boolean isOutput) {
+    public void pickFile(boolean isOutput, String initialFolder, String defaultOutputFilename) {
         FilePicker filePicker = null;
         int filePickerType = SettingsHelper.getFilePickerType(this);
         if (filePickerType == SettingsHelper.FILE_ICON_VIEWER) {
@@ -90,16 +99,17 @@ public class MainActivity extends AppCompatActivity {
         } else if (filePickerType == SettingsHelper.FILE_LIST_VIEWER) {
             filePicker = new ListFilePicker();
         }
-        String title = isOutput?getString(R.string.choose_input_file):getString(R.string.choose_output_file);
+        String title = isOutput?getString(R.string.choose_output_file):getString(R.string.choose_input_file);
         Bundle args = new Bundle();
         args.putBoolean(FilePicker.IS_OUTPUT_KEY, isOutput);
+        args.putString(FilePicker.INITIAL_FOLDER_KEY, initialFolder);
+        args.putString(FilePicker.DEFAULT_OUTPUT_FILENAME_KEY, defaultOutputFilename);
         filePicker.setArguments(args);
         displaySecondaryFragmentScreen(filePicker, title, FILEPICKERFRAGMENT_TAG);
     }
 
     public void filePicked(File file, boolean isOutput) {
-        getMainActivityFragment().setFileAndUpdateUI(file, isOutput);
-        getMainActivityFragment().saveStateAsMemberVariable();
+        getMainActivityFragment().setFile(file, isOutput);
     }
 
     /**

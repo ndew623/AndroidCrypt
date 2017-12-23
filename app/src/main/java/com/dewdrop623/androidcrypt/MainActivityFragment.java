@@ -62,21 +62,20 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
 
     //stores the type of operation to be done
     private boolean operationMode = CryptoThread.OPERATION_TYPE_ENCRYPTION;
-
+    private boolean showPassword = false;
     private File inputFile = null;
     private File outputFile = null;
-    private Bundle stateBundle;
     //see comment on this.onAttach(Context)
     private Context context;
 
     private Button encryptModeButton;
     private Button decryptModeButton;
-    private LinearLayout inputContentURILinearLayout;
+    private LinearLayout inputFilePathLinearLayout;
     private TextView inputFilePathTextView;
-    private View inputContentURIUnderlineView;
-    private LinearLayout outputContentURILinearLayout;
+    private View inputFilePathUnderlineView;
+    private LinearLayout outputFilePathLinearLayout;
     private TextView outputFilePathTextView;
-    private View outputContentURIUnderlineView;
+    private View outputFilePathUnderlineView;
     private FileSelectButton inputFileSelectButton;
     private FileSelectButton outputFileSelectButton;
     private EditText passwordEditText;
@@ -103,12 +102,12 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
 
         encryptModeButton = (Button) view.findViewById(R.id.encryptModeButton);
         decryptModeButton = (Button) view.findViewById(R.id.decryptModeButton);
-        inputContentURILinearLayout = (LinearLayout) view.findViewById(R.id.inputContentURILinearLayout);
-        inputFilePathTextView = (TextView) view.findViewById(R.id.inputContentURITextView);
-        inputContentURIUnderlineView = view.findViewById(R.id.inputContentURIUnderlineView);
-        outputContentURILinearLayout = (LinearLayout) view.findViewById(R.id.outputContentURILinearLayout);
-        outputFilePathTextView = (TextView) view.findViewById(R.id.outputContentURITextView);
-        outputContentURIUnderlineView = view.findViewById(R.id.outputContentURIUnderlineView);
+        inputFilePathLinearLayout = (LinearLayout) view.findViewById(R.id.inputFilePathLinearLayout);
+        inputFilePathTextView = (TextView) view.findViewById(R.id.inputFilePathTextView);
+        inputFilePathUnderlineView = view.findViewById(R.id.inputFilePathUnderlineView);
+        outputFilePathLinearLayout = (LinearLayout) view.findViewById(R.id.outputFilePathLinearLayout);
+        outputFilePathTextView = (TextView) view.findViewById(R.id.outputFilePathTextView);
+        outputFilePathUnderlineView = view.findViewById(R.id.outputFilePathUnderlineView);
         inputFileSelectButton = (FileSelectButton) view.findViewById(R.id.selectInputFileButton);
         outputFileSelectButton = (FileSelectButton) view.findViewById(R.id.selectOutputFileButton);
         passwordEditText = (EditText) view.findViewById(R.id.passwordEditText);
@@ -131,10 +130,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         //Hide the keyboard that automatically pops up.
         getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-        if (stateBundle == null && savedInstanceState != null) {
-            stateBundle = savedInstanceState;
-        }
-        restoreFromStateBundle(stateBundle);
+        updateUI(savedInstanceState);
 
         CryptoThread.registerForProgressUpdate(PROGRESS_DISPLAYER_ID, this);
 
@@ -152,7 +148,6 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
     @Override
     public void onPause() {
         super.onPause();
-        saveStateAsMemberVariable();
     }
 
     /*
@@ -178,10 +173,10 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_about:
-                ((MainActivity) getActivity()).displaySecondaryFragmentScreen(new AboutFragment(), getString(R.string.action_about), null);
+                ((MainActivity) getActivity()).displaySecondaryFragmentScreen(new AboutFragment(), context.getString(R.string.action_about), null);
                 return true;
             case R.id.action_settings:
-                ((MainActivity) getActivity()).displaySecondaryFragmentScreen(new SettingsFragment(), getString(R.string.action_settings), null);
+                ((MainActivity) getActivity()).displaySecondaryFragmentScreen(new SettingsFragment(), context.getString(R.string.action_settings), null);
                 return true;
         }
         return false;
@@ -265,7 +260,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
      * TODO rewrite this comment
      */
     public void selectInputFile() {
-        ((MainActivity) getActivity()).pickFile(false);
+        ((MainActivity) getActivity()).pickFile(false, null, null);
     }
 
     /**
@@ -279,33 +274,49 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
      * show that dialog before selecting a file
      */
     public void selectOutputFile() {
-        ((MainActivity) getActivity()).pickFile(true);
+        String defaultOutputDirectory = null;
+        if (inputFile != null) {
+            defaultOutputDirectory = inputFile.getParentFile().getAbsolutePath();
+        }
+        ((MainActivity) getActivity()).pickFile(true, defaultOutputDirectory, getDefaultOutputFileName());
+    }
+
+    public void setFile(File file, boolean isOutput) {
+        if (isOutput) {
+            outputFile = file;
+        } else {
+            inputFile = file;
+        }
+        if (context != null) {
+            updateFileUI(isOutput);
+        }
     }
 
     /*
     * Set the inputFile (isOutput == false) or outputFile (isOutput == true) member variable and change UI of the file select buttons.
     * Pass null to clear the uri value and reset ui.
      */
-    public void setFileAndUpdateUI(File file, boolean isOutput) {
+    private void updateFileUI(boolean isOutput) {
+        File file;
         TextView filePathTextView;
         FileSelectButton fileSelectButton;
-        View contentURIUnderlineView;
-        LinearLayout contentURILinearLayout;
-        String contentURITextPrefix;
+        View filePathUnderlineView;
+        LinearLayout filePathLinearLayout;
+        String filePathTextPrefix;
         if (isOutput) {
-            outputFile = file;
+            file = outputFile;
             filePathTextView = outputFilePathTextView;
             fileSelectButton = outputFileSelectButton;
-            contentURIUnderlineView = outputContentURIUnderlineView;
-            contentURILinearLayout = outputContentURILinearLayout;
-            contentURITextPrefix = getString(R.string.output_file).concat(": ");
+            filePathUnderlineView = outputFilePathUnderlineView;
+            filePathLinearLayout = outputFilePathLinearLayout;
+            filePathTextPrefix = context.getString(R.string.output_file).concat(": ");
         } else {
-            inputFile = file;
+            file = inputFile;
             filePathTextView = inputFilePathTextView;
             fileSelectButton = inputFileSelectButton;
-            contentURIUnderlineView = inputContentURIUnderlineView;
-            contentURILinearLayout = inputContentURILinearLayout;
-            contentURITextPrefix = getString(R.string.input_file).concat(": ");
+            filePathUnderlineView = inputFilePathUnderlineView;
+            filePathLinearLayout = inputFilePathLinearLayout;
+            filePathTextPrefix = context.getString(R.string.input_file).concat(": ");
         }
 
         String filePath = "";
@@ -321,13 +332,12 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
             gravity = Gravity.START | Gravity.CENTER_VERTICAL;
         }
         fileSelectButton.setMinimized(fileSelectButtonMinimize);
-        SpannableString contentURISpannableString = new SpannableString(contentURITextPrefix.concat(filePath));
-        contentURISpannableString.setSpan(new ForegroundColorSpan(Color.GRAY), 0, contentURITextPrefix.length(), 0);
+        SpannableString contentURISpannableString = new SpannableString(filePathTextPrefix.concat(filePath));
+        contentURISpannableString.setSpan(new ForegroundColorSpan(Color.GRAY), 0, filePathTextPrefix.length(), 0);
         filePathTextView.setText(contentURISpannableString);
         filePathTextView.setVisibility(filePathTextViewVisibility);
-        contentURIUnderlineView.setVisibility(filePathUnderlineViewVisibility);
-        contentURILinearLayout.setGravity(gravity);
-        stateBundle = createOutStateBundle(null);
+        filePathUnderlineView.setVisibility(filePathUnderlineViewVisibility);
+        filePathLinearLayout.setGravity(gravity);
     }
 
     /**
@@ -368,6 +378,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
     }
 
     private void setShowPassword(boolean showPassword) {
+        this.showPassword = showPassword;
         int inputType;
         if (showPassword) {
             inputType = InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD;
@@ -479,16 +490,6 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         return password;
     }
 
-    /**
-     *Set a member variable to a Bundle to be used by onCreateView. Sometimes onCreateView is called
-     * but the fragment has not been destroyed and recreated so the member variables' values persist
-     * needed by the main activity.
-     * when a file is picked, the ui is recreated.
-     */
-    public void saveStateAsMemberVariable() {
-        stateBundle = createOutStateBundle(null);
-    }
-
     /*
     * Create a bundle that stores the state of MainActivityFragment and set MainActivityFragment.password
     * If used in onSaveInstanceState: preserve whatever values Android may put in the outState bundle already by passing it in as systemOutStateBundle
@@ -502,7 +503,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         } else {
             outState = systemOutStateBundle;
         }
-        outState.putBoolean(SAVED_INSTANCE_STATE_SHOW_PASSWORD, showPasswordCheckbox.isChecked());
+        outState.putBoolean(SAVED_INSTANCE_STATE_SHOW_PASSWORD, showPassword);
         outState.putBoolean(SAVED_INSTANCE_STATE_OPERATION_MODE, operationMode);
         if (inputFile != null) {
             outState.putString(SAVED_INSTANCE_STATE_INPUT_FILE, inputFile.getAbsolutePath());
@@ -510,37 +511,42 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         if (outputFile != null) {
             outState.putString(SAVED_INSTANCE_STATE_OUTPUT_FILE, outputFile.getAbsolutePath());
         }
-        MainActivityFragment.password = passwordEditText.getText().toString().toCharArray();
+
+        /**
+         * may not be able to get password from view if screen was rotated while viewing another fragment.
+         */
+        if (passwordEditText != null) {
+            MainActivityFragment.password = passwordEditText.getText().toString().toCharArray();
+        }
         return outState;
     }
 
     /*
-    * Given a bundle from createOutStateBundle, restore the state of the fragment.
-    * Retrieves and clears the password from the char[] MainActivityFragment.password
+    * Update the UI to match the member variables and/or savedInstanceState
     * */
-    private void restoreFromStateBundle(Bundle stateBundle) {
-        if (stateBundle == null) {
-            setShowPassword(false);
+    private void updateUI(Bundle savedInstanceState) {
+        if (savedInstanceState == null) {
+            savedInstanceState = new Bundle();
+        }
+        setShowPassword(savedInstanceState.getBoolean(SAVED_INSTANCE_STATE_SHOW_PASSWORD, showPassword));
+        if (savedInstanceState.getBoolean(SAVED_INSTANCE_STATE_OPERATION_MODE, operationMode) == CryptoThread.OPERATION_TYPE_ENCRYPTION) {
             enableEncryptionMode();
         } else {
-            setShowPassword(stateBundle.getBoolean(SAVED_INSTANCE_STATE_SHOW_PASSWORD, false));
-            if (stateBundle.getBoolean(SAVED_INSTANCE_STATE_OPERATION_MODE, CryptoThread.OPERATION_TYPE_ENCRYPTION) == CryptoThread.OPERATION_TYPE_ENCRYPTION) {
-                enableEncryptionMode();
-            } else {
-                enableDecryptionMode();
-            }
-            String inputFileString = stateBundle.getString(SAVED_INSTANCE_STATE_INPUT_FILE, null);
-            String outputFileString = stateBundle.getString(SAVED_INSTANCE_STATE_OUTPUT_FILE, null);
-            if (inputFileString != null) {
-                setFileAndUpdateUI(new File(inputFileString), false);
-            }
-            if (outputFileString != null) {
-                setFileAndUpdateUI(new File(outputFileString), true);
-            }
-            String password = getAndClearPassword();
-            if (password != null) {
-                passwordEditText.setText(password);
-            }
+            enableDecryptionMode();
+        }
+        String inputFileString = savedInstanceState.getString(SAVED_INSTANCE_STATE_INPUT_FILE, null);
+        String outputFileString = savedInstanceState.getString(SAVED_INSTANCE_STATE_OUTPUT_FILE, null);
+        if (inputFileString != null) {
+            setFile(new File(inputFileString), false);
+        }
+        updateFileUI(false);
+        if (outputFileString != null) {
+            setFile(new File(outputFileString), true);
+        }
+        updateFileUI(true);
+        String password = getAndClearPassword();
+        if (password != null) {
+            passwordEditText.setText(password);
         }
     }
 }

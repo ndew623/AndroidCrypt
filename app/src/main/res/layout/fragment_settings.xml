@@ -1,66 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="16dp">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/aescrypt_version"/>
-
-    <RadioGroup
-        android:id="@+id/aescryptVersionRadioGroup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="start"
         android:orientation="vertical"
-        android:layout_marginBottom="16dp">
+        android:padding="16dp">
 
-        <RadioButton
-            android:id="@+id/version1RadioButton"
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingEnd="16dp"
-            android:text="@string/version_1_radio_button_text" />
+            android:text="@string/aescrypt_version" />
 
-        <RadioButton
-            android:id="@+id/version2RadioButton"
+        <RadioGroup
+            android:id="@+id/aescryptVersionRadioGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/version_2_radio_button_text" />
-    </RadioGroup>
+            android:layout_gravity="start"
+            android:layout_marginBottom="16dp"
+            android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/file_picker_display" />
+            <RadioButton
+                android:id="@+id/version1RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingEnd="16dp"
+                android:text="@string/version_1_radio_button_text" />
 
-    <RadioGroup
-        android:id="@+id/filePickerDisplayRadioGroup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="start"
-        android:orientation="vertical">
+            <RadioButton
+                android:id="@+id/version2RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/version_2_radio_button_text" />
+        </RadioGroup>
 
-        <RadioButton
-            android:id="@+id/iconDisplayRadioButton"
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingEnd="16dp"
-            android:text="@string/icons" />
+            android:text="@string/file_picker_display" />
 
-        <RadioButton
-            android:id="@+id/listDisplayRadioButton"
+        <RadioGroup
+            android:id="@+id/filePickerDisplayRadioGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/list" />
-    </RadioGroup>
+            android:layout_gravity="start"
+            android:layout_marginBottom="16dp"
+            android:orientation="vertical">
 
-</LinearLayout>
+            <RadioButton
+                android:id="@+id/iconDisplayRadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingEnd="16dp"
+                android:text="@string/icons" />
+
+            <RadioButton
+                android:id="@+id/listDisplayRadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/list" />
+        </RadioGroup>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/sdcard_location" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/sdCardRootEditText"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:enabled="false"/>
+            <Button
+                android:id="@+id/sdCardRootEditButton"
+                android:text="@string/edit"
+                style="@style/DialogButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+    </LinearLayout>
 </ScrollView>

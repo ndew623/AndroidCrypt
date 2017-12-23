@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
 
     <HorizontalScrollView
         android:id="@+id/currentPathTextViewScrollView"
@@ -26,7 +26,6 @@
     <!--two invisible listviews, one can be made visible and referenced to be used-->
     <GridView
         android:id="@+id/fileGridView"
-        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/currentPathTextViewScrollView"
@@ -38,11 +37,11 @@
         android:paddingBottom="8dp"
         android:paddingTop="8dp"
         android:stretchMode="columnWidth"
-        android:verticalSpacing="4dp" />
+        android:verticalSpacing="4dp"
+        android:visibility="gone" />
 
     <ListView
         android:id="@+id/fileListView"
-        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/currentPathTextViewScrollView"
@@ -50,5 +49,28 @@
         android:gravity="center"
         android:paddingBottom="8dp"
         android:paddingTop="8dp"
-        />
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/fileNameInputLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#FFF"
+        android:visibility="gone">
+
+        <EditText
+            android:id="@+id/fileNameEditText"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:hint="@string/filename"/>
+
+        <Button
+            android:id="@+id/fileNameOkButton"
+            style="@style/DialogButton"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/ok" />
+    </LinearLayout>
 </RelativeLayout>

@@ -9,7 +9,7 @@ import android.os.Looper;
 import java.io.File;
 
 /**
- * TODO comment here
+ * FilePicker uses FileBrowser to get the information it needs about the file system.
  */
 
 public class FileBrowser {
@@ -19,6 +19,7 @@ public class FileBrowser {
     private FileObserver fileChangeMonitor;
 
     public static final File parentDirectory = new File("..");
+    //changing root will determine how high up the directory tree filepicker can go
     public static final File root = new File("/");
     public static final File homeDirectory = Environment.getExternalStorageDirectory();
 

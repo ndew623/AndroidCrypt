@@ -97,4 +97,15 @@
     <string name="file_icon_creator_name">Madebyoliver</string>
     <string name="choose_input_file">Choose input file</string>
     <string name="choose_output_file">Choose output file</string>
+    <string name="file_is_a_directory">File is a directory</string>
+    <string name="filename_cannot_be_empty">Filename cannot be empty</string>
+    <string name="filename">Filename</string>
+    <string name="sdcard_location">SD Card Location</string>
+    <string name="edit">Edit</string>
+    <string name="not_set">Not set</string>
+    <string name="set">set</string>
+    <string name="sdcard_icon_creator_link">https://www.flaticon.com/authors/smartline</string>
+    <string name="sdcard_icon_creator_name">Smartline</string>
+    <string name="sdcard">SD Card</string>
+    <string name="how_to_locate_sdcard">To grant SD Card access to AndroidCrypt, select the root directory of your SD Card on the following screen.</string>
 </resources>

@@ -12,12 +12,17 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.dewdrop623.androidcrypt.MainActivity;
 import com.dewdrop623.androidcrypt.R;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -31,7 +36,12 @@ import java.util.List;
 
 public abstract class FilePicker extends Fragment {
 
+    /**
+     * Keys for arguments bundle
+     */
     public static final String IS_OUTPUT_KEY = "com.dewdrop623.androidcrypt.FilePicker.FilePicker.IS_OUTPUT_KEY";
+    public static final String INITIAL_FOLDER_KEY = "com.dewdrop623.androidcrypt.FilePicker.FilePicker.INITIAL_FOLDER_KEY";
+    public static final String DEFAULT_OUTPUT_FILENAME_KEY = "com.dewdrop623.androidcrypt.FilePicker.FilePicker.DEFAULT_OUTPUT_FILENAME_KEY";
 
     ////////////////////////////////
     //MEMBER VARIABLES
@@ -42,9 +52,13 @@ public abstract class FilePicker extends Fragment {
 
     //for storing the current state
     private Bundle savedInstanceState = null;
+    private boolean isOutput;
 
     //the TextView that shows the current directory under the actionbar
     private TextView currentPathTextView;
+    private LinearLayout fileNameInputLinearLayout;
+    private EditText fileNameEditText;
+    private Button fileNameOkButton;
 
     //the list of files being displayed and the instance of FileBrowser
     private File[] fileList;
@@ -74,21 +88,28 @@ public abstract class FilePicker extends Fragment {
             if (clickedFile.isDirectory()) {
                 fileBrowser.setCurrentPath(clickedFile);
             } else {
-                ((MainActivity) getActivity()).filePicked(clickedFile, getArguments().getBoolean(FilePicker.IS_OUTPUT_KEY, true));
-                ((MainActivity) getActivity()).superOnBackPressed();
+                if (isOutput) {
+                    fileNameEditText.setText(clickedFile.getName());
+                } else {
+                    ((MainActivity) getActivity()).filePicked(clickedFile, isOutput);
+                    ((MainActivity) getActivity()).superOnBackPressed();
+                }
             }
         }
     };
 
-    //the onLongClickListener for file items in the fileListView
-    private AdapterView.OnItemLongClickListener onItemLongClickListener = new AdapterView.OnItemLongClickListener() {
+    private View.OnClickListener fileNameOkButtonOnClickListener = new View.OnClickListener() {
         @Override
-        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-            File clickedFile = fileListAdapter.getItem(position);
-            if (clickedFile.isFile()) {
-                //TODO file long pressed, show information
+        public void onClick(View v) {
+            String fileName = fileNameEditText.getText().toString();
+            File newFile = new File(fileBrowser.getCurrentPath().getAbsolutePath().concat(File.separator).concat(fileName));
+            String error = "";//TODO fix checkFileErrors to be compatible with SAF approach checkFileErrors(newFile);
+            if (error.isEmpty()) {
+                ((MainActivity) getActivity()).filePicked(newFile, isOutput);
+                ((MainActivity) getActivity()).superOnBackPressed();
+            } else {
+                Toast.makeText(getContext(), error, Toast.LENGTH_SHORT).show();
             }
-            return true;
         }
     };
 
@@ -113,6 +134,7 @@ public abstract class FilePicker extends Fragment {
         setHasOptionsMenu(true);
         fileBrowser = new FileBrowser(getContext());
         fileBrowser.setFilePicker(this);
+        isOutput = getArguments().getBoolean(FilePicker.IS_OUTPUT_KEY, false);
         this.savedInstanceState = savedInstanceState;
         if (savedInstanceState != null) {
             fileBrowser.setCurrentPath(new File(savedInstanceState.getString(CURRENT_DIRECTORY_KEY, "/")));
@@ -130,6 +152,9 @@ public abstract class FilePicker extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.sdcard_button:
+                //TODO something
+                break;
             case R.id.home_button:
                 goToHomeDirectory();
                 return true;
@@ -169,7 +194,7 @@ public abstract class FilePicker extends Fragment {
     ///////////////////////////////////
 
     //after the concrete class inflates the view and defines the callback for the list adapter getview method, do the rest of the ui initialization work
-    protected final void initializeFileViewerWithViewAndFileListAdapterGetViewCallback(View view, FileListAdapterGetViewCallback fileListAdapterGetViewCallback) {
+    protected final void initializeFilePickerWithViewAndFileListAdapterGetViewCallback(View view, FileListAdapterGetViewCallback fileListAdapterGetViewCallback) {
         fileListAdapter = new FileListAdapter(fileListAdapterGetViewCallback);
         fileListView.setVisibility(View.VISIBLE);
         fileListView.setAdapter(fileListAdapter);
@@ -178,6 +203,24 @@ public abstract class FilePicker extends Fragment {
         currentPathTextView = (TextView) view.findViewById(R.id.currentPathTextView);
         currentPathTextView.setMovementMethod(new ScrollingMovementMethod());
         updateFileArrayAdapterFileList();
+
+        fileNameInputLinearLayout = (LinearLayout) view.findViewById(R.id.fileNameInputLinearLayout);
+        fileNameEditText = (EditText)  view.findViewById(R.id.fileNameEditText);
+        fileNameOkButton = (Button) view.findViewById(R.id.fileNameOkButton);
+
+        if (isOutput) {
+            fileNameInputLinearLayout.setVisibility(View.VISIBLE);
+            fileNameOkButton.setOnClickListener(fileNameOkButtonOnClickListener);
+        }
+
+        String initialFolder = getArguments().getString(INITIAL_FOLDER_KEY, null);
+        String defaultOutputFilename = getArguments().getString(DEFAULT_OUTPUT_FILENAME_KEY, null);
+        if (initialFolder != null) {
+            fileBrowser.setCurrentPath(new File(initialFolder));
+        }
+        if (defaultOutputFilename!=null) {
+            fileNameEditText.setText(defaultOutputFilename);
+        }
     }
     ///////////////////////////////////
     //PRIVATE METHODS
@@ -214,6 +257,30 @@ public abstract class FilePicker extends Fragment {
         fileListAdapter.notifyDataSetChanged();
 
         currentPathTextView.setText(fileBrowser.getCurrentPath().getAbsolutePath());
+    }
+
+    /**
+     * Return the first error encountered with writing to the new file as a String.
+     * return empty string if there are no errors
+     */
+    private String checkFileErrors(File newFile) {
+        String error = "";
+        if (newFile.getAbsolutePath().equals(fileBrowser.getCurrentPath().getAbsolutePath())) {
+            error = getString(R.string.filename_cannot_be_empty);
+        } else if (newFile.isDirectory()) {
+            error = getString(R.string.file_is_a_directory);
+        } else if (!newFile.exists()) {
+            boolean created = false;
+            try {
+                created = newFile.createNewFile();
+            } catch (IOException ioe) {
+                error = ioe.getMessage();
+            }
+            if (created) {
+                newFile.delete();
+            }
+        }
+        return error;
     }
 
     ///////////////////////

@@ -90,7 +90,7 @@ public class CryptoThread extends Thread {
 
         //get the output stream
         try {
-            outputStream = new FileOutputStream(outputFile);
+            outputStream = StorageAccessFrameworkHelper.getOutputStreamWithSAF(cryptoService, outputFile);
         } catch (IOException ioe) {
             ioe.printStackTrace();
             cryptoService.showToastOnGuiThread(R.string.error_could_not_get_output_file);
@@ -156,7 +156,10 @@ public class CryptoThread extends Thread {
 
     //for each progress displayer: if not null: update, else remove it from progressDisplayers because it is null.
     private static void updateProgressDisplayers(long workDone, long totalWork) {
-        int progress = (int) ((workDone * 100) / totalWork);
+        int progress = 100;
+        if (totalWork != 0) {
+            progress = (int) ((workDone * 100) / totalWork);
+        }
         for (HashMap.Entry<String, ProgressDisplayer> progressDisplayer : progressDiplayers.entrySet()) {
             if (progressDisplayer.getValue() != null) {
                 progressDisplayer.getValue().update(operationType, progress, completedMessageStringId);
