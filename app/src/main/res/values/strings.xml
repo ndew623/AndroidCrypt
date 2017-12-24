@@ -108,4 +108,7 @@
     <string name="sdcard_icon_creator_name">Smartline</string>
     <string name="sdcard">SD Card</string>
     <string name="how_to_locate_sdcard">To grant SD Card access to AndroidCrypt, select the root directory of your SD Card on the following screen.</string>
+    <string name="did_not_get_sdcard_access">Did not get SD card access</string>
+    <string name="file_write_access_denied">File write access denied</string>
+    <string name="file_not_found">File not found</string>
 </resources>

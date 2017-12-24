@@ -1,21 +1,25 @@
 package com.dewdrop623.androidcrypt;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.provider.DocumentFile;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 
 /**
  * Settings Fragment contains the settings page UI.
  */
 public class SettingsFragment extends Fragment {
 
-    private EditText sdCardRootEditText;
+    private TextView sdCardRootTextView;
+    private Button sdCardRootEditButton;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -45,19 +49,23 @@ public class SettingsFragment extends Fragment {
         }
         filePickerDisplayRadioGroup.setOnCheckedChangeListener(filePickerDisplayRadioGroupOnCheckedChangedListener);
 
-        sdCardRootEditText = (EditText) view.findViewById(R.id.sdCardRootEditText);
-        Button sdCardRootEditButton = (Button) view.findViewById(R.id.sdCardRootEditButton);
+        sdCardRootTextView = (TextView) view.findViewById(R.id.sdCardRootTextView);
+        sdCardRootEditButton = (Button) view.findViewById(R.id.sdCardRootEditButton);
         sdCardRootEditButton.setOnClickListener(sdCardRootEditButtonOnClickListener);
 
-        String sdCardRoot = SettingsHelper.getSdcardRoot(getContext());
-        if (sdCardRoot != null) {
-            sdCardRootEditText.setText(sdCardRoot);
+        return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        String sdCardRootUri = SettingsHelper.getSdcardRoot(getContext());
+        if (sdCardRootUri != null) {
+            sdCardRootTextView.setText(DocumentFile.fromTreeUri(getContext(), Uri.parse(sdCardRootUri)).getName());
         } else {
-            sdCardRootEditText.setText(R.string.not_set);
+            sdCardRootTextView.setText(R.string.not_set);
             sdCardRootEditButton.setText(R.string.set);
         }
-
-        return view;
     }
 
     private RadioGroup.OnCheckedChangeListener aescryptVersionRadioGroupOnCheckedChangedListener = new RadioGroup.OnCheckedChangeListener() {
@@ -91,7 +99,7 @@ public class SettingsFragment extends Fragment {
     private View.OnClickListener sdCardRootEditButtonOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            //TODO something
+            StorageAccessFrameworkHelper.findSDCardWithDialog(getActivity());
         }
     };
 }

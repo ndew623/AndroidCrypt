@@ -1,21 +1,27 @@
 package com.dewdrop623.androidcrypt;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.res.ResourcesCompat;
+import android.support.v4.provider.DocumentFile;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.dewdrop623.androidcrypt.FilePicker.FilePicker;
 import com.dewdrop623.androidcrypt.FilePicker.IconFilePicker;
 import com.dewdrop623.androidcrypt.FilePicker.ListFilePicker;
 
 import java.io.File;
+import java.io.OutputStream;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -67,6 +73,22 @@ public class MainActivity extends AppCompatActivity {
 
     private FilePicker getFilePickerFragment() {
         return (FilePicker) getSupportFragmentManager().findFragmentByTag(FILEPICKERFRAGMENT_TAG);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == StorageAccessFrameworkHelper.SAF_SDCARD_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                Uri sdCardRoot = data.getData();
+                DocumentFile pickedDir = DocumentFile.fromTreeUri(this, sdCardRoot);
+                grantUriPermission(getPackageName(), sdCardRoot, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                getContentResolver().takePersistableUriPermission(sdCardRoot, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                SettingsHelper.setSdcardRoot(this, pickedDir.getUri().toString());
+
+            } else {
+                Toast.makeText(this, R.string.did_not_get_sdcard_access, Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     @Override

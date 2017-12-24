@@ -73,19 +73,23 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <EditText
-                android:id="@+id/sdCardRootEditText"
+            <TextView
+                android:id="@+id/sdCardRootTextView"
+                style="@android:style/Widget.EditText"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:enabled="false"/>
+                android:gravity="center_vertical"
+                android:paddingStart="15dp"
+                android:textSize="15sp" />
+
             <Button
                 android:id="@+id/sdCardRootEditButton"
-                android:text="@string/edit"
                 style="@style/DialogButton"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
+                android:layout_height="wrap_content"
+                android:text="@string/edit" />
 
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>
