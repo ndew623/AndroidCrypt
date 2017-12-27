@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.content.res.AppCompatResources;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
 import android.util.AttributeSet;
@@ -70,7 +71,7 @@ public class IconAttributionView extends RelativeLayout {
     private void attrSetUp(Context context, AttributeSet attrs) {
         TypedArray attributesArray = context.getTheme().obtainStyledAttributes(attrs, R.styleable.IconAttributionView, 0, 0);
         try {
-            iconAttributionImageView.setImageDrawable(attributesArray.getDrawable(R.styleable.IconAttributionView_icon_src));
+            iconAttributionImageView.setImageDrawable(AppCompatResources.getDrawable(getContext(), attributesArray.getResourceId(R.styleable.IconAttributionView_icon_src, R.drawable.ic_cancel)));
             iconCreatorName = attributesArray.getString(R.styleable.IconAttributionView_creator_name);
             iconCreatorLink = attributesArray.getString(R.styleable.IconAttributionView_creator_link);
             srcName = attributesArray.getString(R.styleable.IconAttributionView_src_name);

@@ -2,7 +2,7 @@ package com.dewdrop623.androidcrypt.FilePicker;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.content.res.ResourcesCompat;
+import android.support.v7.content.res.AppCompatResources;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,9 +42,9 @@ public class ListFilePicker extends FilePicker {
             ImageView listItemImageView = (ImageView) convertView.findViewById(R.id.listItemImageView);
             TextView listItemTextView = (TextView) convertView.findViewById(R.id.listItemTextView);
             if (file.isDirectory()) {
-                listItemImageView.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_folder, null));
+                listItemImageView.setImageDrawable(AppCompatResources.getDrawable(getContext(), R.drawable.ic_folder));
             } else {
-                listItemImageView.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_file, null));
+                listItemImageView.setImageDrawable(AppCompatResources.getDrawable(getContext(), R.drawable.ic_file));
             }
             listItemTextView.setText(file.getName());
             return convertView;

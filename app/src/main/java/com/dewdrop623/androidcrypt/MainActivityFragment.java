@@ -260,7 +260,11 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
      * TODO rewrite this comment
      */
     public void selectInputFile() {
-        ((MainActivity) getActivity()).pickFile(false, null, null);
+        String initialFolder = null;
+        if (inputFile != null) {
+            initialFolder = inputFile.getParentFile().getAbsolutePath();
+        }
+        ((MainActivity) getActivity()).pickFile(false, initialFolder, null);
     }
 
     /**
@@ -274,11 +278,13 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
      * show that dialog before selecting a file
      */
     public void selectOutputFile() {
-        String defaultOutputDirectory = null;
-        if (inputFile != null) {
-            defaultOutputDirectory = inputFile.getParentFile().getAbsolutePath();
+        String initialFolder = null;
+        if (outputFile != null) {
+            initialFolder = outputFile.getParentFile().getAbsolutePath();
+        } else if (inputFile != null) {
+            initialFolder = inputFile.getParentFile().getAbsolutePath();
         }
-        ((MainActivity) getActivity()).pickFile(true, defaultOutputDirectory, getDefaultOutputFileName());
+        ((MainActivity) getActivity()).pickFile(true, initialFolder, getDefaultOutputFileName());
     }
 
     public void setFile(File file, boolean isOutput) {

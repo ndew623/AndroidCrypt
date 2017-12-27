@@ -1,6 +1,7 @@
 package com.dewdrop623.androidcrypt;
 
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -9,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
@@ -18,8 +18,8 @@ import android.widget.TextView;
  */
 public class SettingsFragment extends Fragment {
 
-    private TextView sdCardRootTextView;
-    private Button sdCardRootEditButton;
+    private TextView sdCardTextView;
+    private Button sdCardEditButton;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -49,9 +49,15 @@ public class SettingsFragment extends Fragment {
         }
         filePickerDisplayRadioGroup.setOnCheckedChangeListener(filePickerDisplayRadioGroupOnCheckedChangedListener);
 
-        sdCardRootTextView = (TextView) view.findViewById(R.id.sdCardRootTextView);
-        sdCardRootEditButton = (Button) view.findViewById(R.id.sdCardRootEditButton);
-        sdCardRootEditButton.setOnClickListener(sdCardRootEditButtonOnClickListener);
+        sdCardTextView = (TextView) view.findViewById(R.id.sdCardTextView);
+        sdCardEditButton = (Button) view.findViewById(R.id.sdCardEditButton);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            view.findViewById(R.id.sdCardTitleTextView).setVisibility(View.GONE);
+            sdCardTextView.setVisibility(View.GONE);
+            sdCardEditButton.setVisibility(View.GONE);
+        } else {
+            sdCardEditButton.setOnClickListener(sdCardEditButtonOnClickListener);
+        }
 
         return view;
     }
@@ -59,12 +65,20 @@ public class SettingsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        String sdCardRootUri = SettingsHelper.getSdcardRoot(getContext());
-        if (sdCardRootUri != null) {
-            sdCardRootTextView.setText(DocumentFile.fromTreeUri(getContext(), Uri.parse(sdCardRootUri)).getName());
-        } else {
-            sdCardRootTextView.setText(R.string.not_set);
-            sdCardRootEditButton.setText(R.string.set);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ) {
+            String sdCardUri = SettingsHelper.getSdcardRoot(getContext());
+            if (sdCardUri != null) {
+                String sdCardName = DocumentFile.fromTreeUri(getContext(), Uri.parse(sdCardUri)).getName();
+                String sdCardPath = StorageAccessFrameworkHelper.findLikelySDCardPathFromSDCardName(getContext(), sdCardName);
+                if (sdCardPath != null) {
+                    sdCardTextView.setText(sdCardPath);
+                } else {
+                    sdCardTextView.setText(sdCardName);
+                }
+            } else {
+                sdCardTextView.setText(R.string.not_set);
+                sdCardEditButton.setText(R.string.set);
+            }
         }
     }
 
@@ -96,7 +110,7 @@ public class SettingsFragment extends Fragment {
         }
     };
 
-    private View.OnClickListener sdCardRootEditButtonOnClickListener = new View.OnClickListener() {
+    private View.OnClickListener sdCardEditButtonOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             StorageAccessFrameworkHelper.findSDCardWithDialog(getActivity());

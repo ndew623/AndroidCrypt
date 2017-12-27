@@ -1,8 +1,11 @@
 package com.dewdrop623.androidcrypt.FilePicker;
 
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.provider.DocumentFile;
 import android.text.method.ScrollingMovementMethod;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,9 +23,10 @@ import android.widget.Toast;
 
 import com.dewdrop623.androidcrypt.MainActivity;
 import com.dewdrop623.androidcrypt.R;
+import com.dewdrop623.androidcrypt.SettingsHelper;
+import com.dewdrop623.androidcrypt.StorageAccessFrameworkHelper;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -102,8 +106,8 @@ public abstract class FilePicker extends Fragment {
         @Override
         public void onClick(View v) {
             String fileName = fileNameEditText.getText().toString();
-            File newFile = new File(fileBrowser.getCurrentPath().getAbsolutePath().concat(File.separator).concat(fileName));
-            String error = "";//TODO fix checkFileErrors to be compatible with SAF approach checkFileErrors(newFile);
+            File newFile = new File(fileBrowser.getCurrentPath(), fileName);
+            String error = checkFileErrors(newFile);
             if (error.isEmpty()) {
                 ((MainActivity) getActivity()).filePicked(newFile, isOutput);
                 ((MainActivity) getActivity()).superOnBackPressed();
@@ -153,7 +157,7 @@ public abstract class FilePicker extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.sdcard_button:
-                //TODO something
+                sdCardMenuButtonOnClick();
                 break;
             case R.id.home_button:
                 goToHomeDirectory();
@@ -269,18 +273,28 @@ public abstract class FilePicker extends Fragment {
             error = getString(R.string.filename_cannot_be_empty);
         } else if (newFile.isDirectory()) {
             error = getString(R.string.file_is_a_directory);
-        } else if (!newFile.exists()) {
-            boolean created = false;
-            try {
-                created = newFile.createNewFile();
-            } catch (IOException ioe) {
-                error = ioe.getMessage();
-            }
-            if (created) {
-                newFile.delete();
-            }
         }
         return error;
+    }
+
+    private void sdCardMenuButtonOnClick() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            Toast.makeText(getContext(), R.string.sdcard_cannot_be_supported_on_versions_older_than_lollipop, Toast.LENGTH_SHORT).show();
+        } else {
+            String sdCardUriString = SettingsHelper.getSdcardRoot(getContext());
+            if (sdCardUriString == null) {
+                StorageAccessFrameworkHelper.findSDCardWithDialog(getActivity());
+            } else {
+                String sdCardName = DocumentFile.fromTreeUri(getContext(), Uri.parse(sdCardUriString)).getName();
+                String sdCardPath = StorageAccessFrameworkHelper
+                        .findLikelySDCardPathFromSDCardName(getContext(), sdCardName);
+                if (sdCardPath != null) {
+                    changePath(new File(sdCardPath));
+                } else {
+                    Toast.makeText(getContext(), getString(R.string.could_not_find_sdcard) + ": " + sdCardName, Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
     }
 
     ///////////////////////

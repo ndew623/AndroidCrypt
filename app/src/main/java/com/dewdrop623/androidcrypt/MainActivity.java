@@ -3,14 +3,13 @@ package com.dewdrop623.androidcrypt;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.provider.DocumentFile;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.content.res.AppCompatResources;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,7 +20,6 @@ import com.dewdrop623.androidcrypt.FilePicker.IconFilePicker;
 import com.dewdrop623.androidcrypt.FilePicker.ListFilePicker;
 
 import java.io.File;
-import java.io.OutputStream;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -84,7 +82,6 @@ public class MainActivity extends AppCompatActivity {
                 grantUriPermission(getPackageName(), sdCardRoot, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                 getContentResolver().takePersistableUriPermission(sdCardRoot, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                 SettingsHelper.setSdcardRoot(this, pickedDir.getUri().toString());
-
             } else {
                 Toast.makeText(this, R.string.did_not_get_sdcard_access, Toast.LENGTH_SHORT).show();
             }
@@ -105,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
 
     //Called by MainActivityFragment to change the icon when switching between encryption and decryption.
     public void setFABIcon(int drawableId) {
-        fab.setImageDrawable(ResourcesCompat.getDrawable(getResources(), drawableId, null));
+        fab.setImageDrawable(AppCompatResources.getDrawable(this, drawableId));
     }
 
     /**

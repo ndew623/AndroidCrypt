@@ -2,7 +2,6 @@ package com.dewdrop623.androidcrypt;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -93,7 +92,7 @@ public class CryptoThread extends Thread {
             outputStream = StorageAccessFrameworkHelper.getOutputStreamWithSAF(cryptoService, outputFile);
         } catch (IOException ioe) {
             ioe.printStackTrace();
-            cryptoService.showToastOnGuiThread(R.string.error_could_not_get_output_file);
+            cryptoService.showToastOnGuiThread(ioe.getMessage());
         }
 
         if (inputStream != null && outputStream != null) {

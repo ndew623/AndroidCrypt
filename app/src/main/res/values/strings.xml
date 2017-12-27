@@ -107,8 +107,11 @@
     <string name="sdcard_icon_creator_link">https://www.flaticon.com/authors/smartline</string>
     <string name="sdcard_icon_creator_name">Smartline</string>
     <string name="sdcard">SD Card</string>
-    <string name="how_to_locate_sdcard">To grant SD Card access to AndroidCrypt, select the root directory of your SD Card on the following screen.</string>
+    <string name="how_to_locate_sdcard">To grant SD card access to AndroidCrypt, select the root directory of your SD Card on the following screen. This can be changed at any time in settings.</string>
     <string name="did_not_get_sdcard_access">Did not get SD card access</string>
     <string name="file_write_access_denied">File write access denied</string>
     <string name="file_not_found">File not found</string>
+    <string name="write_permission_denied_if_sdcard_grant_permission_in_settings">Write permission denied. If outputting to SD card you need to grant permission to it in settings.</string>
+    <string name="could_not_find_sdcard">Could not find SD card</string>
+    <string name="sdcard_cannot_be_supported_on_versions_older_than_lollipop">Storage on SD card cannot be supported on versions older than Android 5.0 Lollipop</string>
 </resources>
