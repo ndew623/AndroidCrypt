@@ -63,8 +63,8 @@
     <string name="cc30_link">https://creativecommons.org/licenses/by/3.0/</string>
     <string name="icons">Icons</string>
     <string name="error_null_password">Error: null password</string>
-    <string name="version_1_radio_button_text">AESCrypt version 1 (Not recommended. For legacy support only.)</string>
-    <string name="version_2_radio_button_text">AESCrypt version 2 (Recommmended.)</string>
+    <string name="version_1_radio_button_text">AESCrypt version 1 (Not recommended, for legacy support only)</string>
+    <string name="version_2_radio_button_text">AESCrypt version 2 (Recommended)</string>
     <string name="aescrypt_version">AESCrypt Version</string>
     <string name="another_operation_is_already_in_progress">Another operation is already in progress</string>
     <string name="ongoing">Ongoing</string>

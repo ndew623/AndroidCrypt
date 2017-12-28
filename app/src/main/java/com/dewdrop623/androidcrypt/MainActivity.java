@@ -82,6 +82,10 @@ public class MainActivity extends AppCompatActivity {
                 grantUriPermission(getPackageName(), sdCardRoot, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                 getContentResolver().takePersistableUriPermission(sdCardRoot, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                 SettingsHelper.setSdcardRoot(this, pickedDir.getUri().toString());
+                FilePicker filePicker = getFilePickerFragment();
+                if (filePicker != null) {
+                    filePicker.changePathToSDCard();
+                }
             } else {
                 Toast.makeText(this, R.string.did_not_get_sdcard_access, Toast.LENGTH_SHORT).show();
             }

@@ -195,6 +195,28 @@ public abstract class FilePicker extends Fragment {
         fileBrowser.setCurrentPath(newPath);
     }
 
+    /**
+     * Exists so MainActivity can call this after SAF Activity for selecting SD card completes.
+     */
+    public void changePathToSDCard() {
+        String sdCardUriString = SettingsHelper.getSdcardRoot(getContext());
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP || sdCardUriString == null) {
+            /*
+             * Not on Lollipop or above or SD card location has not been set. Do nothing...
+             * This method should not have even been called.
+             */
+        } else {
+            String sdCardName = DocumentFile.fromTreeUri(getContext(), Uri.parse(sdCardUriString)).getName();
+            String sdCardPath = StorageAccessFrameworkHelper
+                    .findLikelySDCardPathFromSDCardName(getContext(), sdCardName);
+            if (sdCardPath != null) {
+                changePath(new File(sdCardPath));
+            } else {
+                Toast.makeText(getContext(), getString(R.string.could_not_find_sdcard) + ": " + sdCardName, Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
     ///////////////////////////////////
     //PROTECTED METHODS
     ///////////////////////////////////
@@ -211,7 +233,7 @@ public abstract class FilePicker extends Fragment {
         updateFileArrayAdapterFileList();
 
         fileNameInputLinearLayout = (LinearLayout) view.findViewById(R.id.fileNameInputLinearLayout);
-        fileNameEditText = (EditText)  view.findViewById(R.id.fileNameEditText);
+        fileNameEditText = (EditText) view.findViewById(R.id.fileNameEditText);
         fileNameOkButton = (Button) view.findViewById(R.id.fileNameOkButton);
 
         if (isOutput) {
@@ -224,7 +246,7 @@ public abstract class FilePicker extends Fragment {
         if (initialFolder != null) {
             fileBrowser.setCurrentPath(new File(initialFolder));
         }
-        if (defaultOutputFilename!=null) {
+        if (defaultOutputFilename != null) {
             fileNameEditText.setText(defaultOutputFilename);
         }
     }
@@ -287,14 +309,7 @@ public abstract class FilePicker extends Fragment {
             if (sdCardUriString == null) {
                 StorageAccessFrameworkHelper.findSDCardWithDialog(getActivity());
             } else {
-                String sdCardName = DocumentFile.fromTreeUri(getContext(), Uri.parse(sdCardUriString)).getName();
-                String sdCardPath = StorageAccessFrameworkHelper
-                        .findLikelySDCardPathFromSDCardName(getContext(), sdCardName);
-                if (sdCardPath != null) {
-                    changePath(new File(sdCardPath));
-                } else {
-                    Toast.makeText(getContext(), getString(R.string.could_not_find_sdcard) + ": " + sdCardName, Toast.LENGTH_SHORT).show();
-                }
+                changePathToSDCard();
             }
         }
     }
