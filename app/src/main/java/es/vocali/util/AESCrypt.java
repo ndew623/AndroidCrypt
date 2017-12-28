@@ -482,7 +482,7 @@ public class AESCrypt {
 			hmac.init(new SecretKeySpec(aesKey2.getEncoded(), HMAC_ALG));
 			backup = new byte[BLOCK_SIZE];
 			text = new byte[BLOCK_SIZE];
-			for (int block = (int) (total / BLOCK_SIZE); block > 0; block--) {
+			for (long block = (total / BLOCK_SIZE); block > 0; block--) {
 				int len = BLOCK_SIZE;
 				if (in.read(backup, 0, len) != len) {	// Cyphertext block.
 					throw new IOException("Unexpected end of file contents");
