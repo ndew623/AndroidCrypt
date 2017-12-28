@@ -15,7 +15,7 @@ import com.dewdrop623.androidcrypt.R;
 import java.io.File;
 
 /**
- * TODO Documentation comment
+ * Implementation of FilePicker that displays files and folders as icons.
  */
 
 public class IconFilePicker extends FilePicker {

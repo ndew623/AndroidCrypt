@@ -257,7 +257,8 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
     };
 
     /**
-     * TODO rewrite this comment
+     * Show the FilePicker fragment so the user can pick a file.
+     * Open the file picker in the same folder that an already picked input file came from.
      */
     public void selectInputFile() {
         String initialFolder = null;
@@ -268,14 +269,9 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
     }
 
     /**
-     * TODO rewrite this comment
-     * ask StorageAccessFramework to allow user to pick a directory
-     * if:
-     * -dont show this again has not been selected from the show internal storage help dialog
-     * and:
-     * -this is not a callback from that same help dialog
-     * then:
-     * show that dialog before selecting a file
+     * Open the FilePicker fragment so the user can pick an output file.
+     * if an output file has previously been selected open its directory.
+     * else if an input file has already been selected open that directory.
      */
     public void selectOutputFile() {
         String initialFolder = null;

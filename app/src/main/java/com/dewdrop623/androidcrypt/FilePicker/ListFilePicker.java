@@ -15,7 +15,7 @@ import com.dewdrop623.androidcrypt.R;
 import java.io.File;
 
 /**
- * TODO Documentation Comment
+ * Implementation of FilePicker that displays files and folders in a list.
  */
 
 public class ListFilePicker extends FilePicker {

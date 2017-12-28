@@ -35,7 +35,9 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * TODO comment on class
+ * FilePicker fragment allows users to select a file.
+ * Child fragments determine what implementation of android's AbsListView to use.
+ * Child fragments define the behavior for the listviewadapter's getView method.
  */
 
 public abstract class FilePicker extends Fragment {
