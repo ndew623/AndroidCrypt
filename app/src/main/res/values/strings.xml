@@ -114,4 +114,5 @@
     <string name="write_permission_denied_if_sdcard_grant_permission_in_settings">Write permission denied. If outputting to SD card you need to grant permission to it in settings.</string>
     <string name="could_not_find_sdcard">Could not find SD card</string>
     <string name="sdcard_cannot_be_supported_on_versions_older_than_lollipop">Storage on SD card cannot be supported on versions older than Android 5.0 Lollipop</string>
+    <string name="denied">denied</string>
 </resources>

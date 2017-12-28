@@ -51,14 +51,21 @@ public final class StorageAccessFrameworkHelper {
             //context.getContentResolver().openOutputStream((DocumentFile.fromFile(newFile.getParentFile())
             //      .createFile("", newFile.getName())).getUri());
         } catch (IOException ioe) {
-            if (ioe.getCause().getMessage().equals("open failed: EACCES (Permission denied)")) {
+            /*
+             * catch an exception with the word denied in its message to detect that we may be writing to the sdcard.
+             * (different devices (different android versions?) produce different errors,
+              * but they seem to share this common word)
+             * Very ugly, but it works.
+             */
+            if (ioe.getMessage().toLowerCase().contains(context.getString(R.string.denied))) {
                 /**
                  * The newFile is probably on the SD Card.
                  *
-                 * Split the file into its individual parts and use that combined with the DocumentFile
-                 * to find the correct directory to write in.
-                 * If the SD Card's name is not in the path and write access is denied, throw an exception.
-                 * If DocumentFile.listFiles() does not contain the folder in newFile's path, throw an exception
+                 * Split the file path into its individual parts and use that combined with the
+                 * DocumentFile to find the correct directory to write in.
+                 * If the SD Card's name is not in the path, throw an exception.
+                 * If DocumentFile.listFiles() does not contain the folders in newFile's path, throw an exception
+                 * Very ugly, but it works.
                  */
                 String uriString = SettingsHelper.getSdcardRoot(context);
                 if (uriString == null) {
@@ -94,6 +101,8 @@ public final class StorageAccessFrameworkHelper {
                 } else if (fileNotFound) {
                     throw new IOException(context.getString(R.string.file_not_found));
                 }
+            } else {
+                throw ioe;
             }
         }
         return outputStream;
