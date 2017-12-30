@@ -46,63 +46,55 @@ public final class StorageAccessFrameworkHelper {
 
     public static OutputStream getOutputStreamWithSAF(Context context, File newFile) throws IOException {
         OutputStream outputStream = null;
-        try {
+        if (newFile.getParentFile().canWrite()) {
             outputStream = new FileOutputStream(newFile);
-            //context.getContentResolver().openOutputStream((DocumentFile.fromFile(newFile.getParentFile())
-            //      .createFile("", newFile.getName())).getUri());
-        } catch (IOException ioe) {
-            /*
-             * catch an exception with the word denied in its message to detect that we may be writing to the sdcard.
-             * (different devices (different android versions?) produce different errors,
-              * but they seem to share this common word)
+        } else {
+            /**
+             * The newFile is probably on the SD Card.
+             *
+             * Split the file path into its individual parts and use that combined with the
+             * DocumentFile to find the correct directory to write in.
+             * If the SD Card's name is not in the path, throw an exception.
+             * If DocumentFile.listFiles() does not contain the folders in newFile's path, throw an exception
              * Very ugly, but it works.
              */
-            if (ioe.getMessage().toLowerCase().contains(context.getString(R.string.denied))) {
-                /**
-                 * The newFile is probably on the SD Card.
-                 *
-                 * Split the file path into its individual parts and use that combined with the
-                 * DocumentFile to find the correct directory to write in.
-                 * If the SD Card's name is not in the path, throw an exception.
-                 * If DocumentFile.listFiles() does not contain the folders in newFile's path, throw an exception
-                 * Very ugly, but it works.
-                 */
-                String uriString = SettingsHelper.getSdcardRoot(context);
-                if (uriString == null) {
-                    throw new IOException(context.getString(R.string.write_permission_denied_if_sdcard_grant_permission_in_settings));
+            String uriString = SettingsHelper.getSdcardRoot(context);
+            if (uriString == null) {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                    throw new IOException(context.getString(R.string.file_write_access_denied));
                 }
-                DocumentFile sdCardDirectory = DocumentFile.fromTreeUri(context, Uri.parse(uriString));
-                String sdCardName = sdCardDirectory.getName();
-                String newFilePathString = newFile.getAbsolutePath();
-                String[] newFileSplitPath = newFilePathString.split("/");
-                boolean foundSDCard = false;
-                boolean fileNotFound = false;
-                for (int i = 0; (i < newFileSplitPath.length) && !fileNotFound; i++) {
-                    if (!foundSDCard) {
-                        if (sdCardName.equals(newFileSplitPath[i])) {
-                            foundSDCard = true;
-                        }
-                    } else if (i == newFileSplitPath.length - 1) {
-                        outputStream = context.getContentResolver().openOutputStream(
-                                sdCardDirectory.createFile("", newFileSplitPath[newFileSplitPath.length - 1])
-                                        .getUri());
-                    } else {
-                        fileNotFound = true;
-                        for (int j = 0; j < sdCardDirectory.listFiles().length; j++) {
-                            if (newFileSplitPath[i].equals(sdCardDirectory.listFiles()[j].getName())) {
-                                fileNotFound = false;
-                                sdCardDirectory = sdCardDirectory.listFiles()[j];
-                            }
+                throw new IOException(context.getString(R.string.write_permission_denied_if_sdcard_grant_permission_in_settings));
+            }
+            DocumentFile sdCardDirectory = DocumentFile.fromTreeUri(context, Uri.parse(uriString));
+            String sdCardName = sdCardDirectory.getName();
+            String newFilePathString = newFile.getAbsolutePath();
+            String[] newFileSplitPath = newFilePathString.split("/");
+            boolean foundSDCard = false;
+            boolean fileNotFound = false;
+            for (int i = 0; (i < newFileSplitPath.length) && !fileNotFound; i++) {
+                if (!foundSDCard) {
+                    if (sdCardName.equals(newFileSplitPath[i])) {
+                        foundSDCard = true;
+                    }
+                } else if (i == newFileSplitPath.length - 1) {
+                    outputStream = context.getContentResolver().openOutputStream(
+                            sdCardDirectory.createFile("", newFileSplitPath[newFileSplitPath.length - 1])
+                                    .getUri());
+                } else {
+                    fileNotFound = true;
+                    for (int j = 0; j < sdCardDirectory.listFiles().length; j++) {
+                        if (newFileSplitPath[i].equals(sdCardDirectory.listFiles()[j].getName())) {
+                            fileNotFound = false;
+                            sdCardDirectory = sdCardDirectory.listFiles()[j];
                         }
                     }
                 }
+
                 if (!foundSDCard) {
                     throw new IOException(context.getString(R.string.file_write_access_denied));
                 } else if (fileNotFound) {
                     throw new IOException(context.getString(R.string.file_not_found));
                 }
-            } else {
-                throw ioe;
             }
         }
         return outputStream;

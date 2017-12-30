@@ -132,6 +132,9 @@ public abstract class FilePicker extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         //create file viewer menu with a home button and a refresh button
         inflater.inflate(R.menu.file_viewer_menu, menu);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            menu.findItem(R.id.sdcard_button).setVisible(false);
+        }
     }
 
     @Override

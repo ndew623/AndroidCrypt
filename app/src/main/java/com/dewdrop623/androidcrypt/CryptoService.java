@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -107,7 +108,8 @@ public class CryptoService extends Service implements CryptoThread.ProgressDispl
         Intent resultIntent = new Intent(this, MainActivity.class);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, resultIntent, 0);
 
-        builder.setSmallIcon(operationType == CryptoThread.OPERATION_TYPE_ENCRYPTION ? R.drawable.ic_lock : R.drawable.ic_unlock).setContentIntent(resultPendingIntent);
+        builder.setSmallIcon(operationType == CryptoThread.OPERATION_TYPE_ENCRYPTION ? R.drawable.ic_lock_png : R.drawable.ic_unlock_png);
+        builder.setContentIntent(resultPendingIntent);
 
         if (progress < 0) {
             builder.setContentTitle(getString(R.string.app_name));
