@@ -1,7 +1,6 @@
 package com.dewdrop623.androidcrypt.FilePicker;
 
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -132,7 +131,7 @@ public abstract class FilePicker extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         //create file viewer menu with a home button and a refresh button
         inflater.inflate(R.menu.file_viewer_menu, menu);
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+        if (!StorageAccessFrameworkHelper.canSupportSDCardOnAndroidVersion()) {
             menu.findItem(R.id.sdcard_button).setVisible(false);
         }
     }
@@ -203,9 +202,9 @@ public abstract class FilePicker extends Fragment {
      */
     public void changePathToSDCard() {
         String sdCardUriString = SettingsHelper.getSdcardRoot(getContext());
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP || sdCardUriString == null) {
+        if (!StorageAccessFrameworkHelper.canSupportSDCardOnAndroidVersion() || sdCardUriString == null) {
             /*
-             * Not on Lollipop or above or SD card location has not been set. Do nothing...
+             * Not on a supported version or above or SD card location has not been set. Do nothing...
              * This method should not have even been called.
              */
         } else {
@@ -305,15 +304,11 @@ public abstract class FilePicker extends Fragment {
     }
 
     private void sdCardMenuButtonOnClick() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            Toast.makeText(getContext(), R.string.sdcard_cannot_be_supported_on_versions_older_than_lollipop, Toast.LENGTH_SHORT).show();
+        String sdCardUriString = SettingsHelper.getSdcardRoot(getContext());
+        if (sdCardUriString == null) {
+            StorageAccessFrameworkHelper.findSDCardWithDialog(getActivity());
         } else {
-            String sdCardUriString = SettingsHelper.getSdcardRoot(getContext());
-            if (sdCardUriString == null) {
-                StorageAccessFrameworkHelper.findSDCardWithDialog(getActivity());
-            } else {
-                changePathToSDCard();
-            }
+            changePathToSDCard();
         }
     }
 

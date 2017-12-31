@@ -1,7 +1,6 @@
 package com.dewdrop623.androidcrypt;
 
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -51,7 +50,7 @@ public class SettingsFragment extends Fragment {
 
         sdCardTextView = (TextView) view.findViewById(R.id.sdCardTextView);
         sdCardEditButton = (Button) view.findViewById(R.id.sdCardEditButton);
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+        if (!StorageAccessFrameworkHelper.canSupportSDCardOnAndroidVersion()) {
             view.findViewById(R.id.sdCardTitleTextView).setVisibility(View.GONE);
             sdCardTextView.setVisibility(View.GONE);
             sdCardEditButton.setVisibility(View.GONE);
@@ -65,7 +64,7 @@ public class SettingsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ) {
+        if (StorageAccessFrameworkHelper.canSupportSDCardOnAndroidVersion()) {
             String sdCardUri = SettingsHelper.getSdcardRoot(getContext());
             if (sdCardUri != null) {
                 String sdCardName = DocumentFile.fromTreeUri(getContext(), Uri.parse(sdCardUri)).getName();

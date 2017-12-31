@@ -151,8 +151,10 @@ public final class StorageAccessFrameworkHelper {
             // better variation of: http://stackoverflow.com/a/40123073/5002496
             String output = "";
             try {
-                final Process process = new ProcessBuilder().command("mount | grep /dev/block/vold")
-                        .redirectErrorStream(true).start();
+                ProcessBuilder processBuilder = new ProcessBuilder().command("sh", "-c", "mount | grep /dev/block/vold");
+                final Process process = processBuilder.redirectErrorStream(true).start();
+                /*final Process process = new ProcessBuilder().command("")
+                        .redirectErrorStream(true).start();*/
                 process.waitFor();
                 final InputStream is = process.getInputStream();
                 final byte[] buffer = new byte[1024];
@@ -166,7 +168,10 @@ public final class StorageAccessFrameworkHelper {
             if (!output.trim().isEmpty()) {
                 String devicePoints[] = output.split("\n");
                 for (String voldPoint : devicePoints) {
-                    results.add(voldPoint.split(" ")[2]);
+                    String[] splitVoldPoint = voldPoint.split(" ");
+                    if (splitVoldPoint.length > 2) {
+                        results.add(voldPoint.split(" ")[2]);
+                    }
                 }
             }
         }
@@ -192,5 +197,9 @@ public final class StorageAccessFrameworkHelper {
         for (int i = 0; i < results.size(); ++i) storageDirectories[i] = results.get(i);
 
         return storageDirectories;
+    }
+
+    public static boolean canSupportSDCardOnAndroidVersion() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP || Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1;
     }
 }
