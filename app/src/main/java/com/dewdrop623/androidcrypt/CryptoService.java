@@ -1,10 +1,14 @@
 package com.dewdrop623.androidcrypt;
 
+import android.annotation.TargetApi;
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -27,6 +31,8 @@ public class CryptoService extends Service implements CryptoThread.ProgressDispl
     public static final String OUTPUT_FILE_PATH_EXTRA_KEY = "com.dewdrop623.androidcrypt.CryptoService.OUTPUT_FILE_PATH_EXTRA_KEY";
     public static final String VERSION_EXTRA_KEY = "com.dewdrop623.androidcrypt.CryptoService.VERSION_EXTRA_KEY";
     public static final String OPERATION_TYPE_EXTRA_KEY = "com.dewdrop623.androidcrypt.CryptoService.OPERATION_TYPE_EXTRA_KEY";
+
+    public static final String NOTIFICATION_CHANNEL_ID = "com.dewdrop623.androidcrypt.CryptoService.OPERATION_TYPE_EXTRA_KEY";
 
     private static final String PROGRESS_DISPLAYER_ID = "com.dewdrop623.androidcrypt.CryptoService.PROGRESS_DISPLAYER_ID";
 
@@ -102,7 +108,12 @@ public class CryptoService extends Service implements CryptoThread.ProgressDispl
     * if progress < 0: displayed without progress bar
      */
     private Notification buildProgressNotification(boolean operationType, int progress, int completedMessageStringId) {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            createNotificationChannel();
+        }
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
 
         Intent resultIntent = new Intent(this, MainActivity.class);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, resultIntent, 0);
@@ -121,6 +132,15 @@ public class CryptoService extends Service implements CryptoThread.ProgressDispl
             builder.setContentText(getString(completedMessageStringId));
         }
         return builder.build();
+    }
+
+    @TargetApi(Build.VERSION_CODES.O)
+    private void createNotificationChannel() {
+        CharSequence channelName = getString(R.string.app_name);
+        NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_LOW);
+        notificationChannel.enableLights(false);
+        notificationChannel.enableVibration(false);
+        ((NotificationManager)getSystemService(NOTIFICATION_SERVICE)).createNotificationChannel(notificationChannel);
     }
 
     //Implementation of CryptoThread.ProgressDisplayers interface. Called by CryptoThread to update the progress.
