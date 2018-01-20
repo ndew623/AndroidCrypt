@@ -33,13 +33,14 @@ public class CryptoThread extends Thread {
     private static HashMap<String, ProgressDisplayer> progressDiplayers = new HashMap<>();
 
     public interface ProgressDisplayer {
+        //[minutes|seconds]ToCompletion=-1 => unknown
         void update(boolean operationType, int progress, int completedMessageStringId);
     }
 
-    private static final long updateIntervalInBytes = 4096;
+    private static final long updateIntervalInBytes = 40096;
 
     private static long lastUpdateAtByteNumber = 0;
-    private static long totalBytesReadForProgress = 0;
+    private static long totalBytesRead = 0;
     private static long fileSize = 0;
 
     private CryptoService cryptoService;
@@ -49,25 +50,28 @@ public class CryptoThread extends Thread {
     private File outputFile;
     private String password;
     private int version;
+    private boolean deleteInputFile = false;
     private static int completedMessageStringId = R.string.done;
 
     /**
      * Takes a cryptoService, input and output uris, the password, a version (use VERSION_X constants), and operation type (defined by the OPERATION_TYPE_X constants)
      */
-    public CryptoThread(CryptoService cryptoService, File inputFile, File outputFile, String password, int version, boolean operationType) {
+    public CryptoThread(CryptoService cryptoService, File inputFile, File outputFile, String password, int version, boolean operationType, boolean deleteInputFile) {
         this.cryptoService = cryptoService;
         this.inputFile = inputFile;
         this.outputFile = outputFile;
         this.password = password;
         this.version = version;
+        this.deleteInputFile = deleteInputFile;
         this.operationType = operationType;
     }
 
     @Override
     public void run() {
+        boolean successful = true;
         operationInProgress = true;
         lastUpdateAtByteNumber = 0;
-        totalBytesReadForProgress = 0;
+        totalBytesRead = 0;
 
         if (operationType == OPERATION_TYPE_ENCRYPTION) {
             completedMessageStringId = R.string.encryption_completed;
@@ -83,6 +87,7 @@ public class CryptoThread extends Thread {
         try {
             inputStream = new FileInputStream(inputFile);
         } catch (IOException ioe) {
+            successful = false;
             ioe.printStackTrace();
             cryptoService.showToastOnGuiThread(R.string.error_could_not_get_input_file);
         }
@@ -91,6 +96,7 @@ public class CryptoThread extends Thread {
         try {
             outputStream = StorageAccessFrameworkHelper.getOutputStreamWithSAF(cryptoService, outputFile);
         } catch (IOException ioe) {
+            successful = false;
             ioe.printStackTrace();
             cryptoService.showToastOnGuiThread(ioe.getMessage());
         }
@@ -108,14 +114,18 @@ public class CryptoThread extends Thread {
                     aesCrypt.decrypt(fileSize, inputStream, outputStream);
                 }
             } catch (GeneralSecurityException gse) {
+                successful = false;
                 gse.printStackTrace();
                 cryptoService.showToastOnGuiThread(R.string.error_platform_does_not_support_the_required_cryptographic_methods);
             } catch (UnsupportedEncodingException uee) {
+                successful = false;
                 uee.printStackTrace();
                 cryptoService.showToastOnGuiThread(R.string.error_utf16_encoding_is_not_supported);
             } catch (IOException ioe) {
+                successful = false;
                 cryptoService.showToastOnGuiThread(ioe.getMessage());
             } catch (NullPointerException npe) {
+                successful = false;
                 cryptoService.showToastOnGuiThread(npe.getMessage());
             }
         }
@@ -125,6 +135,7 @@ public class CryptoThread extends Thread {
             try {
                 inputStream.close();
             } catch (IOException ioe) {
+                successful = false;
                 ioe.printStackTrace();
                 cryptoService.showToastOnGuiThread(R.string.error_could_not_close_input_file);
             }
@@ -133,6 +144,7 @@ public class CryptoThread extends Thread {
             try {
                 outputStream.close();
             } catch (IOException ioe) {
+                successful = false;
                 cryptoService.showToastOnGuiThread(R.string.error_could_not_close_output_file);
             }
         }
@@ -140,16 +152,24 @@ public class CryptoThread extends Thread {
         //Send out one last progress update. It is important that ProgressDisplayers get the final update at 100%. Even if the operation was canceled.
         updateProgressDisplayers(fileSize, fileSize);
 
+        /*
+        if operation didn't encounter errors (successful == true), didn't get canceled
+        (operationInProgress is still true), and user asked (deleteInputFile == true):
+        delete the input file
+         */
+        if (successful && deleteInputFile && operationInProgress) {
+            deleteInputFile();
+        }
         //stop the service
         cryptoService.stopForeground(false);
         operationInProgress = false;
     }
 
     public static void updateProgressOnInterval(long bytesRead) {
-        totalBytesReadForProgress += bytesRead;
-        if (totalBytesReadForProgress - lastUpdateAtByteNumber > updateIntervalInBytes) {
-            lastUpdateAtByteNumber = totalBytesReadForProgress;
-            updateProgressDisplayers(totalBytesReadForProgress, fileSize);
+        totalBytesRead += bytesRead;
+        if (totalBytesRead - lastUpdateAtByteNumber > updateIntervalInBytes) {
+            lastUpdateAtByteNumber = totalBytesRead;
+            updateProgressDisplayers(totalBytesRead, fileSize);
         }
     }
 
@@ -166,6 +186,10 @@ public class CryptoThread extends Thread {
                 progressDiplayers.remove(progressDisplayer.getKey());
             }
         }
+    }
+
+    private boolean deleteInputFile() {
+        return inputFile.delete();
     }
 
     public static void registerForProgressUpdate(String id, ProgressDisplayer progressDisplayer) {
@@ -189,7 +213,7 @@ public class CryptoThread extends Thread {
         if (fileSize == 0) {
             progress = 100;
         } else if (operationInProgress) {
-            progress = (int) ((totalBytesReadForProgress * 100) / fileSize);
+            progress = (int) ((totalBytesRead * 100) / fileSize);
         }
         return progress;
     }

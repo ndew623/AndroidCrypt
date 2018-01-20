@@ -115,4 +115,5 @@
     <string name="could_not_find_sdcard">Could not find SD card</string>
     <string name="sdcard_cannot_be_supported_on_versions_older_than_lollipop">Storage on SD card cannot be supported on versions older than Android 5.0 Lollipop</string>
     <string name="denied">denied</string>
+    <string name="delete_input_file">Delete Input File</string>
 </resources>

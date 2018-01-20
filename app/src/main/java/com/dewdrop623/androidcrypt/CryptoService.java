@@ -14,6 +14,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.io.File;
@@ -31,6 +32,7 @@ public class CryptoService extends Service implements CryptoThread.ProgressDispl
     public static final String OUTPUT_FILE_PATH_EXTRA_KEY = "com.dewdrop623.androidcrypt.CryptoService.OUTPUT_FILE_PATH_EXTRA_KEY";
     public static final String VERSION_EXTRA_KEY = "com.dewdrop623.androidcrypt.CryptoService.VERSION_EXTRA_KEY";
     public static final String OPERATION_TYPE_EXTRA_KEY = "com.dewdrop623.androidcrypt.CryptoService.OPERATION_TYPE_EXTRA_KEY";
+    public static final String DELETE_INPUT_FILE_KEY = "com.dewdrop623.androidcrypt.CryptoService.DELETE_INPUT_FILE_KEY";
 
     public static final String NOTIFICATION_CHANNEL_ID = "com.dewdrop623.androidcrypt.CryptoService.OPERATION_TYPE_EXTRA_KEY";
 
@@ -62,11 +64,12 @@ public class CryptoService extends Service implements CryptoThread.ProgressDispl
         int version = intent.getIntExtra(VERSION_EXTRA_KEY, SettingsHelper.AESCRYPT_DEFAULT_VERSION);
         String password = MainActivityFragment.getAndClearPassword();
         boolean operationType = intent.getBooleanExtra(OPERATION_TYPE_EXTRA_KEY, CryptoThread.OPERATION_TYPE_DECRYPTION);
+        boolean deleteInputFile = intent.getBooleanExtra(DELETE_INPUT_FILE_KEY, false);
 
         CryptoThread.registerForProgressUpdate(PROGRESS_DISPLAYER_ID, this);
 
         if (password != null) {
-            CryptoThread cryptoThread = new CryptoThread(this, inputFile, outputFile, password, version, operationType);
+            CryptoThread cryptoThread = new CryptoThread(this, inputFile, outputFile, password, version, operationType, deleteInputFile);
             cryptoThread.start();
         } else {
             showToastOnGuiThread(R.string.error_null_password);

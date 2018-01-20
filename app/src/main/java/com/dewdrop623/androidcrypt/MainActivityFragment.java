@@ -59,12 +59,14 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
     private static final String SAVED_INSTANCE_STATE_OPERATION_MODE = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_OPERATION_MODE";
     private static final String SAVED_INSTANCE_STATE_INPUT_FILE = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_INPUT_FILE";
     private static final String SAVED_INSTANCE_STATE_OUTPUT_FILE = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_OUTPUT_FILE";
+    private static final String SAVED_INSTANCE_STATE_DELETE_INPUT_FILE = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_DELETE_INPUT_FILE";
 
     //stores the type of operation to be done
     private boolean operationMode = CryptoThread.OPERATION_TYPE_ENCRYPTION;
     private boolean showPassword = false;
     private File inputFile = null;
     private File outputFile = null;
+    private boolean deleteInputFile = false;
     //see comment on this.onAttach(Context)
     private Context context;
 
@@ -77,6 +79,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
     private TextView outputFilePathTextView;
     private View outputFilePathUnderlineView;
     private FileSelectButton inputFileSelectButton;
+    private CheckBox deleteInputFileCheckbox;
     private FileSelectButton outputFileSelectButton;
     private EditText passwordEditText;
     private EditText confirmPasswordEditText;
@@ -109,6 +112,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         outputFilePathTextView = (TextView) view.findViewById(R.id.outputFilePathTextView);
         outputFilePathUnderlineView = view.findViewById(R.id.outputFilePathUnderlineView);
         inputFileSelectButton = (FileSelectButton) view.findViewById(R.id.selectInputFileButton);
+        deleteInputFileCheckbox = (CheckBox) view.findViewById(R.id.deleteInputFileCheckbox);
         outputFileSelectButton = (FileSelectButton) view.findViewById(R.id.selectOutputFileButton);
         passwordEditText = (EditText) view.findViewById(R.id.passwordEditText);
         confirmPasswordEditText = (EditText) view.findViewById(R.id.confirmPasswordEditText);
@@ -124,6 +128,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         encryptModeButton.setOnClickListener(operationModeButtonsOnClickListener);
         decryptModeButton.setOnClickListener(operationModeButtonsOnClickListener);
         progressDispayCancelButton.setOnClickListener(progressDispayCancelButtonOnClickListener);
+        deleteInputFileCheckbox.setOnCheckedChangeListener(deleteInputFileCheckboxOnCheckedChangedListener);
 
         checkPermissions();
 
@@ -256,6 +261,13 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         }
     };
 
+    private CompoundButton.OnCheckedChangeListener deleteInputFileCheckboxOnCheckedChangedListener = new CompoundButton.OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+            deleteInputFile = b;
+        }
+    };
+
     /**
      * Show the FilePicker fragment so the user can pick a file.
      * Open the file picker in the same folder that an already picked input file came from.
@@ -305,6 +317,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         View filePathUnderlineView;
         LinearLayout filePathLinearLayout;
         String filePathTextPrefix;
+        int deleteInputFileCheckboxVisiblity = deleteInputFileCheckbox.getVisibility();
         if (isOutput) {
             file = outputFile;
             filePathTextView = outputFilePathTextView;
@@ -319,6 +332,11 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
             filePathUnderlineView = inputFilePathUnderlineView;
             filePathLinearLayout = inputFilePathLinearLayout;
             filePathTextPrefix = context.getString(R.string.input_file).concat(": ");
+            if (inputFile != null) {
+                deleteInputFileCheckboxVisiblity = View.VISIBLE;
+            } else {
+                deleteInputFileCheckboxVisiblity = View.INVISIBLE;
+            }
         }
 
         String filePath = "";
@@ -340,6 +358,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         filePathTextView.setVisibility(filePathTextViewVisibility);
         filePathUnderlineView.setVisibility(filePathUnderlineViewVisibility);
         filePathLinearLayout.setGravity(gravity);
+        deleteInputFileCheckbox.setVisibility(deleteInputFileCheckboxVisiblity);
     }
 
     /**
@@ -353,6 +372,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
             intent.putExtra(CryptoService.OUTPUT_FILE_PATH_EXTRA_KEY, outputFile.getAbsolutePath());
             intent.putExtra(CryptoService.VERSION_EXTRA_KEY, SettingsHelper.getAESCryptVersion(getContext()));
             intent.putExtra(CryptoService.OPERATION_TYPE_EXTRA_KEY, operationMode);
+            intent.putExtra(CryptoService.DELETE_INPUT_FILE_KEY, deleteInputFile);
             MainActivityFragment.password = passwordEditText.getText().toString().toCharArray();
             context.startService(intent);
         }
@@ -507,6 +527,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         }
         outState.putBoolean(SAVED_INSTANCE_STATE_SHOW_PASSWORD, showPassword);
         outState.putBoolean(SAVED_INSTANCE_STATE_OPERATION_MODE, operationMode);
+        outState.putBoolean(SAVED_INSTANCE_STATE_DELETE_INPUT_FILE, deleteInputFile);
         if (inputFile != null) {
             outState.putString(SAVED_INSTANCE_STATE_INPUT_FILE, inputFile.getAbsolutePath());
         }
@@ -536,6 +557,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         } else {
             enableDecryptionMode();
         }
+        deleteInputFileCheckbox.setChecked(savedInstanceState.getBoolean(SAVED_INSTANCE_STATE_DELETE_INPUT_FILE, deleteInputFile));
         String inputFileString = savedInstanceState.getString(SAVED_INSTANCE_STATE_INPUT_FILE, null);
         String outputFileString = savedInstanceState.getString(SAVED_INSTANCE_STATE_OUTPUT_FILE, null);
         if (inputFileString != null) {
