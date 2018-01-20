@@ -202,4 +202,36 @@ public final class StorageAccessFrameworkHelper {
     public static boolean canSupportSDCardOnAndroidVersion() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1;
     }
+
+    public static String getDocumentFilePath(DocumentFile documentFile) {
+        return getDocumentFilePath(documentFile, null);
+    }
+
+    /**
+     * Gets a file path string for a document file.
+     * childFileName can be null, or used to get the path of a file that doesn't exist yet
+     * (DocumentFiles must exist unlike java.io.file)
+     * if documentFile is null, return the empty string
+     */
+    public static String getDocumentFilePath(DocumentFile documentFile, String childFileName) {
+
+        if (documentFile == null) {
+            return new String();
+        }
+
+        StringBuilder pathNameBuilder = new StringBuilder();
+        pathNameBuilder.append(documentFile.getName());
+        while (documentFile.getParentFile() != null) {
+            pathNameBuilder.insert(0, File.separator);
+            pathNameBuilder.insert(0, documentFile.getParentFile().getName());
+            documentFile = documentFile.getParentFile();
+        }
+
+        if (childFileName != null) {
+            pathNameBuilder.append(File.separator);
+            pathNameBuilder.append(childFileName);
+        }
+
+        return pathNameBuilder.toString();
+    }
 }

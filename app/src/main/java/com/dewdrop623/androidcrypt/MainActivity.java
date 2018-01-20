@@ -19,8 +19,6 @@ import com.dewdrop623.androidcrypt.FilePicker.FilePicker;
 import com.dewdrop623.androidcrypt.FilePicker.IconFilePicker;
 import com.dewdrop623.androidcrypt.FilePicker.ListFilePicker;
 
-import java.io.File;
-
 public class MainActivity extends AppCompatActivity {
 
 
@@ -125,14 +123,14 @@ public class MainActivity extends AppCompatActivity {
         String title = isOutput?getString(R.string.choose_output_file):getString(R.string.choose_input_file);
         Bundle args = new Bundle();
         args.putBoolean(FilePicker.IS_OUTPUT_KEY, isOutput);
-        args.putString(FilePicker.INITIAL_FOLDER_KEY, initialFolder);
+        args.putString(FilePicker.INITIAL_FOLDER_URI_KEY, initialFolder);
         args.putString(FilePicker.DEFAULT_OUTPUT_FILENAME_KEY, defaultOutputFilename);
         filePicker.setArguments(args);
         displaySecondaryFragmentScreen(filePicker, title, FILEPICKERFRAGMENT_TAG);
     }
 
-    public void filePicked(File file, boolean isOutput) {
-        getMainActivityFragment().setFile(file, isOutput);
+    public void filePicked(DocumentFile fileParentDirectory, String filename, boolean isOutput) {
+        getMainActivityFragment().setFile(fileParentDirectory, filename, isOutput);
     }
 
     /**

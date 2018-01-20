@@ -1,12 +1,17 @@
 package com.dewdrop623.androidcrypt.FilePicker;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.Environment;
 import android.os.FileObserver;
-import android.os.Handler;
-import android.os.Looper;
+import android.support.v4.provider.DocumentFile;
+
+import com.dewdrop623.androidcrypt.StorageAccessFrameworkHelper;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * FilePicker uses FileBrowser to get the information it needs about the file system.
@@ -14,31 +19,30 @@ import java.io.File;
 
 public class FileBrowser {
 
-    private File currentPath;
+    private DocumentFile currentDirectory;
     private FilePicker filePicker;
-    private FileObserver fileChangeMonitor;
 
-    public static final File parentDirectory = new File("..");
-    //changing root will determine how high up the directory tree filepicker can go
-    public static final File root = new File("/");
-    public static final File homeDirectory = Environment.getExternalStorageDirectory();
+    public static final DocumentFile internalStorageHome = DocumentFile.fromFile(Environment.getExternalStorageDirectory());
 
     public FileBrowser(Context context) {
-        currentPath = homeDirectory;
+        currentDirectory = internalStorageHome;
         monitorCurrentPathForChanges();
     }
     public void setFilePicker(FilePicker filePicker) {
         this.filePicker = filePicker;
         updateFileViewer();
     }
-    private void updateFileViewer() {
-        File[] files = currentPath.listFiles();
-        if (files == null) {
-            files = new File[]{};
+    public void updateFileViewer() {
+        ArrayList<DocumentFile> files = new ArrayList<>(Arrays.asList(currentDirectory.listFiles()));
+        if (currentDirectory.getParentFile() != null) {
+            files.add(currentDirectory.getParentFile());
         }
         filePicker.setFileList(files);
     }
     private void monitorCurrentPathForChanges() {
+        /*
+
+        TODO figure out how this works with DocumentFile
         if (fileChangeMonitor != null) {
             fileChangeMonitor.stopWatching();
         }
@@ -57,23 +61,42 @@ public class FileBrowser {
                     });
             }
         };
-        fileChangeMonitor.startWatching();
-    }
-    public File getCurrentPath() {
-        return currentPath;
+        fileChangeMonitor.startWatching();*/
     }
 
-    //change the displayed file path to newPath if it is a directory. If the new path is ".." then change the current path to the parent of the current directory.
-    public void setCurrentPath(File newPath) {
-        if(!newPath.isDirectory()) {
+    public String getCurrentPathName() {
+        return StorageAccessFrameworkHelper.getDocumentFilePath(currentDirectory);
+    }
+
+    //change the displayed file path to newDirectory if it is a directory. If the new path is ".." then change the current path to the parent of the current directory.
+    public void setCurrentDirectory(DocumentFile newDirectory) {
+        if(!newDirectory.isDirectory()) {
             return;
         }
-        if (newPath == parentDirectory) {
-            currentPath = currentPath.getParentFile();
-        } else {
-            currentPath = newPath;
-        }
+        currentDirectory = newDirectory;
         monitorCurrentPathForChanges();
         updateFileViewer();
     }
+
+    /**
+     * Tries to change the currentDirectory to currentDirectory's parent directory.
+     * Reports whether or not parent directory existed.
+     */
+    public boolean goToParentDirectory() {
+        boolean hadParentDirectory = false;
+        if (currentDirectory.getParentFile() != null) {
+            setCurrentDirectory(currentDirectory.getParentFile());
+            hadParentDirectory = true;
+        }
+        return hadParentDirectory;
+    }
+
+    public String getCurrentDirectoryUriString() {
+        return currentDirectory.getUri().toString();
+    }
+
+    public DocumentFile getCurrentDirectory() {
+        return currentDirectory;
+    }
+    
 }

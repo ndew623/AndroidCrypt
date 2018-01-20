@@ -29,6 +29,8 @@ public class CryptoService extends Service implements CryptoThread.ProgressDispl
     //Keys for the intent extras
     public static final String INPUT_FILE_PATH_EXTRA_KEY = "com.dewdrop623.androidcrypt.CryptoService.INPUT_URI_KEY";
     public static final String OUTPUT_FILE_PATH_EXTRA_KEY = "com.dewdrop623.androidcrypt.CryptoService.OUTPUT_FILE_PATH_EXTRA_KEY";
+    public static final String INPUT_FILENAME_KEY = "com.dewdrop623.androidcrypt.CryptoService.INPUT_FILENAME_KEY";
+    public static final String OUTPUT_FILENAME_KEY = "com.dewdrop623.androidcrypt.CryptoService.OUTPUT_FILENAME_KEY";
     public static final String VERSION_EXTRA_KEY = "com.dewdrop623.androidcrypt.CryptoService.VERSION_EXTRA_KEY";
     public static final String OPERATION_TYPE_EXTRA_KEY = "com.dewdrop623.androidcrypt.CryptoService.OPERATION_TYPE_EXTRA_KEY";
 

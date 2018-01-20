@@ -2,6 +2,7 @@ package com.dewdrop623.androidcrypt.FilePicker;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.provider.DocumentFile;
 import android.support.v7.content.res.AppCompatResources;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,7 +40,7 @@ public class IconFilePicker extends FilePicker {
             if (convertView == null) {
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.listitem_iconfileviewer_icon, parent, false);
             }
-            File file = fileListAdapter.getItem(position);
+            DocumentFile file = fileListAdapter.getItem(position);
             ImageView fileIconImageView = (ImageView) convertView.findViewById(R.id.fileIconImageView);
             TextView fileNameTextView = (TextView) convertView.findViewById(R.id.fileNameTextView);
             if (file.isDirectory()) {
@@ -47,7 +48,7 @@ public class IconFilePicker extends FilePicker {
             } else {
                 fileIconImageView.setImageDrawable(AppCompatResources.getDrawable(getContext(), R.drawable.ic_file));
             }
-            fileNameTextView.setText(file.getName());
+            fileNameTextView.setText(getGUINameForDocumentFile(file));
             return convertView;
         }
     };

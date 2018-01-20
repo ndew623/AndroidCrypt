@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -12,6 +13,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
+import android.support.v4.provider.DocumentFile;
 import android.text.InputType;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
@@ -57,14 +59,18 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
 
     private static final String SAVED_INSTANCE_STATE_SHOW_PASSWORD = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_SHOW_PASSWORD";
     private static final String SAVED_INSTANCE_STATE_OPERATION_MODE = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_OPERATION_MODE";
-    private static final String SAVED_INSTANCE_STATE_INPUT_FILE = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_INPUT_FILE";
-    private static final String SAVED_INSTANCE_STATE_OUTPUT_FILE = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_OUTPUT_FILE";
+    private static final String SAVED_INSTANCE_STATE_INPUT_PARENT_URI = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_INPUT_PARENT_URI";
+    private static final String SAVED_INSTANCE_STATE_OUTPUT_PARENT_URI = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_OUTPUT_PARENT_URI";
+    private static final String SAVED_INSTANCE_STATE_INPUT_FILENAME = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_INPUT_FILENAME";
+    private static final String SAVED_INSTANCE_STATE_OUTPUT_FILENAME = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_OUTPUT_FILENAME";
 
     //stores the type of operation to be done
     private boolean operationMode = CryptoThread.OPERATION_TYPE_ENCRYPTION;
     private boolean showPassword = false;
-    private File inputFile = null;
-    private File outputFile = null;
+    private DocumentFile inputFileParentDirectory = null;
+    String inputFileName;
+    private DocumentFile outputFileParentDirectory = null;
+    String outputFileName;
     //see comment on this.onAttach(Context)
     private Context context;
 
@@ -262,8 +268,8 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
      */
     public void selectInputFile() {
         String initialFolder = null;
-        if (inputFile != null) {
-            initialFolder = inputFile.getParentFile().getAbsolutePath();
+        if (inputFileParentDirectory != null) {
+            initialFolder = inputFileParentDirectory.getUri().toString();
         }
         ((MainActivity) getActivity()).pickFile(false, initialFolder, null);
     }
@@ -275,19 +281,21 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
      */
     public void selectOutputFile() {
         String initialFolder = null;
-        if (outputFile != null) {
-            initialFolder = outputFile.getParentFile().getAbsolutePath();
-        } else if (inputFile != null) {
-            initialFolder = inputFile.getParentFile().getAbsolutePath();
+        if (outputFileParentDirectory != null) {
+            initialFolder = outputFileParentDirectory.getUri().toString();
+        } else if (inputFileParentDirectory != null) {
+            initialFolder = inputFileParentDirectory.getUri().toString();
         }
         ((MainActivity) getActivity()).pickFile(true, initialFolder, getDefaultOutputFileName());
     }
 
-    public void setFile(File file, boolean isOutput) {
+    public void setFile(DocumentFile file, String filename, boolean isOutput) {
         if (isOutput) {
-            outputFile = file;
+            outputFileParentDirectory = file;
+            outputFileName = filename;
         } else {
-            inputFile = file;
+            inputFileParentDirectory = file;
+            inputFileName = filename;
         }
         if (context != null) {
             updateFileUI(isOutput);
@@ -295,39 +303,36 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
     }
 
     /*
-    * Set the inputFile (isOutput == false) or outputFile (isOutput == true) member variable and change UI of the file select buttons.
+    * Set the inputFileParentDirectory (isOutput == false) or outputFileParentDirectory (isOutput == true) member variable and change UI of the file select buttons.
     * Pass null to clear the uri value and reset ui.
      */
     private void updateFileUI(boolean isOutput) {
-        File file;
+        String filePath;
         TextView filePathTextView;
         FileSelectButton fileSelectButton;
         View filePathUnderlineView;
         LinearLayout filePathLinearLayout;
         String filePathTextPrefix;
         if (isOutput) {
-            file = outputFile;
+            filePath = StorageAccessFrameworkHelper.getDocumentFilePath(outputFileParentDirectory, outputFileName);
             filePathTextView = outputFilePathTextView;
             fileSelectButton = outputFileSelectButton;
             filePathUnderlineView = outputFilePathUnderlineView;
             filePathLinearLayout = outputFilePathLinearLayout;
             filePathTextPrefix = context.getString(R.string.output_file).concat(": ");
         } else {
-            file = inputFile;
+            filePath = StorageAccessFrameworkHelper.getDocumentFilePath(inputFileParentDirectory, inputFileName);
             filePathTextView = inputFilePathTextView;
             fileSelectButton = inputFileSelectButton;
             filePathUnderlineView = inputFilePathUnderlineView;
             filePathLinearLayout = inputFilePathLinearLayout;
             filePathTextPrefix = context.getString(R.string.input_file).concat(": ");
         }
-
-        String filePath = "";
         int filePathTextViewVisibility = View.GONE;
         int filePathUnderlineViewVisibility = View.INVISIBLE;
         boolean fileSelectButtonMinimize = false;
         int gravity = Gravity.CENTER;
-        if (file != null) {
-            filePath = file.getAbsolutePath();
+        if (!filePath.isEmpty()) {
             filePathTextViewVisibility = View.VISIBLE;
             filePathUnderlineViewVisibility = View.VISIBLE;
             fileSelectButtonMinimize = true;
@@ -349,8 +354,10 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         if (isValidElsePrintErrors()) {
             //Can't use getContext() or getActivity(). See comment on this.onAttach(Context)
             Intent intent = new Intent(context, CryptoService.class);
-            intent.putExtra(CryptoService.INPUT_FILE_PATH_EXTRA_KEY, inputFile.getAbsolutePath());
-            intent.putExtra(CryptoService.OUTPUT_FILE_PATH_EXTRA_KEY, outputFile.getAbsolutePath());
+            intent.putExtra(CryptoService.INPUT_FILE_PATH_EXTRA_KEY, inputFileParentDirectory.getUri().toString());
+            intent.putExtra(CryptoService.OUTPUT_FILE_PATH_EXTRA_KEY, outputFileParentDirectory.getUri().toString());
+            intent.putExtra(CryptoService.INPUT_FILENAME_KEY, inputFileName);
+            intent.putExtra(CryptoService.OUTPUT_FILENAME_KEY, outputFileName);
             intent.putExtra(CryptoService.VERSION_EXTRA_KEY, SettingsHelper.getAESCryptVersion(getContext()));
             intent.putExtra(CryptoService.OPERATION_TYPE_EXTRA_KEY, operationMode);
             MainActivityFragment.password = passwordEditText.getText().toString().toCharArray();
@@ -430,15 +437,15 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
     }
 
 
-    /*return the default output filename based on the inputFile.
-    *if inputFile is null, returns null.
+    /*return the default output filename based on the inputFileParentDirectory.
+    *if inputFileParentDirectory is null, returns null.
     * if in encryption mode, append '.aes' to filename.
     * if in decryption mode, and input filename ends with '.aes', remove '.aes'
     * if in decryption mode and input filename does not end with '.aes', return empty string*/
     private String getDefaultOutputFileName() {
         String result = null;
-        if (inputFile != null) {
-            String fileName = inputFile.getName();
+        if (inputFileParentDirectory != null) {
+            String fileName = inputFileParentDirectory.getName();
             if (operationMode == CryptoThread.OPERATION_TYPE_ENCRYPTION) {
                 result = fileName.concat(".aes");
             } else if (operationMode == CryptoThread.OPERATION_TYPE_DECRYPTION) {
@@ -458,16 +465,16 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
      */
     private boolean isValidElsePrintErrors() {
         boolean valid = true;
-        if (inputFile == null) {
+        if (inputFileParentDirectory == null) {
             valid = false;
             showError(R.string.no_input_file_selected);
-        } else if (outputFile == null) {
+        } else if (outputFileParentDirectory == null) {
             valid = false;
             showError(R.string.no_output_file_selected);
         } else if (operationMode == CryptoThread.OPERATION_TYPE_ENCRYPTION && !passwordEditText.getText().toString().equals(confirmPasswordEditText.getText().toString())) {
             valid = false;
             showError(R.string.passwords_do_not_match);
-        } else if (inputFile.equals(outputFile)) {
+        } else if (inputFileParentDirectory.equals(outputFileParentDirectory)) {
             valid = false;
             showError(R.string.the_input_and_output_files_must_be_different);
         } else if (CryptoThread.operationInProgress) {
@@ -507,14 +514,16 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         }
         outState.putBoolean(SAVED_INSTANCE_STATE_SHOW_PASSWORD, showPassword);
         outState.putBoolean(SAVED_INSTANCE_STATE_OPERATION_MODE, operationMode);
-        if (inputFile != null) {
-            outState.putString(SAVED_INSTANCE_STATE_INPUT_FILE, inputFile.getAbsolutePath());
+        if (inputFileParentDirectory != null) {
+            outState.putString(SAVED_INSTANCE_STATE_INPUT_PARENT_URI, inputFileParentDirectory.getUri().toString());
+            outState.putString(SAVED_INSTANCE_STATE_INPUT_FILENAME, inputFileName);
         }
-        if (outputFile != null) {
-            outState.putString(SAVED_INSTANCE_STATE_OUTPUT_FILE, outputFile.getAbsolutePath());
+        if (outputFileParentDirectory != null) {
+            outState.putString(SAVED_INSTANCE_STATE_OUTPUT_PARENT_URI, outputFileParentDirectory.getUri().toString());
+            outState.putString(SAVED_INSTANCE_STATE_OUTPUT_FILENAME, outputFileName);
         }
 
-        /**
+        /*
          * may not be able to get password from view if screen was rotated while viewing another fragment.
          */
         if (passwordEditText != null) {
@@ -536,14 +545,16 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         } else {
             enableDecryptionMode();
         }
-        String inputFileString = savedInstanceState.getString(SAVED_INSTANCE_STATE_INPUT_FILE, null);
-        String outputFileString = savedInstanceState.getString(SAVED_INSTANCE_STATE_OUTPUT_FILE, null);
-        if (inputFileString != null) {
-            setFile(new File(inputFileString), false);
+        String inputFileParentUriString = savedInstanceState.getString(SAVED_INSTANCE_STATE_INPUT_PARENT_URI, null);
+        String outputFileParentUriString = savedInstanceState.getString(SAVED_INSTANCE_STATE_OUTPUT_PARENT_URI, null);
+        if (inputFileParentUriString != null) {
+            String filename = savedInstanceState.getString(SAVED_INSTANCE_STATE_INPUT_FILENAME, null);
+            setFile(DocumentFile.fromSingleUri(getContext(), Uri.parse(inputFileParentUriString)), filename, false);
         }
         updateFileUI(false);
-        if (outputFileString != null) {
-            setFile(new File(outputFileString), true);
+        if (outputFileParentUriString != null) {
+            String filename = savedInstanceState.getString(SAVED_INSTANCE_STATE_OUTPUT_FILENAME, null);
+            setFile(DocumentFile.fromSingleUri(getContext(), Uri.parse(outputFileParentUriString)), filename, true);
         }
         updateFileUI(true);
         String password = getAndClearPassword();
