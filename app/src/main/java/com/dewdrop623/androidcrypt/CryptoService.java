@@ -41,7 +41,7 @@ public class CryptoService extends Service implements CryptoThread.ProgressDispl
     @Override
     public void onCreate() {
         super.onCreate();
-        startForeground(START_FOREGROUND_ID, buildProgressNotification(CryptoThread.OPERATION_TYPE_ENCRYPTION, -1, R.string.app_name));
+        startForeground(START_FOREGROUND_ID, buildProgressNotification(CryptoThread.OPERATION_TYPE_ENCRYPTION, -1, R.string.app_name, -1, -1));
     }
 
     @Override
@@ -110,7 +110,7 @@ public class CryptoService extends Service implements CryptoThread.ProgressDispl
     * Create the notification that is displayed while the operation is ongoing.
     * if progress < 0: displayed without progress bar
      */
-    private Notification buildProgressNotification(boolean operationType, int progress, int completedMessageStringId) {
+    private Notification buildProgressNotification(boolean operationType, int progress, int completedMessageStringId, int minutesToCompletion, int secondsToCompletion) {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel();
@@ -128,7 +128,14 @@ public class CryptoService extends Service implements CryptoThread.ProgressDispl
             builder.setContentTitle(getString(R.string.app_name));
             builder.setContentText(getString(R.string.operation_in_progress));
         } else if (progress < 100) {
-            builder.setContentTitle(operationType == CryptoThread.OPERATION_TYPE_ENCRYPTION ? getString(R.string.encrypting) : getString(R.string.decrypting));
+            String title = operationType == CryptoThread.OPERATION_TYPE_ENCRYPTION ? getString(R.string.encrypting) : getString(R.string.decrypting);
+            if (minutesToCompletion != -1) {
+                title = title.concat(" "+minutesToCompletion+"m");
+            }
+            if (secondsToCompletion != -1) {
+                title = title.concat(" "+secondsToCompletion+"s");
+            }
+            builder.setContentTitle(title);
             builder.setProgress(100, progress, false);
         } else {
             builder.setContentTitle(getString(R.string.app_name));
@@ -149,8 +156,8 @@ public class CryptoService extends Service implements CryptoThread.ProgressDispl
     //Implementation of CryptoThread.ProgressDisplayers interface. Called by CryptoThread to update the progress.
     //progress is out of 100.
     @Override
-    public void update(boolean operationType, int progress, int completedMessageStringId) {
+    public void update(boolean operationType, int progress, int completedMessageStringId, int minutesToCompletion, int secondsToCompletion) {
         NotificationManagerCompat notificationManager = (NotificationManagerCompat) NotificationManagerCompat.from(this);
-        notificationManager.notify(START_FOREGROUND_ID, buildProgressNotification(operationType, progress, completedMessageStringId));
+        notificationManager.notify(START_FOREGROUND_ID, buildProgressNotification(operationType, progress, completedMessageStringId, minutesToCompletion, secondsToCompletion));
     }
 }

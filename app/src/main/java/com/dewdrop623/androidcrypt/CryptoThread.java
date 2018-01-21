@@ -34,11 +34,12 @@ public class CryptoThread extends Thread {
 
     public interface ProgressDisplayer {
         //[minutes|seconds]ToCompletion=-1 => unknown
-        void update(boolean operationType, int progress, int completedMessageStringId);
+        void update(boolean operationType, int progress, int completedMessageStringId, int minutesToCompletion, int secondsToCompletion);
     }
 
-    private static final long updateIntervalInBytes = 40096;
+    private static final long updateIntervalInBytes = 550000;
 
+    private static long timeOperationStarted = 0;
     private static long lastUpdateAtByteNumber = 0;
     private static long totalBytesRead = 0;
     private static long fileSize = 0;
@@ -72,6 +73,7 @@ public class CryptoThread extends Thread {
         operationInProgress = true;
         lastUpdateAtByteNumber = 0;
         totalBytesRead = 0;
+        timeOperationStarted = System.currentTimeMillis();
 
         if (operationType == OPERATION_TYPE_ENCRYPTION) {
             completedMessageStringId = R.string.encryption_completed;
@@ -80,7 +82,8 @@ public class CryptoThread extends Thread {
         }
 
         //Send out an initial update for 0 progress.
-        updateProgressDisplayers(0, 1);
+        int [] timeToCompletion = {-1,-1};
+        updateProgressDisplayers(0, 1, timeToCompletion);
         InputStream inputStream = null;
         OutputStream outputStream = null;
         //get the input stream
@@ -150,7 +153,8 @@ public class CryptoThread extends Thread {
         }
 
         //Send out one last progress update. It is important that ProgressDisplayers get the final update at 100%. Even if the operation was canceled.
-        updateProgressDisplayers(fileSize, fileSize);
+        timeToCompletion[0]=0; timeToCompletion[1]=0;
+        updateProgressDisplayers(fileSize, fileSize, timeToCompletion);
 
         /*
         if operation didn't encounter errors (successful == true), didn't get canceled
@@ -168,24 +172,40 @@ public class CryptoThread extends Thread {
     public static void updateProgressOnInterval(long bytesRead) {
         totalBytesRead += bytesRead;
         if (totalBytesRead - lastUpdateAtByteNumber > updateIntervalInBytes) {
+            int [] timeToCompletion = getTimeToCompletion();
             lastUpdateAtByteNumber = totalBytesRead;
-            updateProgressDisplayers(totalBytesRead, fileSize);
+            updateProgressDisplayers(totalBytesRead, fileSize, timeToCompletion);
         }
     }
 
     //for each progress displayer: if not null: update, else remove it from progressDisplayers because it is null.
-    private static void updateProgressDisplayers(long workDone, long totalWork) {
+    private static void updateProgressDisplayers(long workDone, long totalWork, int [] timeToCompletion) {
         int progress = 100;
         if (totalWork != 0) {
             progress = (int) ((workDone * 100) / totalWork);
         }
         for (HashMap.Entry<String, ProgressDisplayer> progressDisplayer : progressDiplayers.entrySet()) {
             if (progressDisplayer.getValue() != null) {
-                progressDisplayer.getValue().update(operationType, progress, completedMessageStringId);
+                progressDisplayer.getValue().update(operationType, progress, completedMessageStringId, timeToCompletion[0], timeToCompletion[1]);
             } else {
                 progressDiplayers.remove(progressDisplayer.getKey());
             }
         }
+    }
+
+    /**
+     * Calculate time until operation finishes using the file size, bytes since last update, and time since last update.
+     * return int array [minutes, seconds]
+     */
+    private static int[] getTimeToCompletion() {
+        int[] timeToCompletion = {0, 0};
+        long bytesPerMillisecond = totalBytesRead/(System.currentTimeMillis()-timeOperationStarted);
+        long bytesPerSecond = bytesPerMillisecond*1000;
+        if (bytesPerSecond != 0) {
+            int secondsToCompletion = (int) ((fileSize - totalBytesRead) / bytesPerSecond);
+            timeToCompletion[0] = secondsToCompletion / 60; timeToCompletion[1] = secondsToCompletion % 60;
+        }
+        return timeToCompletion;
     }
 
     private boolean deleteInputFile() {

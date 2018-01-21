@@ -141,7 +141,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
 
         //Check if there is an operation in progress. If there is, get an update show the progress bar and cancel button immediately, rather than waiting for CryptoThread to push an update.
         if (CryptoThread.operationInProgress) {
-            update(CryptoThread.getCurrentOperationType(), CryptoThread.getProgressUpdate(), CryptoThread.getCompletedMessageStringId());
+            update(CryptoThread.getCurrentOperationType(), CryptoThread.getProgressUpdate(), CryptoThread.getCompletedMessageStringId(), -1, -1);
         }
 
         return view;
@@ -202,7 +202,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
     * Has to be done on the gui thread.
      */
     @Override
-    public void update(final boolean operationType, final int progress, final int completedMessageStringId) {
+    public void update(final boolean operationType, final int progress, final int completedMessageStringId, final int minutesToCompletion, final int secondsToCompletion) {
         final Context context = getContext();
         if (context != null) {
             new Handler(context.getMainLooper()).post(new Runnable() {
@@ -210,11 +210,14 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
                 public void run() {
                     progressDisplayLinearLayout.setVisibility(progress == 100 ? View.INVISIBLE : View.VISIBLE);
                     progressDisplayProgressBar.setProgress(progress);
-                    if (operationType == CryptoThread.OPERATION_TYPE_ENCRYPTION) {
-                        progressDisplayTextView.setText(R.string.encrypting);
-                    } else {
-                        progressDisplayTextView.setText(R.string.decrypting);
+                    String progressText = operationType == CryptoThread.OPERATION_TYPE_ENCRYPTION ? getString(R.string.encrypting) : getString(R.string.decrypting);
+                    if (minutesToCompletion != -1) {
+                        progressText = progressText.concat(" "+minutesToCompletion+"m");
                     }
+                    if (secondsToCompletion != -1) {
+                        progressText = progressText.concat(" "+secondsToCompletion+"s");
+                    }
+                    progressDisplayTextView.setText(progressText);
                 }
             });
         }
@@ -317,7 +320,6 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         View filePathUnderlineView;
         LinearLayout filePathLinearLayout;
         String filePathTextPrefix;
-        int deleteInputFileCheckboxVisiblity = deleteInputFileCheckbox.getVisibility();
         if (isOutput) {
             file = outputFile;
             filePathTextView = outputFilePathTextView;
@@ -332,11 +334,6 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
             filePathUnderlineView = inputFilePathUnderlineView;
             filePathLinearLayout = inputFilePathLinearLayout;
             filePathTextPrefix = context.getString(R.string.input_file).concat(": ");
-            if (inputFile != null) {
-                deleteInputFileCheckboxVisiblity = View.VISIBLE;
-            } else {
-                deleteInputFileCheckboxVisiblity = View.INVISIBLE;
-            }
         }
 
         String filePath = "";
@@ -358,7 +355,6 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         filePathTextView.setVisibility(filePathTextViewVisibility);
         filePathUnderlineView.setVisibility(filePathUnderlineViewVisibility);
         filePathLinearLayout.setGravity(gravity);
-        deleteInputFileCheckbox.setVisibility(deleteInputFileCheckboxVisiblity);
     }
 
     /**
