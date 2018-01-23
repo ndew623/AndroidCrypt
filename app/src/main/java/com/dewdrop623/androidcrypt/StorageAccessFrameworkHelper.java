@@ -89,12 +89,11 @@ public final class StorageAccessFrameworkHelper {
                         }
                     }
                 }
-
-                if (!foundSDCard) {
-                    throw new IOException(context.getString(R.string.file_write_access_denied));
-                } else if (fileNotFound) {
-                    throw new IOException(context.getString(R.string.file_not_found));
-                }
+            }
+            if (!foundSDCard) {
+                throw new IOException(context.getString(R.string.file_write_access_denied));
+            } else if (fileNotFound) {
+                throw new IOException(context.getString(R.string.file_not_found));
             }
         }
         return outputStream;
@@ -112,10 +111,12 @@ public final class StorageAccessFrameworkHelper {
      * If not found, return null.
      */
     public static String findLikelySDCardPathFromSDCardName(Context context, String sdCardName) {
-        String[] externalStorageDirs = getExternalStorageDirectories(context);
-        for (int i = 0; i < externalStorageDirs.length; i++) {
-            if (externalStorageDirs[i].contains(sdCardName)) {
-                return externalStorageDirs[i];
+        if (sdCardName != null) {
+            String[] externalStorageDirs = getExternalStorageDirectories(context);
+            for (int i = 0; i < externalStorageDirs.length; i++) {
+                if (externalStorageDirs[i].contains(sdCardName)) {
+                    return externalStorageDirs[i];
+                }
             }
         }
         return null;

@@ -69,7 +69,7 @@ public class SettingsFragment extends Fragment {
             if (sdCardUri != null) {
                 String sdCardName = DocumentFile.fromTreeUri(getContext(), Uri.parse(sdCardUri)).getName();
                 String sdCardPath = StorageAccessFrameworkHelper.findLikelySDCardPathFromSDCardName(getContext(), sdCardName);
-                if (sdCardPath != null) {
+                if (sdCardPath != null && sdCardName != null) {
                     sdCardTextView.setText(sdCardPath);
                 } else {
                     sdCardTextView.setText(sdCardName);
