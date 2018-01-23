@@ -20,6 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.dewdrop623.androidcrypt.GlobalDocumentFileStateHolder;
 import com.dewdrop623.androidcrypt.MainActivity;
 import com.dewdrop623.androidcrypt.R;
 import com.dewdrop623.androidcrypt.SettingsHelper;
@@ -43,18 +44,13 @@ public abstract class FilePicker extends Fragment {
      * Keys for arguments bundle
      */
     public static final String IS_OUTPUT_KEY = "com.dewdrop623.androidcrypt.FilePicker.FilePicker.IS_OUTPUT_KEY";
-    public static final String INITIAL_FOLDER_URI_KEY = "com.dewdrop623.androidcrypt.FilePicker.FilePicker.INITIAL_FOLDER_URI_KEY";
     public static final String DEFAULT_OUTPUT_FILENAME_KEY = "com.dewdrop623.androidcrypt.FilePicker.FilePicker.DEFAULT_OUTPUT_FILENAME_KEY";
 
     ////////////////////////////////
     //MEMBER VARIABLES
     ///////////////////////////////
 
-    //keys to remember state on rotation
-    private static final String CURRENT_DIRECTORY_KEY = "com.dewdrop623.androidcrypt.FilePicker.FilePicker.CURRENT_DIRECTORY_KEY";
-
     //for storing the current state
-    private Bundle savedInstanceState = null;
     private boolean isOutput;
 
     //the TextView that shows the current directory under the actionbar
@@ -141,17 +137,15 @@ public abstract class FilePicker extends Fragment {
         fileBrowser = new FileBrowser(getContext());
         fileBrowser.setFilePicker(this);
         isOutput = getArguments().getBoolean(FilePicker.IS_OUTPUT_KEY, false);
-        this.savedInstanceState = savedInstanceState;
-        if (savedInstanceState != null) {
-            fileBrowser.setCurrentDirectory(DocumentFile.fromTreeUri(getContext(),
-                    Uri.parse(savedInstanceState.getString(CURRENT_DIRECTORY_KEY, fileBrowser.getCurrentDirectoryUriString()))));
+        if (!GlobalDocumentFileStateHolder.savedCurrentDirectoryForRotateIsNull()) {
+            fileBrowser.setCurrentDirectory(GlobalDocumentFileStateHolder.getAndClearSavedCurrentDirectoryForRotate());
         }
     }
 
     //save the current state for a screen rotation
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putString(CURRENT_DIRECTORY_KEY, fileBrowser.getCurrentDirectoryUriString());
+        GlobalDocumentFileStateHolder.setSavedCurrentDirectoryForRotate(fileBrowser.getCurrentDirectory());
         super.onSaveInstanceState(outState);
     }
 
@@ -246,10 +240,9 @@ public abstract class FilePicker extends Fragment {
             fileNameOkButton.setOnClickListener(fileNameOkButtonOnClickListener);
         }
 
-        String initialFolderUri = getArguments().getString(INITIAL_FOLDER_URI_KEY, null);
         String defaultOutputFilename = getArguments().getString(DEFAULT_OUTPUT_FILENAME_KEY, null);
-        if (initialFolderUri != null) {
-            changeDirectory(DocumentFile.fromTreeUri(getContext(), Uri.parse(initialFolderUri)));
+        if (!GlobalDocumentFileStateHolder.initialFilePickerDirectoryIsNull()) {
+            changeDirectory(GlobalDocumentFileStateHolder.getAndClearInitialFilePickerDirectory());
         }
         if (defaultOutputFilename != null) {
             fileNameEditText.setText(defaultOutputFilename);

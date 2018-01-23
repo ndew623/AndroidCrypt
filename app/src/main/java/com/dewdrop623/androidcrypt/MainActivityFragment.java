@@ -268,10 +268,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
      */
     public void selectInputFile() {
         String initialFolder = null;
-        if (inputFileParentDirectory != null) {
-            initialFolder = inputFileParentDirectory.getUri().toString();
-        }
-        ((MainActivity) getActivity()).pickFile(false, initialFolder, null);
+        ((MainActivity) getActivity()).pickFile(false, inputFileParentDirectory, null);
     }
 
     /**
@@ -280,11 +277,9 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
      * else if an input file has already been selected open that directory.
      */
     public void selectOutputFile() {
-        String initialFolder = null;
-        if (outputFileParentDirectory != null) {
-            initialFolder = outputFileParentDirectory.getUri().toString();
-        } else if (inputFileParentDirectory != null) {
-            initialFolder = inputFileParentDirectory.getUri().toString();
+        DocumentFile initialFolder = outputFileParentDirectory;
+        if (initialFolder == null) {
+            initialFolder = inputFileParentDirectory;
         }
         ((MainActivity) getActivity()).pickFile(true, initialFolder, getDefaultOutputFileName());
     }

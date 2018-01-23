@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
      * initialFolder - the file picker opens with this directory
      * defaultOutputFilename - if isOutput this will be filled in the output name field, otherwise it can be null
      */
-    public void pickFile(boolean isOutput, String initialFolder, String defaultOutputFilename) {
+    public void pickFile(boolean isOutput, DocumentFile initialFolder, String defaultOutputFilename) {
         FilePicker filePicker = null;
         int filePickerType = SettingsHelper.getFilePickerType(this);
         if (filePickerType == SettingsHelper.FILE_ICON_VIEWER) {
@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
         String title = isOutput?getString(R.string.choose_output_file):getString(R.string.choose_input_file);
         Bundle args = new Bundle();
         args.putBoolean(FilePicker.IS_OUTPUT_KEY, isOutput);
-        args.putString(FilePicker.INITIAL_FOLDER_URI_KEY, initialFolder);
+        GlobalDocumentFileStateHolder.setInitialFilePickerDirectory(initialFolder);
         args.putString(FilePicker.DEFAULT_OUTPUT_FILENAME_KEY, defaultOutputFilename);
         filePicker.setArguments(args);
         displaySecondaryFragmentScreen(filePicker, title, FILEPICKERFRAGMENT_TAG);
