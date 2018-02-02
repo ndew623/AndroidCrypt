@@ -237,9 +237,17 @@ public final class StorageAccessFrameworkHelper {
         return pathNameBuilder.toString();
     }
     public static InputStream getFileInputStream(Context context, String inputFileName) throws FileNotFoundException{
-        return context.getContentResolver().openInputStream(GlobalDocumentFileStateHolder.getInputFileParentDirectory().findFile(inputFileName).getUri());
+        DocumentFile inputFile = GlobalDocumentFileStateHolder.getInputFileParentDirectory().findFile(inputFileName);
+        if (inputFile == null) {
+            throw new FileNotFoundException();
+        }
+        return context.getContentResolver().openInputStream(inputFile.getUri());
     }
     public static OutputStream getFileOutputStream(Context context, String outputFilename) throws FileNotFoundException{
-        return context.getContentResolver().openOutputStream(GlobalDocumentFileStateHolder.getOutputFileParentDirectory().createFile("", outputFilename).getUri());
+        DocumentFile outputFile = GlobalDocumentFileStateHolder.getOutputFileParentDirectory().createFile("", outputFilename);
+        if (outputFile == null) {
+            throw new FileNotFoundException();
+        }
+        return context.getContentResolver().openOutputStream(outputFile.getUri());
     }
 }
