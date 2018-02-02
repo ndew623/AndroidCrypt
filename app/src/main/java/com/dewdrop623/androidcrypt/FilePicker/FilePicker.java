@@ -75,7 +75,15 @@ public abstract class FilePicker extends Fragment {
     private Comparator<DocumentFile> documentFileAlphabeticalComparator = new Comparator<DocumentFile>() {
         @Override
         public int compare(DocumentFile file1, DocumentFile file2) {
-            return file1.getName().toLowerCase().compareTo(file2.getName().toLowerCase());
+            int result;
+            if (file1.equals(fileBrowser.getCurrentDirectory().getParentFile())) {
+                result = -1;
+            } else if (file2.equals(fileBrowser.getCurrentDirectory().getParentFile())) {
+                result = 1;
+            } else {
+                result = file1.getName().toLowerCase().compareTo(file2.getName().toLowerCase());
+            }
+            return result;
         }
     };
 
@@ -207,12 +215,12 @@ public abstract class FilePicker extends Fragment {
     /**
      * Get the name for the document file to display in the GUI.
      * May be different than the actual directory name.
-     * e.g. "Internal Storage" instead of "0" or ".." instead of the name of the parent folder.
+     * e.g. "Internal Storage" instead of "0" or ".." (FileBrowser.PARENT_FILE_NAME) instead of the name of the parent folder.
      */
     protected String getGUINameForDocumentFile(DocumentFile documentFile) {
         String result;
         if (documentFile.equals(fileBrowser.getCurrentDirectory().getParentFile())) {
-            result = "..";
+            result = FileBrowser.PARENT_FILE_NAME;
         } else {
             result = documentFile.getName();
         }

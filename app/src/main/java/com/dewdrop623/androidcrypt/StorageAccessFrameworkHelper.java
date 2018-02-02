@@ -2,6 +2,7 @@ package com.dewdrop623.androidcrypt;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -13,6 +14,7 @@ import android.support.v4.provider.DocumentFile;
 import android.support.v7.app.AlertDialog;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -233,5 +235,11 @@ public final class StorageAccessFrameworkHelper {
         }
 
         return pathNameBuilder.toString();
+    }
+    public static InputStream getFileInputStream(Context context, String inputFileName) throws FileNotFoundException{
+        return context.getContentResolver().openInputStream(GlobalDocumentFileStateHolder.getInputFileParentDirectory().findFile(inputFileName).getUri());
+    }
+    public static OutputStream getFileOutputStream(Context context, String outputFilename) throws FileNotFoundException{
+        return context.getContentResolver().openOutputStream(GlobalDocumentFileStateHolder.getOutputFileParentDirectory().createFile("", outputFilename).getUri());
     }
 }

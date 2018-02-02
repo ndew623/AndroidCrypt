@@ -45,8 +45,8 @@ public class CryptoThread extends Thread {
     private CryptoService cryptoService;
     private static boolean operationType;
 
-    private File inputFile;
-    private File outputFile;
+    private String inputFileName;
+    private String outputFileName;
     private String password;
     private int version;
     private static int completedMessageStringId = R.string.done;
@@ -54,10 +54,10 @@ public class CryptoThread extends Thread {
     /**
      * Takes a cryptoService, input and output uris, the password, a version (use VERSION_X constants), and operation type (defined by the OPERATION_TYPE_X constants)
      */
-    public CryptoThread(CryptoService cryptoService, File inputFile, File outputFile, String password, int version, boolean operationType) {
+    public CryptoThread(CryptoService cryptoService, String inputFileName, String outputFileName, String password, int version, boolean operationType) {
         this.cryptoService = cryptoService;
-        this.inputFile = inputFile;
-        this.outputFile = outputFile;
+        this.inputFileName = inputFileName;
+        this.outputFileName = outputFileName;
         this.password = password;
         this.version = version;
         this.operationType = operationType;
@@ -81,7 +81,7 @@ public class CryptoThread extends Thread {
         OutputStream outputStream = null;
         //get the input stream
         try {
-            inputStream = new FileInputStream(inputFile);
+            inputStream = StorageAccessFrameworkHelper.getFileInputStream(cryptoService, inputFileName);
         } catch (IOException ioe) {
             ioe.printStackTrace();
             cryptoService.showToastOnGuiThread(R.string.error_could_not_get_input_file);
@@ -89,7 +89,7 @@ public class CryptoThread extends Thread {
 
         //get the output stream
         try {
-            outputStream = StorageAccessFrameworkHelper.getOutputStreamWithSAF(cryptoService, outputFile);
+            outputStream = StorageAccessFrameworkHelper.getFileOutputStream(cryptoService, outputFileName);
         } catch (IOException ioe) {
             ioe.printStackTrace();
             cryptoService.showToastOnGuiThread(ioe.getMessage());
@@ -98,7 +98,7 @@ public class CryptoThread extends Thread {
         if (inputStream != null && outputStream != null) {
             //call AESCrypt
             try {
-                fileSize = inputFile.length();
+                fileSize = inputStream.available();
                 AESCrypt aesCrypt = new AESCrypt(password);
                 if (operationType == OPERATION_TYPE_ENCRYPTION) {
                     //Encrypt

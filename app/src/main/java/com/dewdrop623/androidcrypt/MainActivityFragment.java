@@ -34,7 +34,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.File;
 import java.util.Arrays;
 
 /**
@@ -349,8 +348,10 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         if (isValidElsePrintErrors()) {
             //Can't use getContext() or getActivity(). See comment on this.onAttach(Context)
             Intent intent = new Intent(context, CryptoService.class);
-            intent.putExtra(CryptoService.INPUT_FILE_PATH_EXTRA_KEY, inputFileParentDirectory.getUri().toString());
-            intent.putExtra(CryptoService.OUTPUT_FILE_PATH_EXTRA_KEY, outputFileParentDirectory.getUri().toString());
+            intent.putExtra(CryptoService.INPUT_FILE_NAME_EXTRA_KEY, inputFileName);
+            intent.putExtra(CryptoService.OUTPUT_FILE_NAME_EXTRA_KEY, outputFileName);
+            GlobalDocumentFileStateHolder.setInputFileParentDirectory(inputFileParentDirectory);
+            GlobalDocumentFileStateHolder.setOutputFileParentDirectory(outputFileParentDirectory);
             intent.putExtra(CryptoService.INPUT_FILENAME_KEY, inputFileName);
             intent.putExtra(CryptoService.OUTPUT_FILENAME_KEY, outputFileName);
             intent.putExtra(CryptoService.VERSION_EXTRA_KEY, SettingsHelper.getAESCryptVersion(getContext()));
@@ -439,8 +440,8 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
     * if in decryption mode and input filename does not end with '.aes', return empty string*/
     private String getDefaultOutputFileName() {
         String result = null;
-        if (inputFileParentDirectory != null) {
-            String fileName = inputFileParentDirectory.getName();
+        if (inputFileName != null) {
+            String fileName = inputFileName;
             if (operationMode == CryptoThread.OPERATION_TYPE_ENCRYPTION) {
                 result = fileName.concat(".aes");
             } else if (operationMode == CryptoThread.OPERATION_TYPE_DECRYPTION) {
@@ -460,16 +461,16 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
      */
     private boolean isValidElsePrintErrors() {
         boolean valid = true;
-        if (inputFileParentDirectory == null) {
+        if (inputFileParentDirectory == null || inputFileName == null) {
             valid = false;
             showError(R.string.no_input_file_selected);
-        } else if (outputFileParentDirectory == null) {
+        } else if (outputFileParentDirectory == null || outputFileName == null) {
             valid = false;
             showError(R.string.no_output_file_selected);
         } else if (operationMode == CryptoThread.OPERATION_TYPE_ENCRYPTION && !passwordEditText.getText().toString().equals(confirmPasswordEditText.getText().toString())) {
             valid = false;
             showError(R.string.passwords_do_not_match);
-        } else if (inputFileParentDirectory.equals(outputFileParentDirectory)) {
+        } else if (inputFileParentDirectory.equals(outputFileParentDirectory) && inputFileName.equals(outputFileName)) {
             valid = false;
             showError(R.string.the_input_and_output_files_must_be_different);
         } else if (CryptoThread.operationInProgress) {

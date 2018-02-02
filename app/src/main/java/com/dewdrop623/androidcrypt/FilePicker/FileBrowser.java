@@ -23,6 +23,7 @@ public class FileBrowser {
     private FilePicker filePicker;
 
     public static final DocumentFile internalStorageHome = DocumentFile.fromFile(Environment.getExternalStorageDirectory());
+    public static final String PARENT_FILE_NAME = "..";
 
     public FileBrowser(Context context) {
         currentDirectory = internalStorageHome;

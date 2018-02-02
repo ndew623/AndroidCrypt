@@ -27,8 +27,8 @@ public class CryptoService extends Service implements CryptoThread.ProgressDispl
     public static final int START_FOREGROUND_ID = 1025;
 
     //Keys for the intent extras
-    public static final String INPUT_FILE_PATH_EXTRA_KEY = "com.dewdrop623.androidcrypt.CryptoService.INPUT_URI_KEY";
-    public static final String OUTPUT_FILE_PATH_EXTRA_KEY = "com.dewdrop623.androidcrypt.CryptoService.OUTPUT_FILE_PATH_EXTRA_KEY";
+    public static final String INPUT_FILE_NAME_EXTRA_KEY = "com.dewdrop623.androidcrypt.CryptoService.INPUT_URI_KEY";
+    public static final String OUTPUT_FILE_NAME_EXTRA_KEY = "com.dewdrop623.androidcrypt.CryptoService.OUTPUT_FILE_NAME_EXTRA_KEY";
     public static final String INPUT_FILENAME_KEY = "com.dewdrop623.androidcrypt.CryptoService.INPUT_FILENAME_KEY";
     public static final String OUTPUT_FILENAME_KEY = "com.dewdrop623.androidcrypt.CryptoService.OUTPUT_FILENAME_KEY";
     public static final String VERSION_EXTRA_KEY = "com.dewdrop623.androidcrypt.CryptoService.VERSION_EXTRA_KEY";
@@ -59,8 +59,8 @@ public class CryptoService extends Service implements CryptoThread.ProgressDispl
             stopForeground(true);
             return START_NOT_STICKY;
         }
-        File inputFile = new File(intent.getStringExtra(INPUT_FILE_PATH_EXTRA_KEY));
-        File outputFile = new File(intent.getStringExtra(OUTPUT_FILE_PATH_EXTRA_KEY));
+        String inputFileName = intent.getStringExtra(INPUT_FILE_NAME_EXTRA_KEY);
+        String outputFileName = intent.getStringExtra(OUTPUT_FILE_NAME_EXTRA_KEY);
         int version = intent.getIntExtra(VERSION_EXTRA_KEY, SettingsHelper.AESCRYPT_DEFAULT_VERSION);
         String password = MainActivityFragment.getAndClearPassword();
         boolean operationType = intent.getBooleanExtra(OPERATION_TYPE_EXTRA_KEY, CryptoThread.OPERATION_TYPE_DECRYPTION);
@@ -68,7 +68,7 @@ public class CryptoService extends Service implements CryptoThread.ProgressDispl
         CryptoThread.registerForProgressUpdate(PROGRESS_DISPLAYER_ID, this);
 
         if (password != null) {
-            CryptoThread cryptoThread = new CryptoThread(this, inputFile, outputFile, password, version, operationType);
+            CryptoThread cryptoThread = new CryptoThread(this, inputFileName, outputFileName, password, version, operationType);
             cryptoThread.start();
         } else {
             showToastOnGuiThread(R.string.error_null_password);
