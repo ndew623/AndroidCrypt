@@ -1,5 +1,7 @@
 package com.dewdrop623.androidcrypt;
 
+import android.support.v4.provider.DocumentFile;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -34,13 +36,15 @@ public class CryptoThread extends Thread {
     private static HashMap<String, ProgressDisplayer> progressDiplayers = new HashMap<>();
 
     public interface ProgressDisplayer {
-        void update(boolean operationType, int progress, int completedMessageStringId);
+        //[minutes|seconds]ToCompletion=-1 => unknown
+        void update(boolean operationType, int progress, int completedMessageStringId, int minutesToCompletion, int secondsToCompletion);
     }
 
-    private static final long updateIntervalInBytes = 4096;
+    private static final long updateIntervalInBytes = 550000;
 
+    private static long timeOperationStarted = 0;
     private static long lastUpdateAtByteNumber = 0;
-    private static long totalBytesReadForProgress = 0;
+    private static long totalBytesRead = 0;
     private static long fileSize = 0;
 
     private CryptoService cryptoService;
@@ -50,25 +54,29 @@ public class CryptoThread extends Thread {
     private String outputFileName;
     private String password;
     private int version;
+    private boolean deleteInputFile = false;
     private static int completedMessageStringId = R.string.done;
 
     /**
      * Takes a cryptoService, input and output uris, the password, a version (use VERSION_X constants), and operation type (defined by the OPERATION_TYPE_X constants)
      */
-    public CryptoThread(CryptoService cryptoService, String inputFileName, String outputFileName, String password, int version, boolean operationType) {
+    public CryptoThread(CryptoService cryptoService, String inputFileName, String outputFileName, String password, int version, boolean operationType, boolean deleteInputFile) {
         this.cryptoService = cryptoService;
         this.inputFileName = inputFileName;
         this.outputFileName = outputFileName;
         this.password = password;
         this.version = version;
+        this.deleteInputFile = deleteInputFile;
         this.operationType = operationType;
     }
 
     @Override
     public void run() {
+        boolean successful = true;
         operationInProgress = true;
         lastUpdateAtByteNumber = 0;
-        totalBytesReadForProgress = 0;
+        totalBytesRead = 0;
+        timeOperationStarted = System.currentTimeMillis();
 
         if (operationType == OPERATION_TYPE_ENCRYPTION) {
             completedMessageStringId = R.string.encryption_completed;
@@ -77,13 +85,15 @@ public class CryptoThread extends Thread {
         }
 
         //Send out an initial update for 0 progress.
-        updateProgressDisplayers(0, 1);
+        int [] timeToCompletion = {-1,-1};
+        updateProgressDisplayers(0, 1, timeToCompletion);
         InputStream inputStream = null;
         OutputStream outputStream = null;
         //get the input stream
         try {
             inputStream = StorageAccessFrameworkHelper.getFileInputStream(cryptoService, inputFileName);
         } catch (IOException ioe) {
+            successful = false;
             ioe.printStackTrace();
             cryptoService.showToastOnGuiThread(R.string.error_could_not_get_input_file);
         }
@@ -92,6 +102,7 @@ public class CryptoThread extends Thread {
         try {
             outputStream = StorageAccessFrameworkHelper.getFileOutputStream(cryptoService, outputFileName);
         } catch (IOException ioe) {
+            successful = false;
             ioe.printStackTrace();
             cryptoService.showToastOnGuiThread(ioe.getMessage());
         }
@@ -109,14 +120,18 @@ public class CryptoThread extends Thread {
                     aesCrypt.decrypt(fileSize, inputStream, outputStream);
                 }
             } catch (GeneralSecurityException gse) {
+                successful = false;
                 gse.printStackTrace();
                 cryptoService.showToastOnGuiThread(R.string.error_platform_does_not_support_the_required_cryptographic_methods);
             } catch (UnsupportedEncodingException uee) {
+                successful = false;
                 uee.printStackTrace();
                 cryptoService.showToastOnGuiThread(R.string.error_utf16_encoding_is_not_supported);
             } catch (IOException ioe) {
+                successful = false;
                 cryptoService.showToastOnGuiThread(ioe.getMessage());
             } catch (NullPointerException npe) {
+                successful = false;
                 cryptoService.showToastOnGuiThread(npe.getMessage());
             }
         }
@@ -126,6 +141,7 @@ public class CryptoThread extends Thread {
             try {
                 inputStream.close();
             } catch (IOException ioe) {
+                successful = false;
                 ioe.printStackTrace();
                 cryptoService.showToastOnGuiThread(R.string.error_could_not_close_input_file);
             }
@@ -134,38 +150,73 @@ public class CryptoThread extends Thread {
             try {
                 outputStream.close();
             } catch (IOException ioe) {
+                successful = false;
                 cryptoService.showToastOnGuiThread(R.string.error_could_not_close_output_file);
             }
         }
 
         //Send out one last progress update. It is important that ProgressDisplayers get the final update at 100%. Even if the operation was canceled.
-        updateProgressDisplayers(fileSize, fileSize);
+        timeToCompletion[0]=0; timeToCompletion[1]=0;
+        updateProgressDisplayers(fileSize, fileSize, timeToCompletion);
 
+        /*
+        if operation didn't encounter errors (successful == true), didn't get canceled
+        (operationInProgress is still true), and user asked (deleteInputFile == true):
+        delete the input file
+         */
+        if (successful && deleteInputFile && operationInProgress) {
+            deleteInputFile();
+        }
         //stop the service
         cryptoService.stopForeground(false);
         operationInProgress = false;
     }
 
     public static void updateProgressOnInterval(long bytesRead) {
-        totalBytesReadForProgress += bytesRead;
-        if (totalBytesReadForProgress - lastUpdateAtByteNumber > updateIntervalInBytes) {
-            lastUpdateAtByteNumber = totalBytesReadForProgress;
-            updateProgressDisplayers(totalBytesReadForProgress, fileSize);
+        totalBytesRead += bytesRead;
+        if (totalBytesRead - lastUpdateAtByteNumber > updateIntervalInBytes) {
+            int [] timeToCompletion = getTimeToCompletion();
+            lastUpdateAtByteNumber = totalBytesRead;
+            updateProgressDisplayers(totalBytesRead, fileSize, timeToCompletion);
         }
     }
 
     //for each progress displayer: if not null: update, else remove it from progressDisplayers because it is null.
-    private static void updateProgressDisplayers(long workDone, long totalWork) {
+    private static void updateProgressDisplayers(long workDone, long totalWork, int [] timeToCompletion) {
         int progress = 100;
         if (totalWork != 0) {
             progress = (int) ((workDone * 100) / totalWork);
         }
         for (HashMap.Entry<String, ProgressDisplayer> progressDisplayer : progressDiplayers.entrySet()) {
             if (progressDisplayer.getValue() != null) {
-                progressDisplayer.getValue().update(operationType, progress, completedMessageStringId);
+                progressDisplayer.getValue().update(operationType, progress, completedMessageStringId, timeToCompletion[0], timeToCompletion[1]);
             } else {
                 progressDiplayers.remove(progressDisplayer.getKey());
             }
+        }
+    }
+
+    /**
+     * Calculate time until operation finishes using the file size, bytes since last update, and time since last update.
+     * return int array [minutes, seconds]
+     */
+    private static int[] getTimeToCompletion() {
+        int[] timeToCompletion = {0, 0};
+        long bytesPerMillisecond = totalBytesRead/(System.currentTimeMillis()-timeOperationStarted);
+        long bytesPerSecond = bytesPerMillisecond*1000;
+        if (bytesPerSecond != 0) {
+            int secondsToCompletion = (int) ((fileSize - totalBytesRead) / bytesPerSecond);
+            timeToCompletion[0] = secondsToCompletion / 60; timeToCompletion[1] = secondsToCompletion % 60;
+        }
+        return timeToCompletion;
+    }
+
+    private boolean deleteInputFile() {
+        DocumentFile inputFile = GlobalDocumentFileStateHolder.getInputFileParentDirectory().findFile(inputFileName);
+        if (inputFile != null) {
+            return inputFile.delete();
+        } else {
+            return false;
         }
     }
 
@@ -190,7 +241,7 @@ public class CryptoThread extends Thread {
         if (fileSize == 0) {
             progress = 100;
         } else if (operationInProgress) {
-            progress = (int) ((totalBytesReadForProgress * 100) / fileSize);
+            progress = (int) ((totalBytesRead * 100) / fileSize);
         }
         return progress;
     }

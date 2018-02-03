@@ -63,11 +63,15 @@
                     style="@style/FilePathTextView" />
             </HorizontalScrollView>
         </LinearLayout>
-
         <View
             android:id="@+id/inputFilePathUnderlineView"
-            style="@style/FilePathUnderlineView"
-            android:layout_marginBottom="28dp" />
+            style="@style/FilePathUnderlineView"/>
+        <CheckBox
+            android:id="@+id/deleteInputFileCheckbox"
+            android:text="@string/delete_input_file"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"/>
 
         <LinearLayout
             android:id="@+id/outputFilePathLinearLayout"

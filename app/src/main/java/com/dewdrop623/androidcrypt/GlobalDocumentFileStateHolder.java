@@ -8,10 +8,38 @@ import android.support.v4.provider.DocumentFile;
  */
 
 public class GlobalDocumentFileStateHolder {
+    //used by MainActivityFragment
+    private static DocumentFile savedInputParentDirectoryForRotate = null;
+    private static DocumentFile savedOutputParentDirectoryForRotate = null;
+
+    //used by FilePicker
     private static DocumentFile savedCurrentDirectoryForRotate = null;
     private static DocumentFile initialFilePickerDirectory = null;
+
+    //used to get rw access to files for encryption
     private static DocumentFile inputFileParentDirectory = null;
     private static DocumentFile outputFileParentDirectory = null;
+
+
+    public static DocumentFile getAndClearSavedInputParentDirectoryForRotate() {
+        DocumentFile savedInputDirectoryForRotate = GlobalDocumentFileStateHolder.savedInputParentDirectoryForRotate;
+        GlobalDocumentFileStateHolder.savedInputParentDirectoryForRotate = null;
+        return savedInputDirectoryForRotate;
+    }
+
+    public static void setSavedInputParentDirectoryForRotate(DocumentFile savedInputParentDirectoryForRotate) {
+        GlobalDocumentFileStateHolder.savedInputParentDirectoryForRotate = savedInputParentDirectoryForRotate;
+    }
+
+    public static DocumentFile getAndClearSavedOutputParentDirectoryForRotate() {
+        DocumentFile savedOutputDirectoryForRotate = GlobalDocumentFileStateHolder.savedOutputParentDirectoryForRotate;
+        GlobalDocumentFileStateHolder.savedOutputParentDirectoryForRotate = null;
+        return savedOutputDirectoryForRotate;
+    }
+
+    public static void setSavedOutputParentDirectoryForRotate(DocumentFile savedOutputParentDirectoryForRotate) {
+        GlobalDocumentFileStateHolder.savedOutputParentDirectoryForRotate = savedOutputParentDirectoryForRotate;
+    }
 
     public static DocumentFile getInputFileParentDirectory() {
         return inputFileParentDirectory;

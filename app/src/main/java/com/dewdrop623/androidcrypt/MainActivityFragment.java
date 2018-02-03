@@ -58,10 +58,9 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
 
     private static final String SAVED_INSTANCE_STATE_SHOW_PASSWORD = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_SHOW_PASSWORD";
     private static final String SAVED_INSTANCE_STATE_OPERATION_MODE = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_OPERATION_MODE";
-    private static final String SAVED_INSTANCE_STATE_INPUT_PARENT_URI = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_INPUT_PARENT_URI";
-    private static final String SAVED_INSTANCE_STATE_OUTPUT_PARENT_URI = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_OUTPUT_PARENT_URI";
     private static final String SAVED_INSTANCE_STATE_INPUT_FILENAME = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_INPUT_FILENAME";
     private static final String SAVED_INSTANCE_STATE_OUTPUT_FILENAME = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_OUTPUT_FILENAME";
+    private static final String SAVED_INSTANCE_STATE_DELETE_INPUT_FILE = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_DELETE_INPUT_FILE";
 
     //stores the type of operation to be done
     private boolean operationMode = CryptoThread.OPERATION_TYPE_ENCRYPTION;
@@ -70,6 +69,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
     String inputFileName;
     private DocumentFile outputFileParentDirectory = null;
     String outputFileName;
+    private boolean deleteInputFile = false;
     //see comment on this.onAttach(Context)
     private Context context;
 
@@ -82,6 +82,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
     private TextView outputFilePathTextView;
     private View outputFilePathUnderlineView;
     private FileSelectButton inputFileSelectButton;
+    private CheckBox deleteInputFileCheckbox;
     private FileSelectButton outputFileSelectButton;
     private EditText passwordEditText;
     private EditText confirmPasswordEditText;
@@ -114,6 +115,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         outputFilePathTextView = (TextView) view.findViewById(R.id.outputFilePathTextView);
         outputFilePathUnderlineView = view.findViewById(R.id.outputFilePathUnderlineView);
         inputFileSelectButton = (FileSelectButton) view.findViewById(R.id.selectInputFileButton);
+        deleteInputFileCheckbox = (CheckBox) view.findViewById(R.id.deleteInputFileCheckbox);
         outputFileSelectButton = (FileSelectButton) view.findViewById(R.id.selectOutputFileButton);
         passwordEditText = (EditText) view.findViewById(R.id.passwordEditText);
         confirmPasswordEditText = (EditText) view.findViewById(R.id.confirmPasswordEditText);
@@ -129,6 +131,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         encryptModeButton.setOnClickListener(operationModeButtonsOnClickListener);
         decryptModeButton.setOnClickListener(operationModeButtonsOnClickListener);
         progressDispayCancelButton.setOnClickListener(progressDispayCancelButtonOnClickListener);
+        deleteInputFileCheckbox.setOnCheckedChangeListener(deleteInputFileCheckboxOnCheckedChangedListener);
 
         checkPermissions();
 
@@ -141,7 +144,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
 
         //Check if there is an operation in progress. If there is, get an update show the progress bar and cancel button immediately, rather than waiting for CryptoThread to push an update.
         if (CryptoThread.operationInProgress) {
-            update(CryptoThread.getCurrentOperationType(), CryptoThread.getProgressUpdate(), CryptoThread.getCompletedMessageStringId());
+            update(CryptoThread.getCurrentOperationType(), CryptoThread.getProgressUpdate(), CryptoThread.getCompletedMessageStringId(), -1, -1);
         }
 
         return view;
@@ -202,7 +205,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
     * Has to be done on the gui thread.
      */
     @Override
-    public void update(final boolean operationType, final int progress, final int completedMessageStringId) {
+    public void update(final boolean operationType, final int progress, final int completedMessageStringId, final int minutesToCompletion, final int secondsToCompletion) {
         final Context context = getContext();
         if (context != null) {
             new Handler(context.getMainLooper()).post(new Runnable() {
@@ -210,11 +213,14 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
                 public void run() {
                     progressDisplayLinearLayout.setVisibility(progress == 100 ? View.INVISIBLE : View.VISIBLE);
                     progressDisplayProgressBar.setProgress(progress);
-                    if (operationType == CryptoThread.OPERATION_TYPE_ENCRYPTION) {
-                        progressDisplayTextView.setText(R.string.encrypting);
-                    } else {
-                        progressDisplayTextView.setText(R.string.decrypting);
+                    String progressText = operationType == CryptoThread.OPERATION_TYPE_ENCRYPTION ? getString(R.string.encrypting) : getString(R.string.decrypting);
+                    if (minutesToCompletion != -1) {
+                        progressText = progressText.concat(" " + minutesToCompletion + "m");
                     }
+                    if (secondsToCompletion != -1) {
+                        progressText = progressText.concat(" " + secondsToCompletion + "s");
+                    }
+                    progressDisplayTextView.setText(progressText);
                 }
             });
         }
@@ -258,6 +264,13 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         @Override
         public void onClick(View view) {
             CryptoThread.cancel();
+        }
+    };
+
+    private CompoundButton.OnCheckedChangeListener deleteInputFileCheckboxOnCheckedChangedListener = new CompoundButton.OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+            deleteInputFile = b;
         }
     };
 
@@ -356,6 +369,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
             intent.putExtra(CryptoService.OUTPUT_FILENAME_KEY, outputFileName);
             intent.putExtra(CryptoService.VERSION_EXTRA_KEY, SettingsHelper.getAESCryptVersion(getContext()));
             intent.putExtra(CryptoService.OPERATION_TYPE_EXTRA_KEY, operationMode);
+            intent.putExtra(CryptoService.DELETE_INPUT_FILE_KEY, deleteInputFile);
             MainActivityFragment.password = passwordEditText.getText().toString().toCharArray();
             context.startService(intent);
         }
@@ -511,11 +525,12 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         outState.putBoolean(SAVED_INSTANCE_STATE_SHOW_PASSWORD, showPassword);
         outState.putBoolean(SAVED_INSTANCE_STATE_OPERATION_MODE, operationMode);
         if (inputFileParentDirectory != null) {
-            outState.putString(SAVED_INSTANCE_STATE_INPUT_PARENT_URI, inputFileParentDirectory.getUri().toString());
+            GlobalDocumentFileStateHolder.setSavedInputParentDirectoryForRotate(inputFileParentDirectory);
             outState.putString(SAVED_INSTANCE_STATE_INPUT_FILENAME, inputFileName);
+            outState.putBoolean(SAVED_INSTANCE_STATE_DELETE_INPUT_FILE, deleteInputFile);
         }
         if (outputFileParentDirectory != null) {
-            outState.putString(SAVED_INSTANCE_STATE_OUTPUT_PARENT_URI, outputFileParentDirectory.getUri().toString());
+            GlobalDocumentFileStateHolder.setSavedOutputParentDirectoryForRotate(outputFileParentDirectory);
             outState.putString(SAVED_INSTANCE_STATE_OUTPUT_FILENAME, outputFileName);
         }
 
@@ -536,21 +551,22 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
             savedInstanceState = new Bundle();
         }
         setShowPassword(savedInstanceState.getBoolean(SAVED_INSTANCE_STATE_SHOW_PASSWORD, showPassword));
+        deleteInputFileCheckbox.setChecked(savedInstanceState.getBoolean(SAVED_INSTANCE_STATE_DELETE_INPUT_FILE, deleteInputFile));
         if (savedInstanceState.getBoolean(SAVED_INSTANCE_STATE_OPERATION_MODE, operationMode) == CryptoThread.OPERATION_TYPE_ENCRYPTION) {
             enableEncryptionMode();
         } else {
             enableDecryptionMode();
         }
-        String inputFileParentUriString = savedInstanceState.getString(SAVED_INSTANCE_STATE_INPUT_PARENT_URI, null);
-        String outputFileParentUriString = savedInstanceState.getString(SAVED_INSTANCE_STATE_OUTPUT_PARENT_URI, null);
-        if (inputFileParentUriString != null) {
+        DocumentFile inputFileParentDirectory = GlobalDocumentFileStateHolder.getAndClearSavedInputParentDirectoryForRotate();
+        DocumentFile outputFileParentDirectory = GlobalDocumentFileStateHolder.getAndClearSavedOutputParentDirectoryForRotate();
+        if (inputFileParentDirectory != null) {
             String filename = savedInstanceState.getString(SAVED_INSTANCE_STATE_INPUT_FILENAME, null);
-            setFile(DocumentFile.fromSingleUri(getContext(), Uri.parse(inputFileParentUriString)), filename, false);
+            setFile(inputFileParentDirectory, filename, false);
         }
         updateFileUI(false);
-        if (outputFileParentUriString != null) {
+        if (outputFileParentDirectory != null) {
             String filename = savedInstanceState.getString(SAVED_INSTANCE_STATE_OUTPUT_FILENAME, null);
-            setFile(DocumentFile.fromSingleUri(getContext(), Uri.parse(outputFileParentUriString)), filename, true);
+            setFile(outputFileParentDirectory, filename, true);
         }
         updateFileUI(true);
         String password = getAndClearPassword();

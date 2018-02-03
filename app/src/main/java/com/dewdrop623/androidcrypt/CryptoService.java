@@ -14,6 +14,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.io.File;
@@ -33,6 +34,7 @@ public class CryptoService extends Service implements CryptoThread.ProgressDispl
     public static final String OUTPUT_FILENAME_KEY = "com.dewdrop623.androidcrypt.CryptoService.OUTPUT_FILENAME_KEY";
     public static final String VERSION_EXTRA_KEY = "com.dewdrop623.androidcrypt.CryptoService.VERSION_EXTRA_KEY";
     public static final String OPERATION_TYPE_EXTRA_KEY = "com.dewdrop623.androidcrypt.CryptoService.OPERATION_TYPE_EXTRA_KEY";
+    public static final String DELETE_INPUT_FILE_KEY = "com.dewdrop623.androidcrypt.CryptoService.DELETE_INPUT_FILE_KEY";
 
     public static final String NOTIFICATION_CHANNEL_ID = "com.dewdrop623.androidcrypt.CryptoService.OPERATION_TYPE_EXTRA_KEY";
 
@@ -41,7 +43,7 @@ public class CryptoService extends Service implements CryptoThread.ProgressDispl
     @Override
     public void onCreate() {
         super.onCreate();
-        startForeground(START_FOREGROUND_ID, buildProgressNotification(CryptoThread.OPERATION_TYPE_ENCRYPTION, -1, R.string.app_name));
+        startForeground(START_FOREGROUND_ID, buildProgressNotification(CryptoThread.OPERATION_TYPE_ENCRYPTION, -1, R.string.app_name, -1, -1));
     }
 
     @Override
@@ -64,11 +66,12 @@ public class CryptoService extends Service implements CryptoThread.ProgressDispl
         int version = intent.getIntExtra(VERSION_EXTRA_KEY, SettingsHelper.AESCRYPT_DEFAULT_VERSION);
         String password = MainActivityFragment.getAndClearPassword();
         boolean operationType = intent.getBooleanExtra(OPERATION_TYPE_EXTRA_KEY, CryptoThread.OPERATION_TYPE_DECRYPTION);
+        boolean deleteInputFile = intent.getBooleanExtra(DELETE_INPUT_FILE_KEY, false);
 
         CryptoThread.registerForProgressUpdate(PROGRESS_DISPLAYER_ID, this);
 
         if (password != null) {
-            CryptoThread cryptoThread = new CryptoThread(this, inputFileName, outputFileName, password, version, operationType);
+            CryptoThread cryptoThread = new CryptoThread(this, inputFileName, outputFileName, password, version, operationType, deleteInputFile);
             cryptoThread.start();
         } else {
             showToastOnGuiThread(R.string.error_null_password);
@@ -109,7 +112,7 @@ public class CryptoService extends Service implements CryptoThread.ProgressDispl
     * Create the notification that is displayed while the operation is ongoing.
     * if progress < 0: displayed without progress bar
      */
-    private Notification buildProgressNotification(boolean operationType, int progress, int completedMessageStringId) {
+    private Notification buildProgressNotification(boolean operationType, int progress, int completedMessageStringId, int minutesToCompletion, int secondsToCompletion) {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel();
@@ -127,7 +130,14 @@ public class CryptoService extends Service implements CryptoThread.ProgressDispl
             builder.setContentTitle(getString(R.string.app_name));
             builder.setContentText(getString(R.string.operation_in_progress));
         } else if (progress < 100) {
-            builder.setContentTitle(operationType == CryptoThread.OPERATION_TYPE_ENCRYPTION ? getString(R.string.encrypting) : getString(R.string.decrypting));
+            String title = operationType == CryptoThread.OPERATION_TYPE_ENCRYPTION ? getString(R.string.encrypting) : getString(R.string.decrypting);
+            if (minutesToCompletion != -1) {
+                title = title.concat(" " + minutesToCompletion + "m");
+            }
+            if (secondsToCompletion != -1) {
+                title = title.concat(" " + secondsToCompletion + "s");
+            }
+            builder.setContentTitle(title);
             builder.setProgress(100, progress, false);
         } else {
             builder.setContentTitle(getString(R.string.app_name));
@@ -142,14 +152,14 @@ public class CryptoService extends Service implements CryptoThread.ProgressDispl
         NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_LOW);
         notificationChannel.enableLights(false);
         notificationChannel.enableVibration(false);
-        ((NotificationManager)getSystemService(NOTIFICATION_SERVICE)).createNotificationChannel(notificationChannel);
+        ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).createNotificationChannel(notificationChannel);
     }
 
     //Implementation of CryptoThread.ProgressDisplayers interface. Called by CryptoThread to update the progress.
     //progress is out of 100.
     @Override
-    public void update(boolean operationType, int progress, int completedMessageStringId) {
+    public void update(boolean operationType, int progress, int completedMessageStringId, int minutesToCompletion, int secondsToCompletion) {
         NotificationManagerCompat notificationManager = (NotificationManagerCompat) NotificationManagerCompat.from(this);
-        notificationManager.notify(START_FOREGROUND_ID, buildProgressNotification(operationType, progress, completedMessageStringId));
+        notificationManager.notify(START_FOREGROUND_ID, buildProgressNotification(operationType, progress, completedMessageStringId, minutesToCompletion, secondsToCompletion));
     }
 }
