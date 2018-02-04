@@ -13,8 +13,6 @@ import android.widget.TextView;
 
 import com.dewdrop623.androidcrypt.R;
 
-import java.io.File;
-
 /**
  * Implementation of FilePicker that displays files and folders as icons.
  */

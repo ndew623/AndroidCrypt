@@ -1,17 +1,13 @@
 package com.dewdrop623.androidcrypt.FilePicker;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Environment;
-import android.os.FileObserver;
 import android.support.v4.provider.DocumentFile;
 
 import com.dewdrop623.androidcrypt.StorageAccessFrameworkHelper;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * FilePicker uses FileBrowser to get the information it needs about the file system.

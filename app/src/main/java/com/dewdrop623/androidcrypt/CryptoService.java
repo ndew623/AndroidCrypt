@@ -14,10 +14,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
-import android.util.Log;
 import android.widget.Toast;
-
-import java.io.File;
 
 /**
  * Crypto service runs a background thread that does the encryption and decryption operations.

@@ -2,9 +2,6 @@ package com.dewdrop623.androidcrypt;
 
 import android.support.v4.provider.DocumentFile;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;

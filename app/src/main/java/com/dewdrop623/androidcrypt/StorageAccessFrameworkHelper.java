@@ -2,7 +2,6 @@ package com.dewdrop623.androidcrypt;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
