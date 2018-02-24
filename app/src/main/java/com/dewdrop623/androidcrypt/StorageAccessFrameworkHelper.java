@@ -202,7 +202,7 @@ public final class StorageAccessFrameworkHelper {
     }
 
     public static boolean canSupportSDCardOnAndroidVersion() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1;
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
     }
 
     public static String getDocumentFilePath(DocumentFile documentFile) {

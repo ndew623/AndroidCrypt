@@ -31,9 +31,6 @@ public class FileBrowser {
     }
     public void updateFileViewer() {
         ArrayList<DocumentFile> files = new ArrayList<>(Arrays.asList(currentDirectory.listFiles()));
-        if (currentDirectory.getParentFile() != null) {
-            files.add(currentDirectory.getParentFile());
-        }
         filePicker.setFileList(files);
     }
     private void monitorCurrentPathForChanges() {

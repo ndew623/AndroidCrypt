@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.provider.DocumentFile;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -59,11 +60,9 @@ public abstract class FilePicker extends Fragment {
     private EditText fileNameEditText;
     private Button fileNameOkButton;
 
-    //the list of files being displayed and the instance of FileBrowser
-    private List<DocumentFile> fileList;
     private FileBrowser fileBrowser;
 
-    //The list view to display the files
+    //The list view to display the filenames
     protected AbsListView fileListView;
     private FileListAdapter fileListAdapter;
 
@@ -72,16 +71,16 @@ public abstract class FilePicker extends Fragment {
     /////////////////////////////////
 
     //a comparator to help sort file alphabetically
-    private Comparator<DocumentFile> documentFileAlphabeticalComparator = new Comparator<DocumentFile>() {
+    private Comparator<Pair<String, Boolean>> fileNameAlphabeticalComparator = new Comparator<Pair<String, Boolean>>() {
         @Override
-        public int compare(DocumentFile file1, DocumentFile file2) {
+        public int compare(Pair<String, Boolean> file1, Pair<String, Boolean> file2) {
             int result;
-            if (file1.equals(fileBrowser.getCurrentDirectory().getParentFile())) {
+            if (file1.first.equals(FileBrowser.PARENT_FILE_NAME)) {
                 result = -1;
-            } else if (file2.equals(fileBrowser.getCurrentDirectory().getParentFile())) {
+            } else if (file2.first.equals(FileBrowser.PARENT_FILE_NAME)) {
                 result = 1;
             } else {
-                result = file1.getName().toLowerCase().compareTo(file2.getName().toLowerCase());
+                result = file1.first.toLowerCase().compareTo(file2.first.toLowerCase());
             }
             return result;
         }
@@ -91,7 +90,13 @@ public abstract class FilePicker extends Fragment {
     private AdapterView.OnItemClickListener onItemClickListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            DocumentFile clickedFile = fileListAdapter.getItem(position);
+            String clickedFileName = fileListAdapter.getItem(position).first;
+            DocumentFile clickedFile;
+            if (clickedFileName.equals(FileBrowser.PARENT_FILE_NAME)) {
+                clickedFile = fileBrowser.getCurrentDirectory().getParentFile();
+            } else {
+                clickedFile = fileBrowser.getCurrentDirectory().findFile(clickedFileName);
+            }
             if (clickedFile.isDirectory()) {
                 fileBrowser.setCurrentDirectory(clickedFile);
             } else {
@@ -142,6 +147,7 @@ public abstract class FilePicker extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        fileListAdapter = new FileListAdapter();
         fileBrowser = new FileBrowser(getContext());
         fileBrowser.setFilePicker(this);
         isOutput = getArguments().getBoolean(FilePicker.IS_OUTPUT_KEY, false);
@@ -184,10 +190,9 @@ public abstract class FilePicker extends Fragment {
         }
     }
 
-    //called by the FileBrowser, updates the displayed list of files
-    public void setFileList(List<DocumentFile> fileList) {
-        this.fileList = fileList;
-        updateFileArrayAdapterFileList();
+    //called by the FileBrowser, updates the displayed list of filenames
+    public void setFileList(List<DocumentFile> documentFiles) {
+        updateFileArrayAdapterFileList(documentFiles);
         if (currentPathTextView != null) {
             currentPathTextView.setText(fileBrowser.getCurrentPathName());
         }
@@ -212,24 +217,9 @@ public abstract class FilePicker extends Fragment {
     //PROTECTED METHODS
     ///////////////////////////////////
 
-    /**
-     * Get the name for the document file to display in the GUI.
-     * May be different than the actual directory name.
-     * e.g. "Internal Storage" instead of "0" or ".." (FileBrowser.PARENT_FILE_NAME) instead of the name of the parent folder.
-     */
-    protected String getGUINameForDocumentFile(DocumentFile documentFile) {
-        String result;
-        if (documentFile.equals(fileBrowser.getCurrentDirectory().getParentFile())) {
-            result = FileBrowser.PARENT_FILE_NAME;
-        } else {
-            result = documentFile.getName();
-        }
-        return result;
-    }
-
     //after the concrete class inflates the view and defines the callback for the list adapter getview method, do the rest of the ui initialization work
     protected final void initializeFilePickerWithViewAndFileListAdapterGetViewCallback(View view, FileListAdapterGetViewCallback fileListAdapterGetViewCallback) {
-        fileListAdapter = new FileListAdapter(fileListAdapterGetViewCallback);
+        fileListAdapter.setFileListAdapterGetViewCallback(fileListAdapterGetViewCallback);
         fileListView.setVisibility(View.VISIBLE);
         fileListView.setAdapter(fileListAdapter);
         fileListView.setVisibility(View.VISIBLE);
@@ -237,7 +227,6 @@ public abstract class FilePicker extends Fragment {
         currentPathTextView = (TextView) view.findViewById(R.id.currentPathTextView);
         currentPathTextView.setMovementMethod(new ScrollingMovementMethod());
         currentPathTextView.setText(fileBrowser.getCurrentPathName());
-        updateFileArrayAdapterFileList();
 
         fileNameInputLinearLayout = (LinearLayout) view.findViewById(R.id.fileNameInputLinearLayout);
         fileNameEditText = (EditText) view.findViewById(R.id.fileNameEditText);
@@ -270,19 +259,14 @@ public abstract class FilePicker extends Fragment {
         fileBrowser.setCurrentDirectory(FileBrowser.internalStorageHome);
     }
 
-    //sort the fileList member variable alphabetically
-    private void sortFileList() {
-        Collections.sort(fileList, documentFileAlphabeticalComparator);
-    }
-
-
-    private void updateFileArrayAdapterFileList() {
-        if (fileListView == null) { //file viewer has not been displayed yet
-            return;
-        }
+    private void updateFileArrayAdapterFileList(List<DocumentFile> documentFiles) {
         fileListAdapter.clear();
-        sortFileList();
-        fileListAdapter.addAll(fileList);
+        for(DocumentFile documentFile : documentFiles) {
+            fileListAdapter.add(new Pair<>(documentFile.getName(), documentFile.isDirectory()));
+        }
+        if (fileBrowser.getCurrentDirectory().getParentFile() != null) {
+            fileListAdapter.add(new Pair<>(FileBrowser.PARENT_FILE_NAME, true));
+        }
         fileListAdapter.notifyDataSetChanged();
     }
 
@@ -323,48 +307,65 @@ public abstract class FilePicker extends Fragment {
     ///the adapter for the file list view
     protected class FileListAdapter extends BaseAdapter {
         private FileListAdapterGetViewCallback fileListAdapterGetViewCallback;
-        private ArrayList<DocumentFile> files = new ArrayList<>();
+        //Pair<filename, isDirectory>
+        private ArrayList<Pair<String, Boolean>> filenames = new ArrayList<>();
 
-        public FileListAdapter(FileListAdapterGetViewCallback fileListAdapterGetViewCallback) {
-            this.fileListAdapterGetViewCallback = fileListAdapterGetViewCallback;
+        public FileListAdapter() {
         }
 
-        public void add(DocumentFile file) {
-            files.add(file);
+        public void add(Pair<String, Boolean> filename) {
+            filenames.add(filename);
         }
 
-        public void addAll(Collection<DocumentFile> collection) {
-            files.addAll(collection);
+        public void addAll(Collection<Pair<String, Boolean>> collection) {
+            filenames.addAll(collection);
         }
 
-        public void addAll(DocumentFile[] fileArray) {
-            for (DocumentFile file : fileArray) {
-                files.add(file);
+        public void addAll(Pair<String, Boolean>[] fileNameArray) {
+            for (Pair<String, Boolean> filename : fileNameArray) {
+                filenames.add(filename);
             }
         }
 
+        public void sort() {
+            Collections.sort(filenames, fileNameAlphabeticalComparator);
+        }
+
+        public void setFileListAdapterGetViewCallback(FileListAdapterGetViewCallback fileListAdapterGetViewCallback) {
+            this.fileListAdapterGetViewCallback = fileListAdapterGetViewCallback;
+        }
+
         public void clear() {
-            files.clear();
+            filenames.clear();
         }
 
         @Override
         public int getCount() {
-            return files.size();
+            return filenames.size();
         }
 
         @Override
-        public DocumentFile getItem(int i) {
-            return files.get(i);
+        public Pair<String, Boolean> getItem(int i) {
+            return filenames.get(i);
         }
 
         @Override
         public long getItemId(int i) {
-            return files.get(i).hashCode();
+            return filenames.get(i).hashCode();
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
+            if (fileListAdapterGetViewCallback == null) {
+                throw new IllegalStateException("Get view callback wasn't set before calling getView.");
+            }
             return fileListAdapterGetViewCallback.getView(position, convertView, parent, this);
+        }
+
+        @Override
+        public void notifyDataSetChanged() {
+            sort();
+            super.notifyDataSetChanged();
         }
     }
 }
