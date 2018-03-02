@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">AndroidCrypt</string>
     <string name="cancel">Cancel</string>
@@ -86,4 +87,5 @@
     <string name="file_not_found">File not found</string>
     <string name="write_permission_denied_if_sdcard_grant_permission_in_settings">Write permission denied. If outputting to SD card you need to grant permission to it in settings.</string>
     <string name="delete_input_file">Delete Input File</string>
+    <string name = "spanish_translation_credit">Spanish Translation: Thanks to Rony Javier</string>
 </resources>

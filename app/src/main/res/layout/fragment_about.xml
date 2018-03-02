@@ -137,6 +137,12 @@
             app:license_link="@string/cc30_link"
             app:license_name="@string/cc30_license_name"
             app:icon_src="@drawable/ic_sdcard" />
+        <TextView
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:text="@string/spanish_translation_credit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
 </ScrollView>

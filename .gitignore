@@ -1,11 +1,15 @@
 *.iml
 .gradle
 /local.properties
-/.idea/workspace.xml
-/.idea/libraries
+/.idea/**
 .DS_Store
 /build
 /captures
 .externalNativeBuild
 misc.xml
 .idea/vcs.xml
+app/build/**
+app/debug/**
+app/release/**
+gitpush.sh
+gitcommit.sh
