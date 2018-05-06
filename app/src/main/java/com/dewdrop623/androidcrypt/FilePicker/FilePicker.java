@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.provider.DocumentFile;
+import android.support.v7.app.AlertDialog;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Pair;
 import android.view.Menu;
@@ -69,7 +70,6 @@ public abstract class FilePicker extends Fragment {
     ///////////////////////////////
     //ANONYMOUS CLASSES
     /////////////////////////////////
-
     //a comparator to help sort file alphabetically
     private Comparator<Pair<String, Boolean>> fileNameAlphabeticalComparator = new Comparator<Pair<String, Boolean>>() {
         @Override
@@ -209,7 +209,16 @@ public abstract class FilePicker extends Fragment {
     public void changePathToSDCard() {
         String sdCardUriString = SettingsHelper.getSdcardRoot(getContext());
         if (StorageAccessFrameworkHelper.canSupportSDCardOnAndroidVersion() && sdCardUriString != null) {
-            changeDirectory(DocumentFile.fromTreeUri(getContext(), Uri.parse(sdCardUriString)));
+            //cache the current directory to recover if changing to the sd card fails
+            DocumentFile currentDirectory = fileBrowser.getCurrentDirectory();
+            try {
+                changeDirectory(DocumentFile.fromTreeUri(getContext(), Uri.parse(sdCardUriString)));
+            } catch (NullPointerException npe) {
+                changeDirectory(currentDirectory);
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle(R.string.sdcard_error).setMessage(R.string.could_not_read_sdcard).setPositiveButton(R.string.ok, null);
+                builder.show();
+            }
         }
     }
 

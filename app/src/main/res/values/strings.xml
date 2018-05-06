@@ -88,4 +88,6 @@
     <string name="write_permission_denied_if_sdcard_grant_permission_in_settings">Write permission denied. If outputting to SD card you need to grant permission to it in settings.</string>
     <string name="delete_input_file">Delete Input File</string>
     <string name = "spanish_translation_credit">Spanish Translation: Thanks to Rony Javier</string>
+    <string name="sdcard_error">SD Card Error</string>
+    <string name="could_not_read_sdcard">Could not read SD card.</string>
 </resources>
