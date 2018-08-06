@@ -2,6 +2,12 @@
 <resources>
     <color name="colorPrimary">#46859b</color>
     <color name="colorPrimaryDark">#15a1b1</color>
-    <color name="colorAccent">#7d8891</color>
+    <color name="colorAccent">#858689</color>
     <color name="colorFileIcon">#53addc</color>
+
+    <color name="darkThemeColorPrimary">#19323b</color>
+    <color name="darkThemeColorPrimaryDark">#79e6f2</color>
+    <color name="darkThemeTextColor">#fff</color>
+    <color name="darkThemeTextColorHint">#c7c7c7</color>
+    <color name="darkThemeBackground">#1b1b1b</color>
 </resources>

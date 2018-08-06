@@ -18,6 +18,7 @@
         android:orientation="horizontal">
 
         <TextView
+            android:id="@+id/iconMadeByTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/icon_made_by" />
@@ -39,6 +40,7 @@
         android:orientation="horizontal">
 
         <TextView
+            android:id="@+id/fromTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/from" />
@@ -60,6 +62,7 @@
         android:orientation="horizontal">
 
         <TextView
+            android:id="@+id/licensedByTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/licensed_by" />

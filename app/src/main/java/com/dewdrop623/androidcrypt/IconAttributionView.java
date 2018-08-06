@@ -66,6 +66,15 @@ public class IconAttributionView extends RelativeLayout {
         iconCreatorTextView = (TextView) findViewById(R.id.iconCreatorTextView);
         srcLinkTextView = (TextView) findViewById(R.id.srcLinkTextView);
         licenseLinkTextView = (TextView) findViewById(R.id.licenseLinkTextView);
+        /**
+         * apply theme to ui
+         */
+        if (SettingsHelper.getUseDarkTeme(context)) {
+            int color = context.getTheme().obtainStyledAttributes(R.style.AppThemeDark, new int[] {android.R.attr.textColorPrimary}).getColor(0,0);
+            ((TextView) findViewById(R.id.iconMadeByTextView)).setTextColor(color);
+            ((TextView) findViewById(R.id.fromTextView)).setTextColor(color);
+            ((TextView) findViewById(R.id.licensedByTextView)).setTextColor(color);
+        }
     }
 
     private void attrSetUp(Context context, AttributeSet attrs) {
@@ -87,6 +96,8 @@ public class IconAttributionView extends RelativeLayout {
         } finally {
             attributesArray.recycle();
         }
+
+
     }
 
     private void setUpOnClickListeners(final Context context) {

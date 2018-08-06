@@ -10,6 +10,7 @@
         android:padding="16dp">
 
         <TextView
+            android:id="@+id/aescryptVersionTitleTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/aescrypt_version" />
@@ -27,7 +28,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingEnd="16dp"
-                android:text="@string/version_1_radio_button_text" />
+                android:text="@string/version_1_radio_button_text"/>
 
             <RadioButton
                 android:id="@+id/version2RadioButton"
@@ -37,6 +38,7 @@
         </RadioGroup>
 
         <TextView
+            android:id="@+id/filePickerDisplayTitleTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/file_picker_display" />
@@ -61,6 +63,34 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/list" />
+        </RadioGroup>
+
+        <TextView
+            android:id="@+id/themeTitleTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/theme" />
+
+        <RadioGroup
+            android:id="@+id/themeRadioGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_marginBottom="16dp"
+            android:orientation="vertical">
+
+            <RadioButton
+                android:id="@+id/lightThemeRadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingEnd="16dp"
+                android:text="@string/light" />
+
+            <RadioButton
+                android:id="@+id/darkThemeRadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/dark" />
         </RadioGroup>
 
         <TextView

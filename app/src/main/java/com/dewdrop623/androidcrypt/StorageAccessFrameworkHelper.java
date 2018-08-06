@@ -11,6 +11,7 @@ import android.os.Environment;
 import android.support.v4.os.EnvironmentCompat;
 import android.support.v4.provider.DocumentFile;
 import android.support.v7.app.AlertDialog;
+import android.view.ContextThemeWrapper;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -34,7 +35,13 @@ public final class StorageAccessFrameworkHelper {
     }
 
     public static void findSDCardWithDialog(final Activity activity) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        AlertDialog.Builder builder;
+        if (SettingsHelper.getUseDarkTeme(activity)) {
+            ContextThemeWrapper contextThemeWrapper = new ContextThemeWrapper(activity, R.style.DarkAlertDialogTheme);
+            builder = new AlertDialog.Builder(contextThemeWrapper);
+        } else {
+            builder = new AlertDialog.Builder(activity);
+        }
         builder.setTitle(R.string.sdcard).setMessage(R.string.how_to_locate_sdcard)
                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     @Override

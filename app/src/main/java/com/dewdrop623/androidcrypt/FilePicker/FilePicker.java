@@ -1,5 +1,6 @@
 package com.dewdrop623.androidcrypt.FilePicker;
 
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -243,15 +244,21 @@ public abstract class FilePicker extends Fragment {
 
         if (isOutput) {
             fileNameInputLinearLayout.setVisibility(View.VISIBLE);
+            fileNameEditText.setTextColor(Color.BLACK);
             fileNameOkButton.setOnClickListener(fileNameOkButtonOnClickListener);
+
+            String defaultOutputFilename = getArguments().getString(DEFAULT_OUTPUT_FILENAME_KEY, null);
+            if (!GlobalDocumentFileStateHolder.initialFilePickerDirectoryIsNull()) {
+                changeDirectory(GlobalDocumentFileStateHolder.getAndClearInitialFilePickerDirectory());
+            }
+            if (defaultOutputFilename != null) {
+                fileNameEditText.setText(defaultOutputFilename);
+            }
         }
 
-        String defaultOutputFilename = getArguments().getString(DEFAULT_OUTPUT_FILENAME_KEY, null);
-        if (!GlobalDocumentFileStateHolder.initialFilePickerDirectoryIsNull()) {
-            changeDirectory(GlobalDocumentFileStateHolder.getAndClearInitialFilePickerDirectory());
-        }
-        if (defaultOutputFilename != null) {
-            fileNameEditText.setText(defaultOutputFilename);
+        /*Change text to match theme*/
+        if (SettingsHelper.getUseDarkTeme(getContext())) {
+            currentPathTextView.setTextColor(((MainActivity)getActivity()).getDarkThemeColor(android.R.attr.textColorPrimary));
         }
     }
     ///////////////////////////////////

@@ -1,5 +1,6 @@
 package com.dewdrop623.androidcrypt;
 
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -9,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
@@ -48,6 +50,16 @@ public class SettingsFragment extends Fragment {
         }
         filePickerDisplayRadioGroup.setOnCheckedChangeListener(filePickerDisplayRadioGroupOnCheckedChangedListener);
 
+        RadioGroup themeRadioGroup = (RadioGroup) view.findViewById(R.id.themeRadioGroup);
+        boolean currentUseDarkThemeSetting = SettingsHelper.getUseDarkTeme(getContext());
+        if (currentUseDarkThemeSetting == true) {
+            themeRadioGroup.check(R.id.darkThemeRadioButton);
+        } else {
+            themeRadioGroup.check(R.id.lightThemeRadioButton);
+        }
+        themeRadioGroup.setOnCheckedChangeListener(themeRadioGroupOnCheckedChangedListener);
+
+
         sdCardTextView = (TextView) view.findViewById(R.id.sdCardTextView);
         sdCardEditButton = (Button) view.findViewById(R.id.sdCardEditButton);
         if (!StorageAccessFrameworkHelper.canSupportSDCardOnAndroidVersion()) {
@@ -58,6 +70,21 @@ public class SettingsFragment extends Fragment {
             sdCardEditButton.setOnClickListener(sdCardEditButtonOnClickListener);
         }
 
+        /*update ui to match theme preferences*/
+        if (SettingsHelper.getUseDarkTeme(getContext())) {
+            int textColor = ((MainActivity)getActivity()).getDarkThemeColor(android.R.attr.textColorPrimary);
+            ((RadioButton) aescryptVersionRadioGroup.findViewById(R.id.version1RadioButton)).setTextColor(textColor);
+            ((RadioButton) aescryptVersionRadioGroup.findViewById(R.id.version2RadioButton)).setTextColor(textColor);
+            ((RadioButton) filePickerDisplayRadioGroup.findViewById(R.id.iconDisplayRadioButton)).setTextColor(textColor);
+            ((RadioButton) filePickerDisplayRadioGroup.findViewById(R.id.listDisplayRadioButton)).setTextColor(textColor);
+            ((RadioButton) themeRadioGroup.findViewById(R.id.darkThemeRadioButton)).setTextColor(textColor);
+            ((RadioButton) themeRadioGroup.findViewById(R.id.lightThemeRadioButton)).setTextColor(textColor);
+
+            ((TextView) view.findViewById(R.id.aescryptVersionTitleTextView)).setTextColor(textColor);
+            ((TextView) view.findViewById(R.id.filePickerDisplayTitleTextView)).setTextColor(textColor);
+            ((TextView) view.findViewById(R.id.themeTitleTextView)).setTextColor(textColor);
+            ((TextView) view.findViewById(R.id.sdCardTitleTextView)).setTextColor(textColor);
+        }
         return view;
     }
 
@@ -106,6 +133,21 @@ public class SettingsFragment extends Fragment {
                     SettingsHelper.setFilePickerType(getContext(), SettingsHelper.FILE_LIST_VIEWER);
                     break;
             }
+        }
+    };
+
+    private RadioGroup.OnCheckedChangeListener themeRadioGroupOnCheckedChangedListener = new RadioGroup.OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(RadioGroup group, int checkedId) {
+            switch (checkedId) {
+                case R.id.darkThemeRadioButton:
+                    SettingsHelper.setUseDarkTheme(getContext(), true);
+                    break;
+                case R.id.lightThemeRadioButton:
+                    SettingsHelper.setUseDarkTheme(getContext(), false);
+                    break;
+            }
+            ((MainActivity)getActivity()).recreate();
         }
     };
 

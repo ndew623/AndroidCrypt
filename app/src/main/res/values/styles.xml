@@ -2,22 +2,28 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+        <!-- Customize your theme here.-->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="windowActionBar">true</item>
-        <item name="windowNoTitle">false</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
     </style>
-
+    <style name="AppThemeDark" parent="AppTheme" >
+        <item name="colorPrimary">@color/darkThemeColorPrimary</item>
+        <item name="colorPrimaryDark">@color/darkThemeColorPrimaryDark</item>
+        <item name="android:colorControlNormal">@color/colorAccent</item>
+        <item name="android:windowBackground">@color/darkThemeBackground</item>
+        <item name="android:textColorPrimary">@color/darkThemeTextColor</item>
+        <item name="android:textColorHint">@color/darkThemeTextColorHint</item>
+    </style>
+    <style name="DarkAlertDialogTheme" parent="Base.Theme.AppCompat.Dialog.Alert">
+        <item name="android:textColorPrimary">@color/darkThemeTextColor</item>
+        <item name="android:background">@color/darkThemeBackground</item>
+    </style>
     <style name="DialogButton" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-    </style>
-
-    <style name="AppTheme.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
@@ -53,6 +59,4 @@
         <item name="android:background">@color/colorAccent</item>
         <item name="android:visibility">invisible</item>
     </style>
-
-
 </resources>

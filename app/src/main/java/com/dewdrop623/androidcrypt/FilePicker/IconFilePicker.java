@@ -11,7 +11,9 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.dewdrop623.androidcrypt.MainActivity;
 import com.dewdrop623.androidcrypt.R;
+import com.dewdrop623.androidcrypt.SettingsHelper;
 
 /**
  * Implementation of FilePicker that displays files and folders as icons.
@@ -47,6 +49,12 @@ public class IconFilePicker extends FilePicker {
                 fileIconImageView.setImageDrawable(AppCompatResources.getDrawable(getContext(), R.drawable.ic_file));
             }
             fileNameTextView.setText(file.first);
+
+            /*Change text to match theme*/
+            if (SettingsHelper.getUseDarkTeme(getContext())) {
+                fileNameTextView.setTextColor(((MainActivity)getActivity()).getDarkThemeColor(android.R.attr.textColorPrimary));
+            }
+
             return convertView;
         }
     };

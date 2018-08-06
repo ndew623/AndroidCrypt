@@ -146,6 +146,15 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
             update(CryptoThread.getCurrentOperationType(), CryptoThread.getProgressUpdate(), CryptoThread.getCompletedMessageStringId(), -1, -1);
         }
 
+        /*
+        * Apply theme preferences to ui
+        * */
+        if (SettingsHelper.getUseDarkTeme(getContext())) {
+            int textColor = ((MainActivity)getActivity()).getDarkThemeColor(android.R.attr.textColorPrimary);
+            deleteInputFileCheckbox.setTextColor(textColor);
+            showPasswordCheckbox.setTextColor(textColor);
+        }
+
         return view;
     }
 

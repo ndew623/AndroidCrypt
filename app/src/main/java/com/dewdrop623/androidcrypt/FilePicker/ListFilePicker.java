@@ -11,7 +11,9 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.dewdrop623.androidcrypt.MainActivity;
 import com.dewdrop623.androidcrypt.R;
+import com.dewdrop623.androidcrypt.SettingsHelper;
 
 /**
  * Implementation of FilePicker that displays files and folders in a list.
@@ -46,6 +48,11 @@ public class ListFilePicker extends FilePicker {
                 listItemImageView.setImageDrawable(AppCompatResources.getDrawable(getContext(), R.drawable.ic_file));
             }
             listItemTextView.setText(file.first);
+
+            /*Change text to match theme*/
+            if (SettingsHelper.getUseDarkTeme(getContext())) {
+                listItemTextView.setTextColor(((MainActivity)getActivity()).getDarkThemeColor(android.R.attr.textColorPrimary));
+            }
             return convertView;
         }
     };

@@ -90,4 +90,7 @@
     <string name = "spanish_translation_credit">Spanish Translation: Thanks to Rony Javier</string>
     <string name="sdcard_error">SD Card Error</string>
     <string name="could_not_read_sdcard">Could not read SD card.</string>
+    <string name="theme">Theme</string>
+    <string name="dark">Dark</string>
+    <string name="light">Light</string>
 </resources>
