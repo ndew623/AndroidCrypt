@@ -153,6 +153,10 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
             int textColor = ((MainActivity)getActivity()).getDarkThemeColor(android.R.attr.textColorPrimary);
             deleteInputFileCheckbox.setTextColor(textColor);
             showPasswordCheckbox.setTextColor(textColor);
+            inputFilePathTextView.setTextColor(textColor);
+            outputFilePathTextView.setTextColor(textColor);
+            inputFilePathUnderlineView.setBackgroundColor(textColor);
+            outputFilePathUnderlineView.setBackgroundColor(textColor);
         }
 
         return view;

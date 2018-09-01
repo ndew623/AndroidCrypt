@@ -66,7 +66,7 @@ public class IconAttributionView extends RelativeLayout {
         iconCreatorTextView = (TextView) findViewById(R.id.iconCreatorTextView);
         srcLinkTextView = (TextView) findViewById(R.id.srcLinkTextView);
         licenseLinkTextView = (TextView) findViewById(R.id.licenseLinkTextView);
-        /**
+        /*
          * apply theme to ui
          */
         if (SettingsHelper.getUseDarkTeme(context)) {
