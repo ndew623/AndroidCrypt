@@ -3,6 +3,11 @@ package com.dewdrop623.androidcrypt;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * SettingsHelper provides an interface to Android's SharedPreferences.
  */
@@ -20,8 +25,10 @@ public final class SettingsHelper {
     private static final String SHARED_PREFERENCES_FILE = "com.dewdrop623.androidcrypt.SettingsHelper.SHARED_PREFERENCES_FILE";
     private static final String AESCRYPT_VERSION_PREF = "com.dewdrop623.androidcrypt.SettingsHelper.AESCRYPT_VERSION_PREF";
     private static final String FILE_VIEWER_TYPE = "com.dewdrop623.androidcrypt.FileBrowsing.ui.SettingsHelper.FILE_VIEWER_TYPE";
-    private static final String SDCARD_ROOT = "com.dewdrop623.androidcrypt.FileBrowsing.ui.SettingsHelper.SDCARD_ROOT";
+    private static final String MOUNTPOINT_URIS = "com.dewdrop623.androidcrypt.FileBrowsing.ui.SettingsHelper.MOUNTPOINT_URIS";
     private static final String USE_DARK_THEME = "com.dewdrop623.androidcrypt.SettingsHelper.USE_DARK_THEME";
+
+    private static final String ENCODING_MAGIC_STRING = "!@#";
 
     private static SharedPreferences sharedPreferences;
 
@@ -48,6 +55,10 @@ public final class SettingsHelper {
         getSharedPreferencesFile(context).edit().putString(key, value).apply();
     }
 
+    private static void sharedPreferencesPutStringSet(Context context, String key, Set<String> values) {
+        getSharedPreferencesFile(context).edit().putStringSet(key, values).apply();
+    }
+
     /***********************************
      * Set settings
      */
@@ -64,8 +75,8 @@ public final class SettingsHelper {
         sharedPreferencesPutInt(context, FILE_VIEWER_TYPE, fileViewerType);
     }
 
-    public static void setSdcardRoot(Context context, String sdCardRoot) {
-        sharedPreferencesPutString(context, SDCARD_ROOT, sdCardRoot);
+    public static void setExternalMountpointUris(Context context, HashMap<String,String> mountPointUriSet) {
+        sharedPreferencesPutStringSet(context, MOUNTPOINT_URIS, encodeMountpointHashmapToSet(mountPointUriSet));
     }
 
     public static void setUseDarkTheme(Context context, boolean show) {
@@ -89,10 +100,39 @@ public final class SettingsHelper {
         return getSharedPreferencesFile(context).getBoolean(USE_DARK_THEME, USE_DARK_THEME_DEFAULT);
     }
 
+    public static HashMap<String,String> getExternalMountpointUris(Context context) {
+        return decodeMountpointSetToHashmap(
+                getSharedPreferencesFile(context).getStringSet(MOUNTPOINT_URIS, null));
+    }
+
+    /*
+    * Convert the convenient Hashmap of mountpoints and their TreeUris to a set that can
+    * be stored by SharedPreferences.
+    * Encoding format
+    * x!@#/path/to/mountpointTree:Uri/of/Mountpoint
+    * (x is a number with an indeterminate number of digits. the file path is x chars long)
+    * */
+    private static Set<String> encodeMountpointHashmapToSet(HashMap<String, String> mountpoints) {
+        Set<String> result = new HashSet<>();
+        for (Map.Entry<String, String> entry : mountpoints.entrySet()) {
+            result.add(Integer.valueOf(entry.getKey().length()).toString().concat(ENCODING_MAGIC_STRING).concat(entry.getKey()).concat(entry.getValue()));
+        }
+        return result;
+    }
+
     /**
-     * Get the root directory of external storage. Returns null if not set.
+     * Decode Set stored by SharedPreferences to Hashmap that is convenient.
      */
-    public static String getSdcardRoot(Context context) {
-        return getSharedPreferencesFile(context).getString(SDCARD_ROOT, null);
+    private static HashMap<String,String> decodeMountpointSetToHashmap(Set<String> mountpoints) {
+        if (mountpoints == null) {
+            return null;
+        }
+        HashMap<String, String> result = new HashMap<>();
+        for (String s : mountpoints) {
+            int mountDirLength = Integer.parseInt(s.substring(0,s.indexOf(ENCODING_MAGIC_STRING)));
+            int prefixLength = s.indexOf(ENCODING_MAGIC_STRING)+ENCODING_MAGIC_STRING.length();
+            result.put(s.substring(prefixLength,prefixLength+mountDirLength), s.substring(prefixLength+mountDirLength));
+        }
+        return result;
     }
 }

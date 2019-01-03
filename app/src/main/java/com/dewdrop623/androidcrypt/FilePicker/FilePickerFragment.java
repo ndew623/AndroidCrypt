@@ -18,6 +18,7 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -36,18 +37,18 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * FilePicker fragment allows users to select a file.
+ * FilePickerFragment fragment allows users to select a file.
  * Child fragments determine what implementation of android's AbsListView to use.
  * Child fragments define the behavior for the listviewadapter's getView method.
  */
 
-public abstract class FilePicker extends Fragment {
+public abstract class FilePickerFragment extends Fragment {
 
     /**
      * Keys for arguments bundle
      */
-    public static final String IS_OUTPUT_KEY = "com.dewdrop623.androidcrypt.FilePicker.FilePicker.IS_OUTPUT_KEY";
-    public static final String DEFAULT_OUTPUT_FILENAME_KEY = "com.dewdrop623.androidcrypt.FilePicker.FilePicker.DEFAULT_OUTPUT_FILENAME_KEY";
+    public static final String IS_OUTPUT_KEY = "com.dewdrop623.androidcrypt.FilePickerFragment.FilePickerFragment.IS_OUTPUT_KEY";
+    public static final String DEFAULT_OUTPUT_FILENAME_KEY = "com.dewdrop623.androidcrypt.FilePickerFragment.FilePickerFragment.DEFAULT_OUTPUT_FILENAME_KEY";
 
     ////////////////////////////////
     //MEMBER VARIABLES
@@ -55,6 +56,7 @@ public abstract class FilePicker extends Fragment {
 
     //for storing the current state
     private boolean isOutput;
+    private boolean selectingFiles = false;
 
     //the TextView that shows the current directory under the actionbar
     private TextView currentPathTextView;
@@ -111,6 +113,16 @@ public abstract class FilePicker extends Fragment {
         }
     };
 
+    //the onLongClick listener for file items in the fileListView
+    private AdapterView.OnItemLongClickListener onItemLongClickListener = new AdapterView.OnItemLongClickListener() {
+        @Override
+        public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+            ((CheckBox)view.findViewById(R.id.fileSelectCheckbox)).setChecked(true);
+            startMultiSelection();
+            return true;
+        }
+    };
+
     private View.OnClickListener fileNameOkButtonOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -139,6 +151,19 @@ public abstract class FilePicker extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         //create file viewer menu with a home button and a refresh button
         inflater.inflate(R.menu.file_viewer_menu, menu);
+        if (selectingFiles) {
+            menu.findItem(R.id.sdcard_button).setVisible(false);
+            menu.findItem(R.id.home_button).setVisible(false);
+            menu.findItem(R.id.refresh_button).setVisible(false);
+            menu.findItem(R.id.stop_selection).setVisible(true);
+            menu.findItem(R.id.compress).setVisible(true);
+        } else {
+            menu.findItem(R.id.sdcard_button).setVisible(true);
+            menu.findItem(R.id.home_button).setVisible(true);
+            menu.findItem(R.id.refresh_button).setVisible(true);
+            menu.findItem(R.id.stop_selection).setVisible(false);
+            menu.findItem(R.id.compress).setVisible(false);
+        }
         if (!StorageAccessFrameworkHelper.canSupportSDCardOnAndroidVersion()) {
             menu.findItem(R.id.sdcard_button).setVisible(false);
         }
@@ -150,8 +175,8 @@ public abstract class FilePicker extends Fragment {
         setHasOptionsMenu(true);
         fileListAdapter = new FileListAdapter();
         fileBrowser = new FileBrowser(getContext());
-        fileBrowser.setFilePicker(this);
-        isOutput = getArguments().getBoolean(FilePicker.IS_OUTPUT_KEY, false);
+        fileBrowser.setFilePickerFragment(this);
+        isOutput = getArguments().getBoolean(FilePickerFragment.IS_OUTPUT_KEY, false);
         if (!GlobalDocumentFileStateHolder.savedCurrentDirectoryForRotateIsNull()) {
             fileBrowser.setCurrentDirectory(GlobalDocumentFileStateHolder.getAndClearSavedCurrentDirectoryForRotate());
         }
@@ -170,15 +195,51 @@ public abstract class FilePicker extends Fragment {
         switch (item.getItemId()) {
             case R.id.sdcard_button:
                 sdCardMenuButtonOnClick();
-                break;
+                return true;
             case R.id.home_button:
                 goToHomeDirectory();
                 return true;
             case R.id.refresh_button:
                 fileBrowser.updateFileViewer();
                 return true;
+            case R.id.stop_selection:
+                stopMultiSelection();
+                return true;
+            case R.id.compress:
+                tarSelectedFiles();
+                return true;
         }
         return false;
+    }
+
+    /*Start selecting. Show the checkboxes in the listview items*/
+    private void startMultiSelection() {
+        selectingFiles=true;
+        for (int i = 0; i < fileListView.getChildCount(); i++) {
+            ((CheckBox)fileListView.getChildAt(i).findViewById(R.id.fileSelectCheckbox)).setVisibility(View.VISIBLE);
+        }
+        getActivity().invalidateOptionsMenu();
+    }
+
+    /*Stop selecting. Unmark and hide the checkboxes in the listview items*/
+    private void stopMultiSelection() {
+        selectingFiles=false;
+        for (int i = 0; i < fileListView.getChildCount(); i++) {
+            CheckBox checkBox = ((CheckBox)fileListView.getChildAt(i).findViewById(R.id.fileSelectCheckbox));
+            checkBox.setChecked(false);
+            checkBox.setVisibility(View.GONE);
+        }
+        getActivity().invalidateOptionsMenu();
+    }
+
+    private void tarSelectedFiles() {
+        ArrayList<DocumentFile> toBeTarballed = new ArrayList<>();
+        for(int i = 0; i < fileListView.getChildCount(); i++) {
+            if (((CheckBox)fileListView.getChildAt(i).findViewById(R.id.fileSelectCheckbox)).isChecked()) {
+                toBeTarballed.add(fileBrowser.getCurrentDirectory().findFile(fileListAdapter.getItem(i).first));
+            }
+        }
+
     }
 
     /**
@@ -208,7 +269,7 @@ public abstract class FilePicker extends Fragment {
      * Exists so MainActivity can call this after SAF Activity for selecting SD card completes.
      */
     public void changePathToSDCard() {
-        String sdCardUriString = SettingsHelper.getSdcardRoot(getContext());
+        String sdCardUriString = SettingsHelper.getSdcardRootTreeUri(getContext());
         if (StorageAccessFrameworkHelper.canSupportSDCardOnAndroidVersion() && sdCardUriString != null) {
             //cache the current directory to recover if changing to the sd card fails
             DocumentFile currentDirectory = fileBrowser.getCurrentDirectory();
@@ -234,6 +295,7 @@ public abstract class FilePicker extends Fragment {
         fileListView.setAdapter(fileListAdapter);
         fileListView.setVisibility(View.VISIBLE);
         fileListView.setOnItemClickListener(onItemClickListener);
+        fileListView.setOnItemLongClickListener(onItemLongClickListener);
         currentPathTextView = (TextView) view.findViewById(R.id.currentPathTextView);
         currentPathTextView.setMovementMethod(new ScrollingMovementMethod());
         currentPathTextView.setText(fileBrowser.getCurrentPathName());
@@ -265,8 +327,8 @@ public abstract class FilePicker extends Fragment {
     //PRIVATE METHODS
     ///////////////////////////////////
 
-    //the button listeners are in anonymous classes. They need to pass an instance of this FilePicker but for them this points to the anonymous class, they can reach this method though
-    private FilePicker getSelfForButtonListeners() {
+    //the button listeners are in anonymous classes. They need to pass an instance of this FilePickerFragment but for them this points to the anonymous class, they can reach this method though
+    private FilePickerFragment getSelfForButtonListeners() {
         return this;
     }
 
@@ -304,7 +366,7 @@ public abstract class FilePicker extends Fragment {
     }
 
     private void sdCardMenuButtonOnClick() {
-        String sdCardUriString = SettingsHelper.getSdcardRoot(getContext());
+        String sdCardUriString = SettingsHelper.getSdcardRootTreeUri(getContext());
         if (sdCardUriString == null) {
             StorageAccessFrameworkHelper.findSDCardWithDialog(getActivity());
         } else {

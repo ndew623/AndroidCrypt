@@ -134,6 +134,8 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
 
         checkPermissions();
 
+        ((MainActivity)getActivity()).testMediaFiles();
+
         //Hide the keyboard that automatically pops up.
         getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
@@ -287,7 +289,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
     };
 
     /**
-     * Show the FilePicker fragment so the user can pick a file.
+     * Show the FilePickerFragment fragment so the user can pick a file.
      * Open the file picker in the same folder that an already picked input file came from.
      */
     public void selectInputFile() {
@@ -296,7 +298,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
     }
 
     /**
-     * Open the FilePicker fragment so the user can pick an output file.
+     * Open the FilePickerFragment fragment so the user can pick an output file.
      * if an output file has previously been selected open its directory.
      * else if an input file has already been selected open that directory.
      */

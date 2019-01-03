@@ -1,26 +1,26 @@
 package com.dewdrop623.androidcrypt;
 
 import android.content.Intent;
-import android.content.res.TypedArray;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.provider.DocumentFile;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.content.res.AppCompatResources;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.dewdrop623.androidcrypt.FilePicker.FilePicker;
-import com.dewdrop623.androidcrypt.FilePicker.IconFilePicker;
-import com.dewdrop623.androidcrypt.FilePicker.ListFilePicker;
+import com.dewdrop623.androidcrypt.FilePicker.FilePickerFragment;
+import com.dewdrop623.androidcrypt.FilePicker.IconFilePickerFragment;
+import com.dewdrop623.androidcrypt.FilePicker.ListFilePickerFragment;
+
+import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -36,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
         if (SettingsHelper.getUseDarkTeme(this)) {
             setTheme(R.style.AppThemeDark);
         } else {
@@ -75,8 +77,8 @@ public class MainActivity extends AppCompatActivity {
         return (MainActivityFragment) getSupportFragmentManager().findFragmentByTag(MAINACTIVITYFRAGMENT_TAG);
     }
 
-    private FilePicker getFilePickerFragment() {
-        return (FilePicker) getSupportFragmentManager().findFragmentByTag(FILEPICKERFRAGMENT_TAG);
+    private FilePickerFragment getFilePickerFragment() {
+        return (FilePickerFragment) getSupportFragmentManager().findFragmentByTag(FILEPICKERFRAGMENT_TAG);
     }
 
     @Override
@@ -87,10 +89,10 @@ public class MainActivity extends AppCompatActivity {
                 DocumentFile pickedDir = DocumentFile.fromTreeUri(this, sdCardRoot);
                 grantUriPermission(getPackageName(), sdCardRoot, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                 getContentResolver().takePersistableUriPermission(sdCardRoot, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                SettingsHelper.setSdcardRoot(this, pickedDir.getUri().toString());
-                FilePicker filePicker = getFilePickerFragment();
-                if (filePicker != null) {
-                    filePicker.changePathToSDCard();
+                SettingsHelper.setSdcardRootTreeUri(this, pickedDir.getUri().toString());
+                FilePickerFragment filePickerFragment = getFilePickerFragment();
+                if (filePickerFragment != null) {
+                    filePickerFragment.changePathToSDCard();
                 }
             } else {
                 Toast.makeText(this, R.string.did_not_get_sdcard_access, Toast.LENGTH_SHORT).show();
@@ -121,20 +123,20 @@ public class MainActivity extends AppCompatActivity {
      * defaultOutputFilename - if isOutput this will be filled in the output name field, otherwise it can be null
      */
     public void pickFile(boolean isOutput, DocumentFile initialFolder, String defaultOutputFilename) {
-        FilePicker filePicker = null;
+        FilePickerFragment filePickerFragment = null;
         int filePickerType = SettingsHelper.getFilePickerType(this);
         if (filePickerType == SettingsHelper.FILE_ICON_VIEWER) {
-            filePicker = new IconFilePicker();
+            filePickerFragment = new IconFilePickerFragment();
         } else if (filePickerType == SettingsHelper.FILE_LIST_VIEWER) {
-            filePicker = new ListFilePicker();
+            filePickerFragment = new ListFilePickerFragment();
         }
         String title = isOutput?getString(R.string.choose_output_file):getString(R.string.choose_input_file);
         Bundle args = new Bundle();
-        args.putBoolean(FilePicker.IS_OUTPUT_KEY, isOutput);
+        args.putBoolean(FilePickerFragment.IS_OUTPUT_KEY, isOutput);
         GlobalDocumentFileStateHolder.setInitialFilePickerDirectory(initialFolder);
-        args.putString(FilePicker.DEFAULT_OUTPUT_FILENAME_KEY, defaultOutputFilename);
-        filePicker.setArguments(args);
-        displaySecondaryFragmentScreen(filePicker, title, FILEPICKERFRAGMENT_TAG);
+        args.putString(FilePickerFragment.DEFAULT_OUTPUT_FILENAME_KEY, defaultOutputFilename);
+        filePickerFragment.setArguments(args);
+        displaySecondaryFragmentScreen(filePickerFragment, title, FILEPICKERFRAGMENT_TAG);
     }
 
     public void filePicked(DocumentFile fileParentDirectory, String filename, boolean isOutput) {
@@ -195,17 +197,17 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        FilePicker filePicker = getFilePickerFragment();
-        if (filePicker != null && filePicker.isVisible()) {
-            filePicker.onBackPressed();
+        FilePickerFragment filePickerFragment = getFilePickerFragment();
+        if (filePickerFragment != null && filePickerFragment.isVisible()) {
+            filePickerFragment.onBackPressed();
         } else {
             superOnBackPressed();
         }
     }
 
     /**
-     * Used to implement back button behavior, even when FilePicker is visible.
-     * e.g. FilePicker usually goes up a directory in response to back button, unless it is at the
+     * Used to implement back button behavior, even when FilePickerFragment is visible.
+     * e.g. FilePickerFragment usually goes up a directory in response to back button, unless it is at the
      * file system root.
      */
     public void superOnBackPressed() {

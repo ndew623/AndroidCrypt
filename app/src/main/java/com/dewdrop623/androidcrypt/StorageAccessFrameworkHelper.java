@@ -7,8 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
-import android.support.v4.os.EnvironmentCompat;
 import android.support.v4.provider.DocumentFile;
 import android.support.v7.app.AlertDialog;
 import android.view.ContextThemeWrapper;
@@ -20,7 +18,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Stack;
 
 /**
  * StorageAccessFrameworkHelper provides an interface to the StorageAccessFramework.
@@ -50,61 +51,6 @@ public final class StorageAccessFrameworkHelper {
                     }
                 });
         builder.show();
-    }
-
-    public static OutputStream getOutputStreamWithSAF(Context context, File newFile) throws IOException {
-        OutputStream outputStream = null;
-        if (newFile.getParentFile().canWrite()) {
-            outputStream = new FileOutputStream(newFile);
-        } else {
-            /**
-             * The newFile is probably on the SD Card.
-             *
-             * Split the file path into its individual parts and use that combined with the
-             * DocumentFile to find the correct directory to write in.
-             * If the SD Card's name is not in the path, throw an exception.
-             * If DocumentFile.listFiles() does not contain the folders in newFile's path, throw an exception
-             * Very ugly, but it works.
-             */
-            String uriString = SettingsHelper.getSdcardRoot(context);
-            if (uriString == null) {
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                    throw new IOException(context.getString(R.string.file_write_access_denied));
-                }
-                throw new IOException(context.getString(R.string.write_permission_denied_if_sdcard_grant_permission_in_settings));
-            }
-            DocumentFile sdCardDirectory = DocumentFile.fromTreeUri(context, Uri.parse(uriString));
-            String sdCardName = sdCardDirectory.getName();
-            String newFilePathString = newFile.getAbsolutePath();
-            String[] newFileSplitPath = newFilePathString.split("/");
-            boolean foundSDCard = false;
-            boolean fileNotFound = false;
-            for (int i = 0; (i < newFileSplitPath.length) && !fileNotFound; i++) {
-                if (!foundSDCard) {
-                    if (sdCardName.equals(newFileSplitPath[i])) {
-                        foundSDCard = true;
-                    }
-                } else if (i == newFileSplitPath.length - 1) {
-                    outputStream = context.getContentResolver().openOutputStream(
-                            sdCardDirectory.createFile("", newFileSplitPath[newFileSplitPath.length - 1])
-                                    .getUri());
-                } else {
-                    fileNotFound = true;
-                    for (int j = 0; j < sdCardDirectory.listFiles().length; j++) {
-                        if (newFileSplitPath[i].equals(sdCardDirectory.listFiles()[j].getName())) {
-                            fileNotFound = false;
-                            sdCardDirectory = sdCardDirectory.listFiles()[j];
-                        }
-                    }
-                }
-            }
-            if (!foundSDCard) {
-                throw new IOException(context.getString(R.string.file_write_access_denied));
-            } else if (fileNotFound) {
-                throw new IOException(context.getString(R.string.file_not_found));
-            }
-        }
-        return outputStream;
     }
 
     @TargetApi(21)
@@ -142,8 +88,10 @@ public final class StorageAccessFrameworkHelper {
             for (File file : externalDirs) {
                 String path = file.getPath().split("/Android")[0];
 
-                boolean addPath = false;
+                /*boolean addPath = false;
 
+
+                This code would exclude internal storage. (Internal as in hardware-wise.)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     addPath = Environment.isExternalStorageRemovable(file);
                 } else {
@@ -152,7 +100,8 @@ public final class StorageAccessFrameworkHelper {
 
                 if (addPath) {
                     results.add(path);
-                }
+                }*/
+                results.add(path);
             }
         }
 
@@ -243,18 +192,61 @@ public final class StorageAccessFrameworkHelper {
 
         return pathNameBuilder.toString();
     }
-    public static InputStream getFileInputStream(Context context, String inputFileName) throws FileNotFoundException{
-        DocumentFile inputFile = GlobalDocumentFileStateHolder.getInputFileParentDirectory().findFile(inputFileName);
-        if (inputFile == null) {
-            throw new FileNotFoundException();
+
+    /**
+     * Trade a java.io.File that points to an external mountpoint (e.g. sdcard or usb drive)
+     * for a DocumentFile of that same location. (DocumentFiles can be used to write files
+     * to those locations.)
+     * Use the map stored in SharedPreferences to make the connection.
+     * Return null if no match found.
+     */
+    private static DocumentFile getDocumentFileForMountpoint(Context context, File mountpoint) throws IOException {
+        HashMap<String,String> mountpointUris = SettingsHelper.getExternalMountpointUris(context);
+        for (Map.Entry<String,String> e : mountpointUris.entrySet()) {
+            if (e.getKey().equals(mountpoint.getPath())) {
+                return DocumentFile.fromTreeUri(context, Uri.parse(e.getValue()));
+            }
         }
-        return context.getContentResolver().openInputStream(inputFile.getUri());
+        throw new IOException("Could not get permission to write file. Try adding permission for external storage devices in settings.");
     }
-    public static OutputStream getFileOutputStream(Context context, String outputFilename) throws FileNotFoundException{
-        DocumentFile outputFile = GlobalDocumentFileStateHolder.getOutputFileParentDirectory().createFile("", outputFilename);
-        if (outputFile == null) {
-            throw new FileNotFoundException();
+
+    /**
+     * Get the directory that is the mountpoint that file is under.
+     * Returns null if the file is not found under any mountpoint.
+     */
+    private static File getMountpointOfFile(Context context, File file) throws FileNotFoundException {
+        String [] mountpoints = getExternalStorageDirectories(context);
+        for (String s : mountpoints) {
+            if (file.getAbsolutePath().startsWith(s)) {
+                return new File(s);
+            }
         }
-        return context.getContentResolver().openOutputStream(outputFile.getUri());
+        throw new FileNotFoundException("Could not find mountpoint of filesystem containing output file.");
+    }
+
+    public static OutputStream getFileOutputStream(Context context, File outputFile) throws IOException {
+        if (outputFile.getParentFile().canWrite()) {
+            outputFile.createNewFile();
+            return new FileOutputStream(outputFile);
+        }
+        File mountpoint = getMountpointOfFile(context, outputFile);
+        DocumentFile documentFile = getDocumentFileForMountpoint(context, mountpoint);
+        Stack<String> fileNamesOnPath = new Stack<>();
+        File f = outputFile.getParentFile();
+        while (!mountpoint.equals(f)) {
+            fileNamesOnPath.push(f.getName());
+            f = f.getParentFile();
+        }
+        while (fileNamesOnPath.size() > 0) {
+            documentFile = documentFile.findFile(fileNamesOnPath.pop());
+            if (documentFile == null) {
+                throw new FileNotFoundException("AndroidCrypt Error 310");
+            }
+        }
+        documentFile = documentFile.createFile("txt", outputFile.getName());
+        if (documentFile == null) {
+            throw new IOException("Could not create file using DocumentFile API");
+        }
+        return context.getContentResolver().openOutputStream(documentFile.getUri(), "w");
     }
 }

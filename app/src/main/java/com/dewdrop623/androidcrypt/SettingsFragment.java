@@ -1,6 +1,5 @@
 package com.dewdrop623.androidcrypt;
 
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -92,7 +91,7 @@ public class SettingsFragment extends Fragment {
     public void onResume() {
         super.onResume();
         if (StorageAccessFrameworkHelper.canSupportSDCardOnAndroidVersion()) {
-            String sdCardUri = SettingsHelper.getSdcardRoot(getContext());
+            String sdCardUri = SettingsHelper.getSdcardRootTreeUri(getContext());
             if (sdCardUri != null) {
                 String sdCardName = DocumentFile.fromTreeUri(getContext(), Uri.parse(sdCardUri)).getName();
                 String sdCardPath = StorageAccessFrameworkHelper.findLikelySDCardPathFromSDCardName(getContext(), sdCardName);

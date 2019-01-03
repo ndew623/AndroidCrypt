@@ -10,13 +10,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
- * FilePicker uses FileBrowser to get the information it needs about the file system.
+ * FilePickerFragment uses FileBrowser to get the information it needs about the file system.
  */
 
 public class FileBrowser {
 
     private DocumentFile currentDirectory;
-    private FilePicker filePicker;
+    private FilePickerFragment filePickerFragment;
 
     public static final DocumentFile internalStorageHome = DocumentFile.fromFile(Environment.getExternalStorageDirectory());
     public static final String PARENT_FILE_NAME = "..";
@@ -25,13 +25,13 @@ public class FileBrowser {
         currentDirectory = internalStorageHome;
         monitorCurrentPathForChanges();
     }
-    public void setFilePicker(FilePicker filePicker) {
-        this.filePicker = filePicker;
+    public void setFilePickerFragment(FilePickerFragment filePickerFragment) {
+        this.filePickerFragment = filePickerFragment;
         updateFileViewer();
     }
     public void updateFileViewer() {
         ArrayList<DocumentFile> files = new ArrayList<>(Arrays.asList(currentDirectory.listFiles()));
-        filePicker.setFileList(files);
+        filePickerFragment.setFileList(files);
     }
     private void monitorCurrentPathForChanges() {
         /*

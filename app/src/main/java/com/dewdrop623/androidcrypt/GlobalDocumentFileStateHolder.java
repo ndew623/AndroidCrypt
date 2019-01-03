@@ -12,7 +12,7 @@ public class GlobalDocumentFileStateHolder {
     private static DocumentFile savedInputParentDirectoryForRotate = null;
     private static DocumentFile savedOutputParentDirectoryForRotate = null;
 
-    //used by FilePicker
+    //used by FilePickerFragment
     private static DocumentFile savedCurrentDirectoryForRotate = null;
     private static DocumentFile initialFilePickerDirectory = null;
 
