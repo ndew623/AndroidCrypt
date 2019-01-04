@@ -2,10 +2,11 @@ package com.dewdrop623.androidcrypt.FilePicker;
 
 import android.content.Context;
 import android.os.Environment;
-import android.support.v4.provider.DocumentFile;
+import android.os.FileObserver;
+import android.os.Handler;
+import android.os.Looper;
 
-import com.dewdrop623.androidcrypt.StorageAccessFrameworkHelper;
-
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -15,14 +16,16 @@ import java.util.Arrays;
 
 public class FileBrowser {
 
-    private DocumentFile currentDirectory;
+    private File currentDirectory;
     private FilePickerFragment filePickerFragment;
+    private FileObserver fileChangeMonitor;
 
-    public static final DocumentFile internalStorageHome = DocumentFile.fromFile(Environment.getExternalStorageDirectory());
-    public static final String PARENT_FILE_NAME = "..";
+    //TODO delete
+    //public static final DocumentFile internalStorageHome = DocumentFile.fromFile(Environment.getExternalStorageDirectory());
+    //public static final String PARENT_FILE_NAME = "..";
 
     public FileBrowser(Context context) {
-        currentDirectory = internalStorageHome;
+        currentDirectory = getHomeDirectory();
         monitorCurrentPathForChanges();
     }
     public void setFilePickerFragment(FilePickerFragment filePickerFragment) {
@@ -30,17 +33,15 @@ public class FileBrowser {
         updateFileViewer();
     }
     public void updateFileViewer() {
-        ArrayList<DocumentFile> files = new ArrayList<>(Arrays.asList(currentDirectory.listFiles()));
+        ArrayList<File> files = new ArrayList<>(Arrays.asList(currentDirectory.listFiles()));
         filePickerFragment.setFileList(files);
     }
     private void monitorCurrentPathForChanges() {
-        /*
 
-        TODO figure out how this works with DocumentFile
         if (fileChangeMonitor != null) {
             fileChangeMonitor.stopWatching();
         }
-        fileChangeMonitor = new FileObserver(currentPath.getAbsolutePath()) {
+        fileChangeMonitor = new FileObserver(currentDirectory.getAbsolutePath()) {
             @Override
             public void onEvent(int event, String path) {
                 event &= FileObserver.ALL_EVENTS;
@@ -55,16 +56,16 @@ public class FileBrowser {
                     });
             }
         };
-        fileChangeMonitor.startWatching();*/
+        fileChangeMonitor.startWatching();
     }
-
+    /*TODO delete
     public String getCurrentPathName() {
         return StorageAccessFrameworkHelper.getDocumentFilePath(currentDirectory);
-    }
+    }*/
 
     //change the displayed file path to newDirectory if it is a directory. If the new path is ".." then change the current path to the parent of the current directory.
-    public void setCurrentDirectory(DocumentFile newDirectory) {
-        if(!newDirectory.isDirectory()) {
+    public void setCurrentDirectory(File newDirectory) {
+        if(newDirectory != null && newDirectory.exists() && !newDirectory.isDirectory()) {
             return;
         }
         currentDirectory = newDirectory;
@@ -84,13 +85,15 @@ public class FileBrowser {
         }
         return hadParentDirectory;
     }
-
+    /*TODO delete
     public String getCurrentDirectoryUriString() {
         return currentDirectory.getUri().toString();
-    }
+    }*/
 
-    public DocumentFile getCurrentDirectory() {
+    public File getCurrentDirectory() {
         return currentDirectory;
     }
-    
+    public File getHomeDirectory() {
+        return Environment.getExternalStorageDirectory();
+    }
 }

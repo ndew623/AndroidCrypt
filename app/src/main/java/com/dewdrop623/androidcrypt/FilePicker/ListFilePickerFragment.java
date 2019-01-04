@@ -3,7 +3,6 @@ package com.dewdrop623.androidcrypt.FilePicker;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.content.res.AppCompatResources;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +13,8 @@ import android.widget.TextView;
 import com.dewdrop623.androidcrypt.MainActivity;
 import com.dewdrop623.androidcrypt.R;
 import com.dewdrop623.androidcrypt.SettingsHelper;
+
+import java.io.File;
 
 /**
  * Implementation of FilePickerFragment that displays files and folders in a list.
@@ -39,15 +40,15 @@ public class ListFilePickerFragment extends FilePickerFragment {
             if (convertView == null) {
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.listitem_listfileviewer_item, parent, false);
             }
-            Pair<String, Boolean> file = fileListAdapter.getItem(position);
+            File file = fileListAdapter.getItem(position);
             ImageView listItemImageView = (ImageView) convertView.findViewById(R.id.listItemImageView);
             TextView listItemTextView = (TextView) convertView.findViewById(R.id.listItemTextView);
-            if (file.second) {
+            if (file.isDirectory()) {
                 listItemImageView.setImageDrawable(AppCompatResources.getDrawable(getContext(), R.drawable.ic_folder));
             } else {
                 listItemImageView.setImageDrawable(AppCompatResources.getDrawable(getContext(), R.drawable.ic_file));
             }
-            listItemTextView.setText(file.first);
+            listItemTextView.setText(file.getName());
 
             /*Change text to match theme*/
             if (SettingsHelper.getUseDarkTeme(getContext())) {

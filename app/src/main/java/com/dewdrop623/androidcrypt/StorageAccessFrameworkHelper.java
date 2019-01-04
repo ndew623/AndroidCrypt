@@ -78,7 +78,7 @@ public final class StorageAccessFrameworkHelper {
 
     /* returns external storage paths (directory of external memory card) as array of Strings
     * thank you stack overflow*/
-    private static String[] getExternalStorageDirectories(Context context) {
+    public static String[] getExternalStorageDirectories(Context context) {
 
         List<String> results = new ArrayList<>();
 
