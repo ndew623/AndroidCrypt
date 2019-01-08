@@ -7,7 +7,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.provider.DocumentFile;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.content.res.AppCompatResources;
@@ -20,7 +19,7 @@ import com.dewdrop623.androidcrypt.FilePicker.FilePickerFragment;
 import com.dewdrop623.androidcrypt.FilePicker.IconFilePickerFragment;
 import com.dewdrop623.androidcrypt.FilePicker.ListFilePickerFragment;
 
-import java.io.File;
+import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -83,16 +82,35 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == StorageAccessFrameworkHelper.SAF_SDCARD_REQUEST_CODE) {
+        if (requestCode == StorageAccessFrameworkHelper.SAF_REMOVABLE_STORAGE_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-                Uri sdCardRoot = data.getData();
-                DocumentFile pickedDir = DocumentFile.fromTreeUri(this, sdCardRoot);
-                grantUriPermission(getPackageName(), sdCardRoot, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                getContentResolver().takePersistableUriPermission(sdCardRoot, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                SettingsHelper.setSdcardRootTreeUri(this, pickedDir.getUri().toString());
-                FilePickerFragment filePickerFragment = getFilePickerFragment();
-                if (filePickerFragment != null) {
-                    filePickerFragment.changePathToSDCard();
+                Uri removableStorageRoot = data.getData();
+                DocumentFile pickedDir = null;
+                if (removableStorageRoot != null) {
+                    pickedDir = DocumentFile.fromTreeUri(this, removableStorageRoot);
+                }
+                grantUriPermission(getPackageName(), removableStorageRoot, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                getContentResolver().takePersistableUriPermission(removableStorageRoot, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                Uri removableStorageUri = null;
+                if (pickedDir != null) {
+                    removableStorageUri = pickedDir.getUri();
+                }
+                String name = null;
+                if (removableStorageUri != null) {
+                    name = DocumentFile.fromTreeUri(this, removableStorageUri).toString();
+                }
+                if (name != null) {
+                    String removableStoragePath = StorageAccessFrameworkHelper.findLikelyRemovableStoragePathFromName(this, name);
+                    HashMap<String, String> externalMountpoints = SettingsHelper.getExternalMountpointUris(this);
+                    externalMountpoints.put(removableStoragePath, removableStorageUri.toString());
+                    SettingsHelper.setExternalMountpointUris(this, externalMountpoints);
+                    FilePickerFragment filePickerFragment = getFilePickerFragment();
+                    if (filePickerFragment != null) {
+                        filePickerFragment.changePathToSDCard();
+                    }
+                }
+                else {
+                    Toast.makeText(this, R.string.did_not_get_sdcard_access, Toast.LENGTH_SHORT).show();
                 }
             } else {
                 Toast.makeText(this, R.string.did_not_get_sdcard_access, Toast.LENGTH_SHORT).show();

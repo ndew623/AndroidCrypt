@@ -274,6 +274,8 @@ public abstract class FilePickerFragment extends Fragment {
 
     /**
      * TODO. Will need to be modified when supporting multiple external storage devices.
+     * TODO. fuck it. might just take it out when supporting multiple removable storage.
+     * TODO. this doesn't even use the settings. it just guesses at the sd card. wtf?
      * Exists so MainActivity can call this after SAF Activity for selecting SD card completes.
      */
     public void changePathToSDCard() {
@@ -389,7 +391,7 @@ public abstract class FilePickerFragment extends Fragment {
             to add more.
         String sdCardUriString = SettingsHelper.getSdcardRootTreeUri(getContext());
         if (sdCardUriString == null) {
-            StorageAccessFrameworkHelper.findSDCardWithDialog(getActivity());
+            StorageAccessFrameworkHelper.findRemovableStorageWithDialog(getActivity());
         } else {*/
             changePathToSDCard();
         /*}*/

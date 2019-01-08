@@ -13,6 +13,8 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import java.util.HashMap;
+
 /**
  * Settings Fragment contains the settings page UI.
  */
@@ -51,7 +53,7 @@ public class SettingsFragment extends Fragment {
 
         RadioGroup themeRadioGroup = (RadioGroup) view.findViewById(R.id.themeRadioGroup);
         boolean currentUseDarkThemeSetting = SettingsHelper.getUseDarkTeme(getContext());
-        if (currentUseDarkThemeSetting == true) {
+        if (currentUseDarkThemeSetting) {
             themeRadioGroup.check(R.id.darkThemeRadioButton);
         } else {
             themeRadioGroup.check(R.id.lightThemeRadioButton);
@@ -91,10 +93,12 @@ public class SettingsFragment extends Fragment {
     public void onResume() {
         super.onResume();
         if (StorageAccessFrameworkHelper.canSupportSDCardOnAndroidVersion()) {
-            String sdCardUri = SettingsHelper.getSdcardRootTreeUri(getContext());
+            HashMap<String,String> externalMountpointUris = SettingsHelper.getExternalMountpointUris(getContext());
+            /*TODO will need to be changed to support multiple removable storage*/
+            String sdCardUri = externalMountpointUris.entrySet().iterator().next().getValue();
             if (sdCardUri != null) {
                 String sdCardName = DocumentFile.fromTreeUri(getContext(), Uri.parse(sdCardUri)).getName();
-                String sdCardPath = StorageAccessFrameworkHelper.findLikelySDCardPathFromSDCardName(getContext(), sdCardName);
+                String sdCardPath = StorageAccessFrameworkHelper.findLikelyRemovableStoragePathFromName(getContext(), sdCardName);
                 if (sdCardPath != null) {
                     sdCardTextView.setText(sdCardPath);
                 } else if (sdCardName != null) {
@@ -153,7 +157,7 @@ public class SettingsFragment extends Fragment {
     private View.OnClickListener sdCardEditButtonOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            StorageAccessFrameworkHelper.findSDCardWithDialog(getActivity());
+            StorageAccessFrameworkHelper.findRemovableStorageWithDialog(getActivity());
         }
     };
 }

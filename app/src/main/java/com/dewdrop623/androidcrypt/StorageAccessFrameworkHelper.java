@@ -29,13 +29,13 @@ import java.util.Stack;
 
 public final class StorageAccessFrameworkHelper {
 
-    public static final int SAF_SDCARD_REQUEST_CODE = 44;
+    public static final int SAF_REMOVABLE_STORAGE_REQUEST_CODE = 44;
 
     private StorageAccessFrameworkHelper() {
 
     }
 
-    public static void findSDCardWithDialog(final Activity activity) {
+    public static void findRemovableStorageWithDialog(final Activity activity) {
         AlertDialog.Builder builder;
         if (SettingsHelper.getUseDarkTeme(activity)) {
             ContextThemeWrapper contextThemeWrapper = new ContextThemeWrapper(activity, R.style.DarkAlertDialogTheme);
@@ -43,6 +43,7 @@ public final class StorageAccessFrameworkHelper {
         } else {
             builder = new AlertDialog.Builder(activity);
         }
+        /*TODO update strings when supporting multiple removable storage*/
         builder.setTitle(R.string.sdcard).setMessage(R.string.how_to_locate_sdcard)
                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
@@ -56,19 +57,19 @@ public final class StorageAccessFrameworkHelper {
     @TargetApi(21)
     private static void findSDCard(Activity activity) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            activity.startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), SAF_SDCARD_REQUEST_CODE);
+            activity.startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), SAF_REMOVABLE_STORAGE_REQUEST_CODE);
         }
     }
 
     /**
-     * Search the mountpoints of external storage for the name of the SD card.
+     * Search the mountpoints of external storage for the name of the removable storage.
      * If not found, return null.
      */
-    public static String findLikelySDCardPathFromSDCardName(Context context, String sdCardName) {
-        if (sdCardName != null) {
+    public static String findLikelyRemovableStoragePathFromName(Context context, String name) {
+        if (name != null) {
             String[] externalStorageDirs = getExternalStorageDirectories(context);
             for (int i = 0; i < externalStorageDirs.length; i++) {
-                if (externalStorageDirs[i].contains(sdCardName)) {
+                if (externalStorageDirs[i].contains(name)) {
                     return externalStorageDirs[i];
                 }
             }
