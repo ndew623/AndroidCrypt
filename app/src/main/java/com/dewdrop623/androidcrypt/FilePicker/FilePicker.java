@@ -167,16 +167,15 @@ public abstract class FilePicker extends Fragment {
     //define behavior for the options menu
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.sdcard_button:
-                sdCardMenuButtonOnClick();
-                break;
-            case R.id.home_button:
-                goToHomeDirectory();
-                return true;
-            case R.id.refresh_button:
-                fileBrowser.updateFileViewer();
-                return true;
+        int itemId = item.getItemId();
+        if (itemId == R.id.sdcard_button) {
+            sdCardMenuButtonOnClick();
+        } else if (itemId == R.id.home_button){
+            goToHomeDirectory();
+            return true;
+        } else if (itemId == R.id.refresh_button) {
+            fileBrowser.updateFileViewer();
+            return true;
         }
         return false;
     }

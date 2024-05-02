@@ -191,13 +191,13 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_about:
-                ((MainActivity) getActivity()).displaySecondaryFragmentScreen(new AboutFragment(), context.getString(R.string.action_about), null);
-                return true;
-            case R.id.action_settings:
-                ((MainActivity) getActivity()).displaySecondaryFragmentScreen(new SettingsFragment(), context.getString(R.string.action_settings), null);
-                return true;
+        int itemId = item.getItemId();
+        if (itemId == R.id.action_about) {
+            ((MainActivity) getActivity()).displaySecondaryFragmentScreen(new AboutFragment(), context.getString(R.string.action_about), null);
+            return true;
+        } else if (itemId == R.id.action_settings) {
+            ((MainActivity) getActivity()).displaySecondaryFragmentScreen(new SettingsFragment(), context.getString(R.string.action_settings), null);
+            return true;
         }
         return false;
     }
@@ -241,13 +241,11 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
     private View.OnClickListener operationModeButtonsOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            switch (view.getId()) {
-                case R.id.encryptModeButton:
-                    enableEncryptionMode();
-                    break;
-                case R.id.decryptModeButton:
-                    enableDecryptionMode();
-                    break;
+            int viewId = view.getId();
+            if (viewId == R.id.encryptModeButton) {
+                enableEncryptionMode();
+            } else if (viewId == R.id.decryptModeButton) {
+                enableDecryptionMode();
             }
         }
     };

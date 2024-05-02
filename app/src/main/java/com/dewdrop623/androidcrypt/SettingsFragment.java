@@ -111,13 +111,10 @@ public class SettingsFragment extends Fragment {
     private RadioGroup.OnCheckedChangeListener aescryptVersionRadioGroupOnCheckedChangedListener = new RadioGroup.OnCheckedChangeListener() {
         @Override
         public void onCheckedChanged(RadioGroup radioGroup, int i) {
-            switch (i) {
-                case R.id.version1RadioButton:
-                    SettingsHelper.setAESCryptVersion(getContext(), CryptoThread.VERSION_1);
-                    break;
-                case R.id.version2RadioButton:
-                    SettingsHelper.setAESCryptVersion(getContext(), CryptoThread.VERSION_2);
-                    break;
+            if (i == R.id.version1RadioButton) {
+                SettingsHelper.setAESCryptVersion(getContext(), CryptoThread.VERSION_1);
+            } else if (i == R.id.version2RadioButton) {
+                SettingsHelper.setAESCryptVersion(getContext(), CryptoThread.VERSION_2);
             }
         }
     };
@@ -125,13 +122,10 @@ public class SettingsFragment extends Fragment {
     private RadioGroup.OnCheckedChangeListener filePickerDisplayRadioGroupOnCheckedChangedListener = new RadioGroup.OnCheckedChangeListener() {
         @Override
         public void onCheckedChanged(RadioGroup group, int checkedId) {
-            switch (checkedId) {
-                case R.id.iconDisplayRadioButton:
-                    SettingsHelper.setFilePickerType(getContext(), SettingsHelper.FILE_ICON_VIEWER);
-                    break;
-                case R.id.listDisplayRadioButton:
-                    SettingsHelper.setFilePickerType(getContext(), SettingsHelper.FILE_LIST_VIEWER);
-                    break;
+            if (checkedId == R.id.iconDisplayRadioButton) {
+                SettingsHelper.setFilePickerType(getContext(), SettingsHelper.FILE_ICON_VIEWER);
+            } else if (checkedId == R.id.listDisplayRadioButton) {
+                SettingsHelper.setFilePickerType(getContext(), SettingsHelper.FILE_LIST_VIEWER);
             }
         }
     };
@@ -139,13 +133,10 @@ public class SettingsFragment extends Fragment {
     private RadioGroup.OnCheckedChangeListener themeRadioGroupOnCheckedChangedListener = new RadioGroup.OnCheckedChangeListener() {
         @Override
         public void onCheckedChanged(RadioGroup group, int checkedId) {
-            switch (checkedId) {
-                case R.id.darkThemeRadioButton:
-                    SettingsHelper.setUseDarkTheme(getContext(), true);
-                    break;
-                case R.id.lightThemeRadioButton:
-                    SettingsHelper.setUseDarkTheme(getContext(), false);
-                    break;
+            if (checkedId == R.id.darkThemeRadioButton) {
+                SettingsHelper.setUseDarkTheme(getContext(), true);
+            } else if (checkedId == R.id.lightThemeRadioButton) {
+                SettingsHelper.setUseDarkTheme(getContext(), false);
             }
             ((MainActivity)getActivity()).recreate();
         }
