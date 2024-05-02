@@ -62,4 +62,11 @@
     <string name="write_permission_denied_if_sdcard_grant_permission_in_settings">Permiso de escritura denegado. Para enviar a la tarjeta SD, necesita concederle permiso en la configuración.</string>
     <string name="delete_input_file">Eliminar archivo seleccionado</string>
     <string name = "spanish_translation_credit">Traducción al español: Gracias a Rony Javier</string>
+    <string name="sdcard_error">Error de la tarjeta SD</string>
+    <string name="could_not_read_sdcard">No se pudo leer la tarjeta SD</string>
+    <string name="theme">Tema</string>
+    <string name="dark">Oscuro</string>
+    <string name="light">Claro</string>
+    <string name="manage_storage_permission_title">Gestionar permisos de almacenamiento de archivos</string>
+    <string name="manage_storage_permission_string">Pulse OK para ir a Configuración. AndroidCrypt necesita ser autorizado para gestionar el almacenamiento y poder leer y escribir archivos. Encuentre AndroidCrypt en la lista y active el interruptor.</string>
 </resources>

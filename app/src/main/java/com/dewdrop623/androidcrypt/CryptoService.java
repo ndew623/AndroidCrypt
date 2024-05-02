@@ -118,7 +118,7 @@ public class CryptoService extends Service implements CryptoThread.ProgressDispl
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
 
         Intent resultIntent = new Intent(this, MainActivity.class);
-        PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, resultIntent, 0);
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_IMMUTABLE);
 
         builder.setSmallIcon(operationType == CryptoThread.OPERATION_TYPE_ENCRYPTION ? R.drawable.ic_lock_png : R.drawable.ic_unlock_png);
         builder.setContentIntent(resultPendingIntent);

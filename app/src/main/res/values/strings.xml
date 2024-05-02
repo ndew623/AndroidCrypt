@@ -93,4 +93,6 @@
     <string name="theme">Theme</string>
     <string name="dark">Dark</string>
     <string name="light">Light</string>
+    <string name="manage_storage_permission_title">Manage Storage Permission</string>
+    <string name="manage_storage_permission_string">Press OK to go to settings. AndroidCrypt needs to be granted access to manage storage to read and write files. Find AndroidCrypt in the list and toggle the switch on.</string>
 </resources>
