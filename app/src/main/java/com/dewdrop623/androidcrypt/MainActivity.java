@@ -24,9 +24,11 @@ import com.dewdrop623.androidcrypt.FilePicker.ListFilePicker;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static final String INPUT_FILE_ARGUMENT_KEY = "com.dewdrop623.androidcrypt.MainActivity.INPUT_FILE_ARGUMENT_KEY";
 
     private FloatingActionButton fab;
     private boolean mainActivityFragmentOnTop = true;
+
 
     private static final String MAINACITIVITYFRAGMENT_ON_TOP_KEY = "com.dewdrop623.androidcrypt.MainActivity.MAINACTIVITYFRAGMENT_ON_TOP_KEY";
     private static final String MAINACTIVITYFRAGMENT_TAG = "com.dewdrop623.androidcrypt.MainActivity.MAINACTIVITYFRAGMENT_TAG";
@@ -48,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         final MainActivityFragment mainActivityFragment;
         if (savedInstanceState == null) {
             mainActivityFragment = new MainActivityFragment();
+            setFragmentArguments(mainActivityFragment, getIntent());
             attachFragment(mainActivityFragment, false, MAINACTIVITYFRAGMENT_TAG);
         } else {
             FragmentManager fragmentManager = getSupportFragmentManager();
@@ -165,6 +168,20 @@ public class MainActivity extends AppCompatActivity {
         setFabVisible(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         getSupportActionBar().setTitle(R.string.app_name);
+    }
+
+    /*
+    * add arguments to the MainActivity fragment before it is displayed
+     */
+    private void setFragmentArguments(Fragment fragment, Intent intent) {
+        Bundle args = new Bundle();
+        if (intent != null) {
+            Uri data = intent.getData();
+            if (data != null) {
+                args.putParcelable(INPUT_FILE_ARGUMENT_KEY, data);
+            }
+        }
+        fragment.setArguments(args);
     }
 
     /*

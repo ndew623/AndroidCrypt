@@ -19,6 +19,24 @@
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name">
+
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="content"  android:host="*" android:pathPattern=".*" android:mimeType="*/*"  />
+            </intent-filter>
+
+            <!--
+            Older apps maybe still use android:scheme="file". Would need some work to support. Would also need to find an app that still uses scheme="file" (or make one) to test.
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="file"  android:host="*" android:pathPattern=".*" android:mimeType="*/*"  />
+            </intent-filter> -->
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

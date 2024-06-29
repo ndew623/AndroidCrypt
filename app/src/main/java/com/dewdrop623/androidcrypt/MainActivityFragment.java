@@ -170,6 +170,18 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         return view;
     }
 
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState){
+        Bundle args = getArguments();
+        if (args != null && args.containsKey(MainActivity.INPUT_FILE_ARGUMENT_KEY)) {
+            Uri inputFile = args.getParcelable(MainActivity.INPUT_FILE_ARGUMENT_KEY);
+            DocumentFile documentFile =  DocumentFile.fromSingleUri(getContext(), inputFile);
+            DocumentFile parentDocumentFile = documentFile.getParentFile();
+            String filename = documentFile.getName();
+            setFile(parentDocumentFile, filename, false);
+        }
+    }
+
     //Store the current state when MainActivityFragment is added to back stack.
     //onCreateView will be called when the MainActivityFragment is displayed again
     //onSaveInstance state WILL NOT do this when the view is hidden
