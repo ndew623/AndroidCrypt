@@ -47,7 +47,7 @@ public class CryptoThread extends Thread {
     private CryptoService cryptoService;
     private static boolean operationType;
 
-    private String inputFileName;
+    private DocumentFile inputFile;
     private String outputFileName;
     private String password;
     private int version;
@@ -57,9 +57,9 @@ public class CryptoThread extends Thread {
     /**
      * Takes a cryptoService, input and output uris, the password, a version (use VERSION_X constants), and operation type (defined by the OPERATION_TYPE_X constants)
      */
-    public CryptoThread(CryptoService cryptoService, String inputFileName, String outputFileName, String password, int version, boolean operationType, boolean deleteInputFile) {
+    public CryptoThread(CryptoService cryptoService, DocumentFile inputFile, String outputFileName, String password, int version, boolean operationType, boolean deleteInputFile) {
         this.cryptoService = cryptoService;
-        this.inputFileName = inputFileName;
+        this.inputFile = inputFile;
         this.outputFileName = outputFileName;
         this.password = password;
         this.version = version;
@@ -88,7 +88,7 @@ public class CryptoThread extends Thread {
         OutputStream outputStream = null;
         //get the input stream
         try {
-            inputStream = StorageAccessFrameworkHelper.getFileInputStream(cryptoService, inputFileName);
+            inputStream = StorageAccessFrameworkHelper.getFileInputStream(cryptoService, inputFile);
         } catch (IOException ioe) {
             successful = false;
             ioe.printStackTrace();
@@ -209,7 +209,6 @@ public class CryptoThread extends Thread {
     }
 
     private boolean deleteInputFile() {
-        DocumentFile inputFile = GlobalDocumentFileStateHolder.getInputFileParentDirectory().findFile(inputFileName);
         if (inputFile != null) {
             return inputFile.delete();
         } else {

@@ -104,7 +104,7 @@ public abstract class FilePicker extends Fragment {
                 if (isOutput) {
                     fileNameEditText.setText(clickedFile.getName());
                 } else {
-                    ((MainActivity) getActivity()).filePicked(clickedFile.getParentFile(), clickedFile.getName(), isOutput);
+                    ((MainActivity) getActivity()).inputFilePicked(clickedFile.getParentFile(), clickedFile);
                     ((MainActivity) getActivity()).superOnBackPressed();
                 }
             }
@@ -118,7 +118,7 @@ public abstract class FilePicker extends Fragment {
             DocumentFile newFileParentDirectory = fileBrowser.getCurrentDirectory();
             String error = checkFileErrors(newFileParentDirectory, fileName);
             if (error.isEmpty()) {
-                ((MainActivity) getActivity()).filePicked(newFileParentDirectory, fileName, isOutput);
+                ((MainActivity) getActivity()).outputFilePicked(newFileParentDirectory, fileName);
                 ((MainActivity) getActivity()).superOnBackPressed();
             } else {
                 Toast.makeText(getContext(), error, Toast.LENGTH_SHORT).show();

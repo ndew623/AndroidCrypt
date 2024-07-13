@@ -140,8 +140,11 @@ public class MainActivity extends AppCompatActivity {
         displaySecondaryFragmentScreen(filePicker, title, FILEPICKERFRAGMENT_TAG);
     }
 
-    public void filePicked(DocumentFile fileParentDirectory, String filename, boolean isOutput) {
-        getMainActivityFragment().setFile(fileParentDirectory, filename, isOutput);
+    public void outputFilePicked(DocumentFile fileParentDirectory, String filename) {
+        getMainActivityFragment().setOutputFile(fileParentDirectory, filename);
+    }
+    public void inputFilePicked(DocumentFile fileParentDirectory, DocumentFile file) {
+        getMainActivityFragment().setInputFile(fileParentDirectory, file);
     }
 
     /**

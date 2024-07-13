@@ -14,6 +14,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.provider.DocumentFile;
 import android.widget.Toast;
 
 /**
@@ -25,10 +26,7 @@ public class CryptoService extends Service implements CryptoThread.ProgressDispl
     public static final int START_FOREGROUND_ID = 1025;
 
     //Keys for the intent extras
-    public static final String INPUT_FILE_NAME_EXTRA_KEY = "com.dewdrop623.androidcrypt.CryptoService.INPUT_URI_KEY";
     public static final String OUTPUT_FILE_NAME_EXTRA_KEY = "com.dewdrop623.androidcrypt.CryptoService.OUTPUT_FILE_NAME_EXTRA_KEY";
-    public static final String INPUT_FILENAME_KEY = "com.dewdrop623.androidcrypt.CryptoService.INPUT_FILENAME_KEY";
-    public static final String OUTPUT_FILENAME_KEY = "com.dewdrop623.androidcrypt.CryptoService.OUTPUT_FILENAME_KEY";
     public static final String VERSION_EXTRA_KEY = "com.dewdrop623.androidcrypt.CryptoService.VERSION_EXTRA_KEY";
     public static final String OPERATION_TYPE_EXTRA_KEY = "com.dewdrop623.androidcrypt.CryptoService.OPERATION_TYPE_EXTRA_KEY";
     public static final String DELETE_INPUT_FILE_KEY = "com.dewdrop623.androidcrypt.CryptoService.DELETE_INPUT_FILE_KEY";
@@ -58,7 +56,7 @@ public class CryptoService extends Service implements CryptoThread.ProgressDispl
             stopForeground(true);
             return START_NOT_STICKY;
         }
-        String inputFileName = intent.getStringExtra(INPUT_FILE_NAME_EXTRA_KEY);
+        DocumentFile inputFile = GlobalDocumentFileStateHolder.getInputFile();
         String outputFileName = intent.getStringExtra(OUTPUT_FILE_NAME_EXTRA_KEY);
         int version = intent.getIntExtra(VERSION_EXTRA_KEY, SettingsHelper.AESCRYPT_DEFAULT_VERSION);
         String password = MainActivityFragment.getAndClearPassword();
@@ -68,7 +66,7 @@ public class CryptoService extends Service implements CryptoThread.ProgressDispl
         CryptoThread.registerForProgressUpdate(PROGRESS_DISPLAYER_ID, this);
 
         if (password != null) {
-            CryptoThread cryptoThread = new CryptoThread(this, inputFileName, outputFileName, password, version, operationType, deleteInputFile);
+            CryptoThread cryptoThread = new CryptoThread(this, inputFile, outputFileName, password, version, operationType, deleteInputFile);
             cryptoThread.start();
         } else {
             showToastOnGuiThread(R.string.error_null_password);

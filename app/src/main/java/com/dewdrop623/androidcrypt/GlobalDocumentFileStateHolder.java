@@ -11,6 +11,7 @@ public class GlobalDocumentFileStateHolder {
     //used by MainActivityFragment
     private static DocumentFile savedInputParentDirectoryForRotate = null;
     private static DocumentFile savedOutputParentDirectoryForRotate = null;
+    private static DocumentFile savedInputFileForRotate = null;
 
     //used by FilePicker
     private static DocumentFile savedCurrentDirectoryForRotate = null;
@@ -18,6 +19,7 @@ public class GlobalDocumentFileStateHolder {
 
     //used to get rw access to files for encryption
     private static DocumentFile inputFileParentDirectory = null;
+    private static DocumentFile inputFile = null;
     private static DocumentFile outputFileParentDirectory = null;
 
 
@@ -27,8 +29,18 @@ public class GlobalDocumentFileStateHolder {
         return savedInputDirectoryForRotate;
     }
 
+    public static DocumentFile getAndClearSavedInputFileForRotate() {
+        DocumentFile savedInputDirectoryForRotate = GlobalDocumentFileStateHolder.savedInputFileForRotate;
+        GlobalDocumentFileStateHolder.savedInputFileForRotate = null;
+        return savedInputDirectoryForRotate;
+    }
+
     public static void setSavedInputParentDirectoryForRotate(DocumentFile savedInputParentDirectoryForRotate) {
         GlobalDocumentFileStateHolder.savedInputParentDirectoryForRotate = savedInputParentDirectoryForRotate;
+    }
+
+    public static void setSavedInputFileForRotate(DocumentFile setSavedInputFileForRotate) {
+        GlobalDocumentFileStateHolder.savedInputFileForRotate = setSavedInputFileForRotate;
     }
 
     public static DocumentFile getAndClearSavedOutputParentDirectoryForRotate() {
@@ -44,9 +56,15 @@ public class GlobalDocumentFileStateHolder {
     public static DocumentFile getInputFileParentDirectory() {
         return inputFileParentDirectory;
     }
+    public static DocumentFile getInputFile() {
+        return inputFile;
+    }
 
     public static void setInputFileParentDirectory(DocumentFile inputFileParentDirectory) {
         GlobalDocumentFileStateHolder.inputFileParentDirectory = inputFileParentDirectory;
+    }
+    public static void setInputFile(DocumentFile inputFile) {
+        GlobalDocumentFileStateHolder.inputFile = inputFile;
     }
 
     public static DocumentFile getOutputFileParentDirectory() {

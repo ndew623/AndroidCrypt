@@ -213,7 +213,7 @@ public final class StorageAccessFrameworkHelper {
     }
 
     public static String getDocumentFilePath(DocumentFile documentFile) {
-        return getDocumentFilePath(documentFile, null);
+        return getDocumentFilePath(documentFile, (String)null);
     }
 
     /**
@@ -222,18 +222,18 @@ public final class StorageAccessFrameworkHelper {
      * (DocumentFiles must exist unlike java.io.file)
      * if documentFile is null, return the empty string
      */
-    public static String getDocumentFilePath(DocumentFile documentFile, String childFileName) {
+    public static String getDocumentFilePath(DocumentFile parentDocumentFile, String childFileName) {
 
-        if (documentFile == null) {
-            return new String();
+        if (parentDocumentFile == null) {
+            return childFileName == null ? new String() : childFileName;
         }
 
         StringBuilder pathNameBuilder = new StringBuilder();
-        pathNameBuilder.append(documentFile.getName());
-        while (documentFile.getParentFile() != null) {
+        pathNameBuilder.append(parentDocumentFile.getName());
+        while (parentDocumentFile.getParentFile() != null) {
             pathNameBuilder.insert(0, File.separator);
-            pathNameBuilder.insert(0, documentFile.getParentFile().getName());
-            documentFile = documentFile.getParentFile();
+            pathNameBuilder.insert(0, parentDocumentFile.getParentFile().getName());
+            parentDocumentFile = parentDocumentFile.getParentFile();
         }
 
         if (childFileName != null) {
@@ -243,8 +243,28 @@ public final class StorageAccessFrameworkHelper {
 
         return pathNameBuilder.toString();
     }
-    public static InputStream getFileInputStream(Context context, String inputFileName) throws FileNotFoundException{
-        DocumentFile inputFile = GlobalDocumentFileStateHolder.getInputFileParentDirectory().findFile(inputFileName);
+    public static String getDocumentFilePath(DocumentFile parentDocumentFile, DocumentFile childDocumentFile) {
+
+        if (parentDocumentFile == null) {
+            return childDocumentFile == null ? new String() : childDocumentFile.getName();
+        }
+
+        StringBuilder pathNameBuilder = new StringBuilder();
+        pathNameBuilder.append(parentDocumentFile.getName());
+        while (parentDocumentFile.getParentFile() != null) {
+            pathNameBuilder.insert(0, File.separator);
+            pathNameBuilder.insert(0, parentDocumentFile.getParentFile().getName());
+            parentDocumentFile = parentDocumentFile.getParentFile();
+        }
+
+        if (childDocumentFile != null) {
+            pathNameBuilder.append(File.separator);
+            pathNameBuilder.append(childDocumentFile.getName());
+        }
+
+        return pathNameBuilder.toString();
+    }
+    public static InputStream getFileInputStream(Context context, DocumentFile inputFile) throws FileNotFoundException{
         if (inputFile == null) {
             throw new FileNotFoundException();
         }
