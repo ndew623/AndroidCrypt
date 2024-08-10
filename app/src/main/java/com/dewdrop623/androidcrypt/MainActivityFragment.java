@@ -178,6 +178,9 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
             DocumentFile documentFile =  DocumentFile.fromSingleUri(getContext(), inputFile);
             setInputFile(null, documentFile);
             args.clear();
+            if (documentFile.getName().endsWith(".aes")) {
+                enableDecryptionMode();
+            }
         }
     }
 
