@@ -1,5 +1,6 @@
 package com.dewdrop623.androidcrypt;
 
+import android.net.Uri;
 import android.support.v4.provider.DocumentFile;
 
 import java.io.IOException;
@@ -47,8 +48,8 @@ public class CryptoThread extends Thread {
     private CryptoService cryptoService;
     private static boolean operationType;
 
-    private DocumentFile inputFile;
-    private String outputFileName;
+    private Uri inputFile;
+    private Uri outputFile;
     private String password;
     private int version;
     private boolean deleteInputFile = false;
@@ -57,10 +58,10 @@ public class CryptoThread extends Thread {
     /**
      * Takes a cryptoService, input and output uris, the password, a version (use VERSION_X constants), and operation type (defined by the OPERATION_TYPE_X constants)
      */
-    public CryptoThread(CryptoService cryptoService, DocumentFile inputFile, String outputFileName, String password, int version, boolean operationType, boolean deleteInputFile) {
+    public CryptoThread(CryptoService cryptoService, Uri inputFile, Uri outputFile, String password, int version, boolean operationType, boolean deleteInputFile) {
         this.cryptoService = cryptoService;
         this.inputFile = inputFile;
-        this.outputFileName = outputFileName;
+        this.outputFile = outputFile;
         this.password = password;
         this.version = version;
         this.deleteInputFile = deleteInputFile;
@@ -88,7 +89,7 @@ public class CryptoThread extends Thread {
         OutputStream outputStream = null;
         //get the input stream
         try {
-            inputStream = StorageAccessFrameworkHelper.getFileInputStream(cryptoService, inputFile);
+            inputStream = cryptoService.getContentResolver().openInputStream(inputFile);
         } catch (IOException ioe) {
             successful = false;
             ioe.printStackTrace();
@@ -97,7 +98,7 @@ public class CryptoThread extends Thread {
 
         //get the output stream
         try {
-            outputStream = StorageAccessFrameworkHelper.getFileOutputStream(cryptoService, outputFileName);
+            outputStream = cryptoService.getContentResolver().openOutputStream(outputFile);
         } catch (IOException ioe) {
             successful = false;
             ioe.printStackTrace();
@@ -164,6 +165,20 @@ public class CryptoThread extends Thread {
         if (successful && deleteInputFile && operationInProgress) {
             deleteInputFile();
         }
+
+        /*
+        if operation didn't encounter errors (successful == true)
+        and didn't get canceled (operationInProgress is still true):
+        display toast to notify of success
+        */
+        if (successful && operationInProgress) {
+            if (operationType == OPERATION_TYPE_ENCRYPTION) {
+                cryptoService.showToastOnGuiThread(R.string.encryption_completed);
+            } else {
+                cryptoService.showToastOnGuiThread(R.string.decryption_completed);
+            }
+        }
+
         //stop the service
         cryptoService.stopForeground(false);
         operationInProgress = false;
@@ -210,7 +225,7 @@ public class CryptoThread extends Thread {
 
     private boolean deleteInputFile() {
         if (inputFile != null) {
-            return inputFile.delete();
+            return cryptoService.getContentResolver().delete(inputFile, null, null) > 0;
         } else {
             return false;
         }

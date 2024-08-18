@@ -5,20 +5,18 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.support.v4.os.EnvironmentCompat;
 import android.support.v4.provider.DocumentFile;
+import android.provider.OpenableColumns;
 import android.support.v7.app.AlertDialog;
 import android.view.ContextThemeWrapper;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +30,31 @@ public final class StorageAccessFrameworkHelper {
 
     private StorageAccessFrameworkHelper() {
 
+    }
+
+    public static String getFilenameFromUri(Uri uri, Context context) {
+        String result = null;
+        if (uri.getScheme().equals("content")) {
+            Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
+            try {
+                if (cursor != null && cursor.moveToFirst()) {
+                    int columnIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                    if (columnIndex >= 0) {
+                        result = cursor.getString(columnIndex);
+                    }
+                }
+            } finally {
+                cursor.close();
+            }
+        }
+        if (result == null) {
+            result = uri.getPath();
+            int cut = result.lastIndexOf('/');
+            if (cut != -1) {
+                result = result.substring(cut + 1);
+            }
+        }
+        return result;
     }
 
     public static void findSDCardWithDialog(final Activity activity) {
@@ -50,61 +73,6 @@ public final class StorageAccessFrameworkHelper {
                     }
                 });
         builder.show();
-    }
-
-    public static OutputStream getOutputStreamWithSAF(Context context, File newFile) throws IOException {
-        OutputStream outputStream = null;
-        if (newFile.getParentFile().canWrite()) {
-            outputStream = new FileOutputStream(newFile);
-        } else {
-            /**
-             * The newFile is probably on the SD Card.
-             *
-             * Split the file path into its individual parts and use that combined with the
-             * DocumentFile to find the correct directory to write in.
-             * If the SD Card's name is not in the path, throw an exception.
-             * If DocumentFile.listFiles() does not contain the folders in newFile's path, throw an exception
-             * Very ugly, but it works.
-             */
-            String uriString = SettingsHelper.getSdcardRoot(context);
-            if (uriString == null) {
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                    throw new IOException(context.getString(R.string.file_write_access_denied));
-                }
-                throw new IOException(context.getString(R.string.write_permission_denied_if_sdcard_grant_permission_in_settings));
-            }
-            DocumentFile sdCardDirectory = DocumentFile.fromTreeUri(context, Uri.parse(uriString));
-            String sdCardName = sdCardDirectory.getName();
-            String newFilePathString = newFile.getAbsolutePath();
-            String[] newFileSplitPath = newFilePathString.split("/");
-            boolean foundSDCard = false;
-            boolean fileNotFound = false;
-            for (int i = 0; (i < newFileSplitPath.length) && !fileNotFound; i++) {
-                if (!foundSDCard) {
-                    if (sdCardName.equals(newFileSplitPath[i])) {
-                        foundSDCard = true;
-                    }
-                } else if (i == newFileSplitPath.length - 1) {
-                    outputStream = context.getContentResolver().openOutputStream(
-                            sdCardDirectory.createFile("", newFileSplitPath[newFileSplitPath.length - 1])
-                                    .getUri());
-                } else {
-                    fileNotFound = true;
-                    for (int j = 0; j < sdCardDirectory.listFiles().length; j++) {
-                        if (newFileSplitPath[i].equals(sdCardDirectory.listFiles()[j].getName())) {
-                            fileNotFound = false;
-                            sdCardDirectory = sdCardDirectory.listFiles()[j];
-                        }
-                    }
-                }
-            }
-            if (!foundSDCard) {
-                throw new IOException(context.getString(R.string.file_write_access_denied));
-            } else if (fileNotFound) {
-                throw new IOException(context.getString(R.string.file_not_found));
-            }
-        }
-        return outputStream;
     }
 
     @TargetApi(21)
@@ -212,69 +180,4 @@ public final class StorageAccessFrameworkHelper {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
     }
 
-    public static String getDocumentFilePath(DocumentFile documentFile) {
-        return getDocumentFilePath(documentFile, (String)null);
-    }
-
-    /**
-     * Gets a file path string for a document file.
-     * childFileName can be null, or used to get the path of a file that doesn't exist yet
-     * (DocumentFiles must exist unlike java.io.file)
-     * if documentFile is null, return the empty string
-     */
-    public static String getDocumentFilePath(DocumentFile parentDocumentFile, String childFileName) {
-
-        if (parentDocumentFile == null) {
-            return childFileName == null ? new String() : childFileName;
-        }
-
-        StringBuilder pathNameBuilder = new StringBuilder();
-        pathNameBuilder.append(parentDocumentFile.getName());
-        while (parentDocumentFile.getParentFile() != null) {
-            pathNameBuilder.insert(0, File.separator);
-            pathNameBuilder.insert(0, parentDocumentFile.getParentFile().getName());
-            parentDocumentFile = parentDocumentFile.getParentFile();
-        }
-
-        if (childFileName != null) {
-            pathNameBuilder.append(File.separator);
-            pathNameBuilder.append(childFileName);
-        }
-
-        return pathNameBuilder.toString();
-    }
-    public static String getDocumentFilePath(DocumentFile parentDocumentFile, DocumentFile childDocumentFile) {
-
-        if (parentDocumentFile == null) {
-            return childDocumentFile == null ? new String() : childDocumentFile.getName();
-        }
-
-        StringBuilder pathNameBuilder = new StringBuilder();
-        pathNameBuilder.append(parentDocumentFile.getName());
-        while (parentDocumentFile.getParentFile() != null) {
-            pathNameBuilder.insert(0, File.separator);
-            pathNameBuilder.insert(0, parentDocumentFile.getParentFile().getName());
-            parentDocumentFile = parentDocumentFile.getParentFile();
-        }
-
-        if (childDocumentFile != null) {
-            pathNameBuilder.append(File.separator);
-            pathNameBuilder.append(childDocumentFile.getName());
-        }
-
-        return pathNameBuilder.toString();
-    }
-    public static InputStream getFileInputStream(Context context, DocumentFile inputFile) throws FileNotFoundException{
-        if (inputFile == null) {
-            throw new FileNotFoundException();
-        }
-        return context.getContentResolver().openInputStream(inputFile.getUri());
-    }
-    public static OutputStream getFileOutputStream(Context context, String outputFilename) throws FileNotFoundException{
-        DocumentFile outputFile = GlobalDocumentFileStateHolder.getOutputFileParentDirectory().createFile("", outputFilename);
-        if (outputFile == null) {
-            throw new FileNotFoundException();
-        }
-        return context.getContentResolver().openOutputStream(outputFile.getUri());
-    }
 }

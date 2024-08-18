@@ -1,26 +1,17 @@
 package com.dewdrop623.androidcrypt;
 
 import android.content.Intent;
-import android.content.res.TypedArray;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.provider.DocumentFile;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.content.res.AppCompatResources;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
-
-import com.dewdrop623.androidcrypt.FilePicker.FilePicker;
-import com.dewdrop623.androidcrypt.FilePicker.IconFilePicker;
-import com.dewdrop623.androidcrypt.FilePicker.ListFilePicker;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,6 +25,9 @@ public class MainActivity extends AppCompatActivity {
     private static final String MAINACTIVITYFRAGMENT_TAG = "com.dewdrop623.androidcrypt.MainActivity.MAINACTIVITYFRAGMENT_TAG";
     private static final String FILEPICKERFRAGMENT_TAG = "com.dewdrop623.androidcrypt.MainActivity.FILEPICKERFRAGMENT_TAG";
     private static final String TITLE_KEY = "com.dewdrop623.androidcrypt.MainActivity.TITLE_KEY";
+
+    private static final int CHOOSE_INPUT_FILE_REQUEST_CODE = 1654;
+    private static final int CHOOSE_OUTPUT_FILE_REQUEST_CODE = 1655;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,26 +72,13 @@ public class MainActivity extends AppCompatActivity {
         return (MainActivityFragment) getSupportFragmentManager().findFragmentByTag(MAINACTIVITYFRAGMENT_TAG);
     }
 
-    private FilePicker getFilePickerFragment() {
-        return (FilePicker) getSupportFragmentManager().findFragmentByTag(FILEPICKERFRAGMENT_TAG);
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == StorageAccessFrameworkHelper.SAF_SDCARD_REQUEST_CODE) {
-            if (resultCode == RESULT_OK) {
-                Uri sdCardRoot = data.getData();
-                DocumentFile pickedDir = DocumentFile.fromTreeUri(this, sdCardRoot);
-                grantUriPermission(getPackageName(), sdCardRoot, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                getContentResolver().takePersistableUriPermission(sdCardRoot, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                SettingsHelper.setSdcardRoot(this, pickedDir.getUri().toString());
-                FilePicker filePicker = getFilePickerFragment();
-                if (filePicker != null) {
-                    filePicker.changePathToSDCard();
-                }
-            } else {
-                Toast.makeText(this, R.string.did_not_get_sdcard_access, Toast.LENGTH_SHORT).show();
-            }
+        if (requestCode == CHOOSE_INPUT_FILE_REQUEST_CODE) {
+            getMainActivityFragment().setInputFile(data.getData());
+        }
+        else if (requestCode == CHOOSE_OUTPUT_FILE_REQUEST_CODE) {
+            getMainActivityFragment().setOutputFile(data.getData());
         }
     }
 
@@ -118,33 +99,23 @@ public class MainActivity extends AppCompatActivity {
         fab.setImageDrawable(AppCompatResources.getDrawable(this, drawableId));
     }
 
-    /**
-     * Called by MainActivityFragment when the user is picking an input or output file.
-     * initialFolder - the file picker opens with this directory
-     * defaultOutputFilename - if isOutput this will be filled in the output name field, otherwise it can be null
-     */
-    public void pickFile(boolean isOutput, DocumentFile initialFolder, String defaultOutputFilename) {
-        FilePicker filePicker = null;
-        int filePickerType = SettingsHelper.getFilePickerType(this);
-        if (filePickerType == SettingsHelper.FILE_ICON_VIEWER) {
-            filePicker = new IconFilePicker();
-        } else if (filePickerType == SettingsHelper.FILE_LIST_VIEWER) {
-            filePicker = new ListFilePicker();
-        }
-        String title = isOutput?getString(R.string.choose_output_file):getString(R.string.choose_input_file);
-        Bundle args = new Bundle();
-        args.putBoolean(FilePicker.IS_OUTPUT_KEY, isOutput);
-        GlobalDocumentFileStateHolder.setInitialFilePickerDirectory(initialFolder);
-        args.putString(FilePicker.DEFAULT_OUTPUT_FILENAME_KEY, defaultOutputFilename);
-        filePicker.setArguments(args);
-        displaySecondaryFragmentScreen(filePicker, title, FILEPICKERFRAGMENT_TAG);
+    public void pickInputFile() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+        intent.setType("*/*");
+
+        startActivityForResult(intent, CHOOSE_INPUT_FILE_REQUEST_CODE);
     }
 
-    public void outputFilePicked(DocumentFile fileParentDirectory, String filename) {
-        getMainActivityFragment().setOutputFile(fileParentDirectory, filename);
-    }
-    public void inputFilePicked(DocumentFile fileParentDirectory, DocumentFile file) {
-        getMainActivityFragment().setInputFile(fileParentDirectory, file);
+    public void pickOutputFile(String defaultOutputFilename) {
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+        intent.setType("*/*");
+
+        intent.putExtra(Intent.EXTRA_TITLE, defaultOutputFilename);
+        startActivityForResult(intent, CHOOSE_OUTPUT_FILE_REQUEST_CODE);
     }
 
     /**
@@ -211,16 +182,6 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onBackPressed() {
-        FilePicker filePicker = getFilePickerFragment();
-        if (filePicker != null && filePicker.isVisible()) {
-            filePicker.onBackPressed();
-        } else {
-            superOnBackPressed();
-        }
     }
 
     /**

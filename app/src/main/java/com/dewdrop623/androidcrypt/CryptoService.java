@@ -8,6 +8,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
@@ -26,7 +27,8 @@ public class CryptoService extends Service implements CryptoThread.ProgressDispl
     public static final int START_FOREGROUND_ID = 1025;
 
     //Keys for the intent extras
-    public static final String OUTPUT_FILE_NAME_EXTRA_KEY = "com.dewdrop623.androidcrypt.CryptoService.OUTPUT_FILE_NAME_EXTRA_KEY";
+    public static final String OUTPUT_FILE_URI_EXTRA_KEY = "com.dewdrop623.androidcrypt.CryptoService.OUTPUT_FILE_URI_EXTRA_KEY";
+    public static final String INPUT_FILE_URI_EXTRA_KEY = "com.dewdrop623.androidcrypt.CryptoService.INPUT_FILE_URI_EXTRA_KEY";
     public static final String VERSION_EXTRA_KEY = "com.dewdrop623.androidcrypt.CryptoService.VERSION_EXTRA_KEY";
     public static final String OPERATION_TYPE_EXTRA_KEY = "com.dewdrop623.androidcrypt.CryptoService.OPERATION_TYPE_EXTRA_KEY";
     public static final String DELETE_INPUT_FILE_KEY = "com.dewdrop623.androidcrypt.CryptoService.DELETE_INPUT_FILE_KEY";
@@ -56,8 +58,21 @@ public class CryptoService extends Service implements CryptoThread.ProgressDispl
             stopForeground(true);
             return START_NOT_STICKY;
         }
-        DocumentFile inputFile = GlobalDocumentFileStateHolder.getInputFile();
-        String outputFileName = intent.getStringExtra(OUTPUT_FILE_NAME_EXTRA_KEY);
+        String inputFileString = intent.getStringExtra(INPUT_FILE_URI_EXTRA_KEY);
+        String outputFileString = intent.getStringExtra(OUTPUT_FILE_URI_EXTRA_KEY);
+
+        if (inputFileString == null) {
+            showToastOnGuiThread(R.string.no_input_file_selected);
+            stopSelf();
+        }
+        if (outputFileString == null) {
+            showToastOnGuiThread(R.string.no_output_file_selected);
+            stopSelf();
+        }
+
+        Uri inputFile = Uri.parse(inputFileString);
+        Uri outputFile = Uri.parse(outputFileString);
+
         int version = intent.getIntExtra(VERSION_EXTRA_KEY, SettingsHelper.AESCRYPT_DEFAULT_VERSION);
         String password = MainActivityFragment.getAndClearPassword();
         boolean operationType = intent.getBooleanExtra(OPERATION_TYPE_EXTRA_KEY, CryptoThread.OPERATION_TYPE_DECRYPTION);
@@ -66,7 +81,7 @@ public class CryptoService extends Service implements CryptoThread.ProgressDispl
         CryptoThread.registerForProgressUpdate(PROGRESS_DISPLAYER_ID, this);
 
         if (password != null) {
-            CryptoThread cryptoThread = new CryptoThread(this, inputFile, outputFileName, password, version, operationType, deleteInputFile);
+            CryptoThread cryptoThread = new CryptoThread(this, inputFile, outputFile, password, version, operationType, deleteInputFile);
             cryptoThread.start();
         } else {
             showToastOnGuiThread(R.string.error_null_password);
