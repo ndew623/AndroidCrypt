@@ -8,7 +8,7 @@ android {
         applicationId "com.dewdrop623.androidcrypt"
         minSdkVersion 19
         targetSdkVersion 34
-        versionCode 8
+        versionCode 9
         versionName "1.8"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
