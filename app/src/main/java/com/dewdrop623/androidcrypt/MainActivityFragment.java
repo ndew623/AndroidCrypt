@@ -1,25 +1,19 @@
 package com.dewdrop623.androidcrypt;
 
 import android.Manifest;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
-import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
-import android.support.v4.provider.DocumentFile;
 import android.text.InputType;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
@@ -46,9 +40,6 @@ import java.util.Arrays;
  * A placeholder fragment containing a simple view.
  */
 public class MainActivityFragment extends Fragment implements CryptoThread.ProgressDisplayer {
-
-    public static final String CALLBACK_SELECT_OUTPUT_FILE = "com.dewdrop623.androidcrypt.MainActivityFragment.CALLBACK_SELECT_OUTPUT_FILE";
-    public static final String CALLBACK_SELECT_INPUT_FILE = "com.dewdrop623.androidcrypt.MainActivityFragment.CALLBACK_SELECT_INPUT_FILE";
 
     /*
         Using static variables to store the password rather than savedInstanceState and Intent extras because of paranoia.
@@ -109,24 +100,24 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
 
-        encryptModeButton = (Button) view.findViewById(R.id.encryptModeButton);
-        decryptModeButton = (Button) view.findViewById(R.id.decryptModeButton);
-        inputFilePathLinearLayout = (LinearLayout) view.findViewById(R.id.inputFilePathLinearLayout);
-        inputFilePathTextView = (TextView) view.findViewById(R.id.inputFilePathTextView);
+        encryptModeButton = view.findViewById(R.id.encryptModeButton);
+        decryptModeButton = view.findViewById(R.id.decryptModeButton);
+        inputFilePathLinearLayout = view.findViewById(R.id.inputFilePathLinearLayout);
+        inputFilePathTextView = view.findViewById(R.id.inputFilePathTextView);
         inputFilePathUnderlineView = view.findViewById(R.id.inputFilePathUnderlineView);
-        outputFilePathLinearLayout = (LinearLayout) view.findViewById(R.id.outputFilePathLinearLayout);
-        outputFilePathTextView = (TextView) view.findViewById(R.id.outputFilePathTextView);
+        outputFilePathLinearLayout = view.findViewById(R.id.outputFilePathLinearLayout);
+        outputFilePathTextView = view.findViewById(R.id.outputFilePathTextView);
         outputFilePathUnderlineView = view.findViewById(R.id.outputFilePathUnderlineView);
-        inputFileSelectButton = (FileSelectButton) view.findViewById(R.id.selectInputFileButton);
-        deleteInputFileCheckbox = (CheckBox) view.findViewById(R.id.deleteInputFileCheckbox);
-        outputFileSelectButton = (FileSelectButton) view.findViewById(R.id.selectOutputFileButton);
-        passwordEditText = (EditText) view.findViewById(R.id.passwordEditText);
-        confirmPasswordEditText = (EditText) view.findViewById(R.id.confirmPasswordEditText);
-        showPasswordCheckbox = (CheckBox) view.findViewById(R.id.showPasswordCheckbox);
-        progressDisplayLinearLayout = (LinearLayout) view.findViewById(R.id.progressDisplayLinearLayout);
-        progressDisplayTextView = (TextView) view.findViewById(R.id.progressDisplayTextView);
-        progressDisplayProgressBar = (ProgressBar) view.findViewById(R.id.progressDisplayProgressBar);
-        progressDispayCancelButton = (LinearLayout) view.findViewById(R.id.progressDisplayCancelButtonLinearLayout);
+        inputFileSelectButton = view.findViewById(R.id.selectInputFileButton);
+        deleteInputFileCheckbox = view.findViewById(R.id.deleteInputFileCheckbox);
+        outputFileSelectButton = view.findViewById(R.id.selectOutputFileButton);
+        passwordEditText = view.findViewById(R.id.passwordEditText);
+        confirmPasswordEditText = view.findViewById(R.id.confirmPasswordEditText);
+        showPasswordCheckbox = view.findViewById(R.id.showPasswordCheckbox);
+        progressDisplayLinearLayout = view.findViewById(R.id.progressDisplayLinearLayout);
+        progressDisplayTextView = view.findViewById(R.id.progressDisplayTextView);
+        progressDisplayProgressBar = view.findViewById(R.id.progressDisplayProgressBar);
+        progressDispayCancelButton = view.findViewById(R.id.progressDisplayCancelButtonLinearLayout);
 
         showPasswordCheckbox.setOnCheckedChangeListener(showPasswordCheckBoxOnCheckedChangeListener);
         outputFileSelectButton.setOnClickListener(outputFileSelectButtonOnClickListener);
@@ -177,14 +168,6 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
                 enableDecryptionMode();
             }
         }
-    }
-
-    //Store the current state when MainActivityFragment is added to back stack.
-    //onCreateView will be called when the MainActivityFragment is displayed again
-    //onSaveInstance state WILL NOT do this when the view is hidden
-    @Override
-    public void onPause() {
-        super.onPause();
     }
 
     /*
@@ -257,7 +240,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         }
     }
 
-    private View.OnClickListener operationModeButtonsOnClickListener = new View.OnClickListener() {
+    private final View.OnClickListener operationModeButtonsOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             int viewId = view.getId();
@@ -269,34 +252,34 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         }
     };
 
-    private CheckBox.OnCheckedChangeListener showPasswordCheckBoxOnCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() {
+    private final CheckBox.OnCheckedChangeListener showPasswordCheckBoxOnCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() {
         @Override
         public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
             setShowPassword(b);
         }
     };
 
-    private View.OnClickListener inputFileSelectButtonOnClickListener = new View.OnClickListener() {
+    private final View.OnClickListener inputFileSelectButtonOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             selectInputFile();
         }
     };
 
-    private View.OnClickListener outputFileSelectButtonOnClickListener = new View.OnClickListener() {
+    private final View.OnClickListener outputFileSelectButtonOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             selectOutputFile();
         }
     };
-    private View.OnClickListener progressDispayCancelButtonOnClickListener = new View.OnClickListener() {
+    private final View.OnClickListener progressDispayCancelButtonOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             CryptoThread.cancel();
         }
     };
 
-    private CompoundButton.OnCheckedChangeListener deleteInputFileCheckboxOnCheckedChangedListener = new CompoundButton.OnCheckedChangeListener() {
+    private final CompoundButton.OnCheckedChangeListener deleteInputFileCheckboxOnCheckedChangedListener = new CompoundButton.OnCheckedChangeListener() {
         @Override
         public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
             deleteInputFile = b;

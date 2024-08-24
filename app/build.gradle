@@ -6,7 +6,7 @@ android {
     namespace "com.dewdrop623.androidcrypt"
     defaultConfig {
         applicationId "com.dewdrop623.androidcrypt"
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion 34
         versionCode 9
         versionName "1.8"

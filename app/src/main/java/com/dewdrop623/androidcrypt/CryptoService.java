@@ -15,7 +15,6 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
-import android.support.v4.provider.DocumentFile;
 import android.widget.Toast;
 
 /**
@@ -169,7 +168,7 @@ public class CryptoService extends Service implements CryptoThread.ProgressDispl
     //progress is out of 100.
     @Override
     public void update(boolean operationType, int progress, int completedMessageStringId, int minutesToCompletion, int secondsToCompletion) {
-        NotificationManagerCompat notificationManager = (NotificationManagerCompat) NotificationManagerCompat.from(this);
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
         notificationManager.notify(START_FOREGROUND_ID, buildProgressNotification(operationType, progress, completedMessageStringId, minutesToCompletion, secondsToCompletion));
     }
 }

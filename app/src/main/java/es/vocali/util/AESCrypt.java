@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.NetworkInterface;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
@@ -70,10 +71,10 @@ public class AESCrypt {
 
 	private final boolean DEBUG;
 	private byte[] password;
-	private Cipher cipher;
-	private Mac hmac;
-	private SecureRandom random;
-	private MessageDigest digest;
+	private final Cipher cipher;
+	private final Mac hmac;
+	private final SecureRandom random;
+	private final MessageDigest digest;
 	private IvParameterSpec ivSpec1;
 	private SecretKeySpec aesKey1;
 	private IvParameterSpec ivSpec2;
@@ -106,7 +107,7 @@ public class AESCrypt {
 				buffer.append(bytes[i]);
 				buffer.append(i < bytes.length - 1 ? ", " : "]");
 			}
-			System.out.println(buffer.toString());
+			System.out.println(buffer);
 		}
 	}
 
@@ -264,7 +265,7 @@ public class AESCrypt {
 	 * @throws UnsupportedEncodingException if UTF-16 encoding is not supported.
 	 */
 	public void setPassword(String password) throws UnsupportedEncodingException {
-		this.password = password.getBytes("UTF-16LE");
+		this.password = password.getBytes(StandardCharsets.UTF_16LE);
 		debug("Using password: ", this.password);
 	}
 
@@ -319,7 +320,7 @@ public class AESCrypt {
 			debug("IV2: ", ivSpec2.getIV());
 			debug("AES2: ", aesKey2.getEncoded());
 
-			out.write("AES".getBytes("UTF-8"));	// Heading.
+			out.write("AES".getBytes(StandardCharsets.UTF_8));	// Heading.
 			out.write(version);	// Version.
 			out.write(0);	// Reserved.
 			if (version == 2) {	// No extensions.
@@ -417,7 +418,7 @@ public class AESCrypt {
 
 			text = new byte[3];
 			readBytes(in, text);	// Heading.
-			if (!new String(text, "UTF-8").equals("AES")) {
+			if (!new String(text, StandardCharsets.UTF_8).equals("AES")) {
 				throw new IOException("Invalid file header");
 			}
 
@@ -534,8 +535,7 @@ public class AESCrypt {
 					break;
 				default:
 					System.out.println("Invalid operation: must be (e)ncrypt or (d)ecrypt.");
-					return;
-			}
+            }
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

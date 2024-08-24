@@ -23,7 +23,6 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String MAINACITIVITYFRAGMENT_ON_TOP_KEY = "com.dewdrop623.androidcrypt.MainActivity.MAINACTIVITYFRAGMENT_ON_TOP_KEY";
     private static final String MAINACTIVITYFRAGMENT_TAG = "com.dewdrop623.androidcrypt.MainActivity.MAINACTIVITYFRAGMENT_TAG";
-    private static final String FILEPICKERFRAGMENT_TAG = "com.dewdrop623.androidcrypt.MainActivity.FILEPICKERFRAGMENT_TAG";
     private static final String TITLE_KEY = "com.dewdrop623.androidcrypt.MainActivity.TITLE_KEY";
 
     private static final int CHOOSE_INPUT_FILE_REQUEST_CODE = 1654;
@@ -38,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
             setTheme(R.style.AppTheme);
         }
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         final MainActivityFragment mainActivityFragment;
@@ -47,7 +46,6 @@ public class MainActivity extends AppCompatActivity {
             setFragmentArguments(mainActivityFragment, getIntent());
             attachFragment(mainActivityFragment, false, MAINACTIVITYFRAGMENT_TAG);
         } else {
-            FragmentManager fragmentManager = getSupportFragmentManager();
             mainActivityFragment = getMainActivityFragment();
             mainActivityFragmentOnTop = savedInstanceState.getBoolean(MAINACITIVITYFRAGMENT_ON_TOP_KEY, true);
             CharSequence title = savedInstanceState.getCharSequence(TITLE_KEY, null);
@@ -57,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-        fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -74,10 +72,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == CHOOSE_INPUT_FILE_REQUEST_CODE) {
+        if (requestCode == CHOOSE_INPUT_FILE_REQUEST_CODE && data != null) {
             getMainActivityFragment().setInputFile(data.getData());
         }
-        else if (requestCode == CHOOSE_OUTPUT_FILE_REQUEST_CODE) {
+        else if (requestCode == CHOOSE_OUTPUT_FILE_REQUEST_CODE && data != null) {
             getMainActivityFragment().setOutputFile(data.getData());
         }
     }

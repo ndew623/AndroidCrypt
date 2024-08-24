@@ -62,10 +62,10 @@ public class IconAttributionView extends RelativeLayout {
 
     private void constructorTasks(Context context) {
         inflate(context, R.layout.view_icon_attribution, this);
-        iconAttributionImageView = (ImageView) findViewById(R.id.iconAttributionImageView);
-        iconCreatorTextView = (TextView) findViewById(R.id.iconCreatorTextView);
-        srcLinkTextView = (TextView) findViewById(R.id.srcLinkTextView);
-        licenseLinkTextView = (TextView) findViewById(R.id.licenseLinkTextView);
+        iconAttributionImageView = findViewById(R.id.iconAttributionImageView);
+        iconCreatorTextView = findViewById(R.id.iconCreatorTextView);
+        srcLinkTextView = findViewById(R.id.srcLinkTextView);
+        licenseLinkTextView = findViewById(R.id.licenseLinkTextView);
         /*
          * apply theme to ui
          */

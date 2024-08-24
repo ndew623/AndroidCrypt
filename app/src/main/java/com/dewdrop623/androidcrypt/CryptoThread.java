@@ -1,7 +1,6 @@
 package com.dewdrop623.androidcrypt;
 
 import android.net.Uri;
-import android.support.v4.provider.DocumentFile;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,7 +30,7 @@ public class CryptoThread extends Thread {
     public static final int VERSION_2 = 2;
 
 
-    private static HashMap<String, ProgressDisplayer> progressDiplayers = new HashMap<>();
+    private static final HashMap<String, ProgressDisplayer> progressDiplayers = new HashMap<>();
 
     public interface ProgressDisplayer {
         //[minutes|seconds]ToCompletion=-1 => unknown
@@ -45,13 +44,13 @@ public class CryptoThread extends Thread {
     private static long totalBytesRead = 0;
     private static long fileSize = 0;
 
-    private CryptoService cryptoService;
+    private final CryptoService cryptoService;
     private static boolean operationType;
 
-    private Uri inputFile;
-    private Uri outputFile;
-    private String password;
-    private int version;
+    private final Uri inputFile;
+    private final Uri outputFile;
+    private final String password;
+    private final int version;
     private boolean deleteInputFile = false;
     private static int completedMessageStringId = R.string.done;
 
@@ -65,7 +64,7 @@ public class CryptoThread extends Thread {
         this.password = password;
         this.version = version;
         this.deleteInputFile = deleteInputFile;
-        this.operationType = operationType;
+        CryptoThread.operationType = operationType;
     }
 
     @Override
