@@ -53,7 +53,6 @@ public class IconAttributionView extends RelativeLayout {
         attrSetUp(context, attrs);
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public IconAttributionView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         constructorTasks(context);
