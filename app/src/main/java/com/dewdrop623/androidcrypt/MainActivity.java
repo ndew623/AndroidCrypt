@@ -1,5 +1,6 @@
 package com.dewdrop623.androidcrypt;
 
+import android.Manifest;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
