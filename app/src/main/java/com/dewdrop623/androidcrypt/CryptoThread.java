@@ -1,6 +1,7 @@
 package com.dewdrop623.androidcrypt;
 
 import android.net.Uri;
+import android.support.v4.provider.DocumentFile;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -162,7 +163,10 @@ public class CryptoThread extends Thread {
         delete the input file
          */
         if (successful && deleteInputFile && operationInProgress) {
-            deleteInputFile();
+            boolean successfullyDeleted = deleteInputFile();
+            if (!successfullyDeleted) {
+                cryptoService.showToastOnGuiThread(R.string.failed_to_delete_input_file);
+            }
         }
 
         /*
@@ -224,7 +228,7 @@ public class CryptoThread extends Thread {
 
     private boolean deleteInputFile() {
         if (inputFile != null) {
-            return cryptoService.getContentResolver().delete(inputFile, null, null) > 0;
+            return DocumentFile.fromSingleUri(cryptoService, inputFile).delete();
         } else {
             return false;
         }

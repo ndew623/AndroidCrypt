@@ -61,4 +61,5 @@
     <string name="theme">Theme</string>
     <string name="dark">Dark</string>
     <string name="light">Light</string>
+    <string name="failed_to_delete_input_file">ERROR failed to delete input file</string>
 </resources>
