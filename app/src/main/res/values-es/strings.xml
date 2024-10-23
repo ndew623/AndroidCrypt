@@ -46,4 +46,5 @@
     <string name="dark">Oscuro</string>
     <string name="light">Claro</string>
     <string name="failed_to_delete_input_file">ERROR no se pudo eliminar el archivo de entrada</string>
+    <string name="files_other_apps_no_delete">Los archivos seleccionados con otra aplicación no pueden ser eliminados por AndroidCrypt</string>
 </resources>

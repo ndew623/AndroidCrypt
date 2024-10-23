@@ -62,4 +62,5 @@
     <string name="dark">Dark</string>
     <string name="light">Light</string>
     <string name="failed_to_delete_input_file">ERROR failed to delete input file</string>
+    <string name="files_other_apps_no_delete">Files that were selected using another app cannot be deleted by AndroidCrypt.</string>
 </resources>

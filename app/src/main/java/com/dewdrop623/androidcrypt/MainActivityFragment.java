@@ -343,6 +343,11 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
             filePathUnderlineView = inputFilePathUnderlineView;
             filePathLinearLayout = inputFilePathLinearLayout;
             filePathTextPrefix = context.getString(R.string.input_file).concat(": ");
+            if (!inputFile.getAuthority().equals("com.android.externalstorage.documents")) {
+                disableDeleteInputFileCheckbox();
+            } else {
+                enableDeleteInputFileCheckbox();
+            }
         }
         int filePathTextViewVisibility = View.GONE;
         int filePathUnderlineViewVisibility = View.INVISIBLE;
@@ -361,6 +366,16 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         filePathTextView.setVisibility(filePathTextViewVisibility);
         filePathUnderlineView.setVisibility(filePathUnderlineViewVisibility);
         filePathLinearLayout.setGravity(gravity);
+    }
+
+    private void disableDeleteInputFileCheckbox() {
+        deleteInputFileCheckbox.setText(getString(R.string.delete_input_file).concat("\n(").concat(getString(R.string.files_other_apps_no_delete)).concat(")"));
+        deleteInputFileCheckbox.setSelected(false);
+        deleteInputFileCheckbox.setEnabled(false);
+    }
+    private void enableDeleteInputFileCheckbox() {
+        deleteInputFileCheckbox.setEnabled(true);
+        deleteInputFileCheckbox.setText(R.string.delete_input_file);
     }
 
     /**
