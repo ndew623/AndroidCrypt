@@ -13,3 +13,4 @@ app/debug/**
 app/release/**
 gitpush.sh
 gitcommit.sh
+app/.cxx/**
