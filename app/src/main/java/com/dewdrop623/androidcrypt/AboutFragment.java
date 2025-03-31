@@ -21,7 +21,7 @@ public class AboutFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_about, container, false);
         if (SettingsHelper.getUseDarkTeme(getContext())) {
-            LinearLayout rootLinearLayout = (LinearLayout) view.findViewById(R.id.rootLinearLayout);
+            LinearLayout rootLinearLayout = view.findViewById(R.id.rootLinearLayout);
             for (int i = 0; i < rootLinearLayout.getChildCount(); i++) {
                 if (rootLinearLayout.getChildAt(i) instanceof TextView) {
                     ((TextView) rootLinearLayout.getChildAt(i)).setTextColor(((MainActivity) getActivity()).getDarkThemeColor(android.R.attr.textColorPrimary));

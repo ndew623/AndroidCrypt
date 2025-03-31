@@ -53,7 +53,6 @@ public class IconAttributionView extends RelativeLayout {
         attrSetUp(context, attrs);
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public IconAttributionView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         constructorTasks(context);
@@ -62,10 +61,10 @@ public class IconAttributionView extends RelativeLayout {
 
     private void constructorTasks(Context context) {
         inflate(context, R.layout.view_icon_attribution, this);
-        iconAttributionImageView = (ImageView) findViewById(R.id.iconAttributionImageView);
-        iconCreatorTextView = (TextView) findViewById(R.id.iconCreatorTextView);
-        srcLinkTextView = (TextView) findViewById(R.id.srcLinkTextView);
-        licenseLinkTextView = (TextView) findViewById(R.id.licenseLinkTextView);
+        iconAttributionImageView = findViewById(R.id.iconAttributionImageView);
+        iconCreatorTextView = findViewById(R.id.iconCreatorTextView);
+        srcLinkTextView = findViewById(R.id.srcLinkTextView);
+        licenseLinkTextView = findViewById(R.id.licenseLinkTextView);
         /*
          * apply theme to ui
          */

@@ -1,25 +1,19 @@
 package com.dewdrop623.androidcrypt;
 
 import android.Manifest;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
-import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
-import android.support.v4.provider.DocumentFile;
 import android.text.InputType;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
@@ -47,17 +41,12 @@ import java.util.Arrays;
  */
 public class MainActivityFragment extends Fragment implements CryptoThread.ProgressDisplayer {
 
-    public static final String CALLBACK_SELECT_OUTPUT_FILE = "com.dewdrop623.androidcrypt.MainActivityFragment.CALLBACK_SELECT_OUTPUT_FILE";
-    public static final String CALLBACK_SELECT_INPUT_FILE = "com.dewdrop623.androidcrypt.MainActivityFragment.CALLBACK_SELECT_INPUT_FILE";
-
     /*
         Using static variables to store the password rather than savedInstanceState and Intent extras because of paranoia.
         Putting the password as a String into the Android OS that way seems like asking for trouble.
      */
     private static char[] password = null;
 
-    private static final int SELECT_INPUT_FILE_REQUEST_CODE = 623;
-    private static final int SELECT_OUTPUT_DIRECTORY_REQUEST_CODE = 8878;
     private static final int WRITE_FILE_PERMISSION_REQUEST_CODE = 440;
     private static final int READ_FILE_PERMISSION_REQUEST_CODE = 441;
 
@@ -65,17 +54,15 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
 
     private static final String SAVED_INSTANCE_STATE_SHOW_PASSWORD = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_SHOW_PASSWORD";
     private static final String SAVED_INSTANCE_STATE_OPERATION_MODE = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_OPERATION_MODE";
-    private static final String SAVED_INSTANCE_STATE_INPUT_FILENAME = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_INPUT_FILENAME";
-    private static final String SAVED_INSTANCE_STATE_OUTPUT_FILENAME = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_OUTPUT_FILENAME";
     private static final String SAVED_INSTANCE_STATE_DELETE_INPUT_FILE = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_DELETE_INPUT_FILE";
+    private static final String SAVED_INSTANCE_STATE_INPUT_FILE = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_INPUT_FILE";
+    private static final String SAVED_INSTANCE_STATE_OUTPUT_FILE = "com.dewdrop623.androidcrypt.MainActivityFragment.SAVED_INSTANCE_STATE_OUTPUT_FILE";
 
     //stores the type of operation to be done
     private boolean operationMode = CryptoThread.OPERATION_TYPE_ENCRYPTION;
     private boolean showPassword = false;
-    private DocumentFile inputFileParentDirectory = null;
-    String inputFileName;
-    private DocumentFile outputFileParentDirectory = null;
-    String outputFileName;
+    Uri inputFile;
+    Uri outputFile;
     private boolean deleteInputFile = false;
     //see comment on this.onAttach(Context)
     private Context context;
@@ -113,24 +100,24 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
 
-        encryptModeButton = (Button) view.findViewById(R.id.encryptModeButton);
-        decryptModeButton = (Button) view.findViewById(R.id.decryptModeButton);
-        inputFilePathLinearLayout = (LinearLayout) view.findViewById(R.id.inputFilePathLinearLayout);
-        inputFilePathTextView = (TextView) view.findViewById(R.id.inputFilePathTextView);
+        encryptModeButton = view.findViewById(R.id.encryptModeButton);
+        decryptModeButton = view.findViewById(R.id.decryptModeButton);
+        inputFilePathLinearLayout = view.findViewById(R.id.inputFilePathLinearLayout);
+        inputFilePathTextView = view.findViewById(R.id.inputFilePathTextView);
         inputFilePathUnderlineView = view.findViewById(R.id.inputFilePathUnderlineView);
-        outputFilePathLinearLayout = (LinearLayout) view.findViewById(R.id.outputFilePathLinearLayout);
-        outputFilePathTextView = (TextView) view.findViewById(R.id.outputFilePathTextView);
+        outputFilePathLinearLayout = view.findViewById(R.id.outputFilePathLinearLayout);
+        outputFilePathTextView = view.findViewById(R.id.outputFilePathTextView);
         outputFilePathUnderlineView = view.findViewById(R.id.outputFilePathUnderlineView);
-        inputFileSelectButton = (FileSelectButton) view.findViewById(R.id.selectInputFileButton);
-        deleteInputFileCheckbox = (CheckBox) view.findViewById(R.id.deleteInputFileCheckbox);
-        outputFileSelectButton = (FileSelectButton) view.findViewById(R.id.selectOutputFileButton);
-        passwordEditText = (EditText) view.findViewById(R.id.passwordEditText);
-        confirmPasswordEditText = (EditText) view.findViewById(R.id.confirmPasswordEditText);
-        showPasswordCheckbox = (CheckBox) view.findViewById(R.id.showPasswordCheckbox);
-        progressDisplayLinearLayout = (LinearLayout) view.findViewById(R.id.progressDisplayLinearLayout);
-        progressDisplayTextView = (TextView) view.findViewById(R.id.progressDisplayTextView);
-        progressDisplayProgressBar = (ProgressBar) view.findViewById(R.id.progressDisplayProgressBar);
-        progressDispayCancelButton = (LinearLayout) view.findViewById(R.id.progressDisplayCancelButtonLinearLayout);
+        inputFileSelectButton = view.findViewById(R.id.selectInputFileButton);
+        deleteInputFileCheckbox = view.findViewById(R.id.deleteInputFileCheckbox);
+        outputFileSelectButton = view.findViewById(R.id.selectOutputFileButton);
+        passwordEditText = view.findViewById(R.id.passwordEditText);
+        confirmPasswordEditText = view.findViewById(R.id.confirmPasswordEditText);
+        showPasswordCheckbox = view.findViewById(R.id.showPasswordCheckbox);
+        progressDisplayLinearLayout = view.findViewById(R.id.progressDisplayLinearLayout);
+        progressDisplayTextView = view.findViewById(R.id.progressDisplayTextView);
+        progressDisplayProgressBar = view.findViewById(R.id.progressDisplayProgressBar);
+        progressDispayCancelButton = view.findViewById(R.id.progressDisplayCancelButtonLinearLayout);
 
         showPasswordCheckbox.setOnCheckedChangeListener(showPasswordCheckBoxOnCheckedChangeListener);
         outputFileSelectButton.setOnClickListener(outputFileSelectButtonOnClickListener);
@@ -170,12 +157,17 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         return view;
     }
 
-    //Store the current state when MainActivityFragment is added to back stack.
-    //onCreateView will be called when the MainActivityFragment is displayed again
-    //onSaveInstance state WILL NOT do this when the view is hidden
     @Override
-    public void onPause() {
-        super.onPause();
+    public void onViewCreated(View view, Bundle savedInstanceState){
+        Bundle args = getArguments();
+        if (args != null && args.containsKey(MainActivity.INPUT_FILE_ARGUMENT_KEY)) {
+            Uri inputFile = args.getParcelable(MainActivity.INPUT_FILE_ARGUMENT_KEY);
+            setInputFile(inputFile);
+            args.clear();
+            if (StorageAccessFrameworkHelper.getFilenameFromUri(inputFile, getContext()).endsWith(".aes")) {
+                enableDecryptionMode();
+            }
+        }
     }
 
     /*
@@ -184,6 +176,8 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
     @Override
     public void onResume() {
         super.onResume();
+        //hide the progress bar on resume will show again when progress update is received but wont be stuck if wasn't in app when final progress update was sent
+        progressDisplayLinearLayout.setVisibility(View.INVISIBLE);
         ((MainActivity) getActivity()).returnedToMainFragment();
     }
 
@@ -246,7 +240,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         }
     }
 
-    private View.OnClickListener operationModeButtonsOnClickListener = new View.OnClickListener() {
+    private final View.OnClickListener operationModeButtonsOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             int viewId = view.getId();
@@ -258,34 +252,34 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         }
     };
 
-    private CheckBox.OnCheckedChangeListener showPasswordCheckBoxOnCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() {
+    private final CheckBox.OnCheckedChangeListener showPasswordCheckBoxOnCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() {
         @Override
         public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
             setShowPassword(b);
         }
     };
 
-    private View.OnClickListener inputFileSelectButtonOnClickListener = new View.OnClickListener() {
+    private final View.OnClickListener inputFileSelectButtonOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             selectInputFile();
         }
     };
 
-    private View.OnClickListener outputFileSelectButtonOnClickListener = new View.OnClickListener() {
+    private final View.OnClickListener outputFileSelectButtonOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             selectOutputFile();
         }
     };
-    private View.OnClickListener progressDispayCancelButtonOnClickListener = new View.OnClickListener() {
+    private final View.OnClickListener progressDispayCancelButtonOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             CryptoThread.cancel();
         }
     };
 
-    private CompoundButton.OnCheckedChangeListener deleteInputFileCheckboxOnCheckedChangedListener = new CompoundButton.OnCheckedChangeListener() {
+    private final CompoundButton.OnCheckedChangeListener deleteInputFileCheckboxOnCheckedChangedListener = new CompoundButton.OnCheckedChangeListener() {
         @Override
         public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
             deleteInputFile = b;
@@ -297,8 +291,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
      * Open the file picker in the same folder that an already picked input file came from.
      */
     public void selectInputFile() {
-        String initialFolder = null;
-        ((MainActivity) getActivity()).pickFile(false, inputFileParentDirectory, null);
+        ((MainActivity) getActivity()).pickInputFile();
     }
 
     /**
@@ -307,21 +300,19 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
      * else if an input file has already been selected open that directory.
      */
     public void selectOutputFile() {
-        DocumentFile initialFolder = outputFileParentDirectory;
-        if (initialFolder == null) {
-            initialFolder = inputFileParentDirectory;
-        }
-        ((MainActivity) getActivity()).pickFile(true, initialFolder, getDefaultOutputFileName());
+        ((MainActivity) getActivity()).pickOutputFile(getDefaultOutputFileName());
     }
 
-    public void setFile(DocumentFile file, String filename, boolean isOutput) {
-        if (isOutput) {
-            outputFileParentDirectory = file;
-            outputFileName = filename;
-        } else {
-            inputFileParentDirectory = file;
-            inputFileName = filename;
+    public void setInputFile(Uri file) {
+        boolean isOutput = false;
+        inputFile = file;
+        if (context != null) {
+            updateFileUI(isOutput);
         }
+    }
+    public void setOutputFile(Uri file) {
+        boolean isOutput = true;
+        outputFile = file;
         if (context != null) {
             updateFileUI(isOutput);
         }
@@ -339,19 +330,24 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         LinearLayout filePathLinearLayout;
         String filePathTextPrefix;
         if (isOutput) {
-            filePath = StorageAccessFrameworkHelper.getDocumentFilePath(outputFileParentDirectory, outputFileName);
+            filePath = outputFile != null ? Uri.decode(outputFile.toString()) : "";
             filePathTextView = outputFilePathTextView;
             fileSelectButton = outputFileSelectButton;
             filePathUnderlineView = outputFilePathUnderlineView;
             filePathLinearLayout = outputFilePathLinearLayout;
             filePathTextPrefix = context.getString(R.string.output_file).concat(": ");
         } else {
-            filePath = StorageAccessFrameworkHelper.getDocumentFilePath(inputFileParentDirectory, inputFileName);
+            filePath = inputFile != null ? Uri.decode(inputFile.toString()) : "";
             filePathTextView = inputFilePathTextView;
             fileSelectButton = inputFileSelectButton;
             filePathUnderlineView = inputFilePathUnderlineView;
             filePathLinearLayout = inputFilePathLinearLayout;
             filePathTextPrefix = context.getString(R.string.input_file).concat(": ");
+            if (!inputFile.getAuthority().equals("com.android.externalstorage.documents")) {
+                disableDeleteInputFileCheckbox();
+            } else {
+                enableDeleteInputFileCheckbox();
+            }
         }
         int filePathTextViewVisibility = View.GONE;
         int filePathUnderlineViewVisibility = View.INVISIBLE;
@@ -372,6 +368,16 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         filePathLinearLayout.setGravity(gravity);
     }
 
+    private void disableDeleteInputFileCheckbox() {
+        deleteInputFileCheckbox.setText(getString(R.string.delete_input_file).concat("\n(").concat(getString(R.string.files_other_apps_no_delete)).concat(")"));
+        deleteInputFileCheckbox.setSelected(false);
+        deleteInputFileCheckbox.setEnabled(false);
+    }
+    private void enableDeleteInputFileCheckbox() {
+        deleteInputFileCheckbox.setEnabled(true);
+        deleteInputFileCheckbox.setText(R.string.delete_input_file);
+    }
+
     /**
      * called by MainActivity when the Floating Action Button is pressed.
      */
@@ -379,12 +385,8 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         if (isValidElsePrintErrors()) {
             //Can't use getContext() or getActivity(). See comment on this.onAttach(Context)
             Intent intent = new Intent(context, CryptoService.class);
-            intent.putExtra(CryptoService.INPUT_FILE_NAME_EXTRA_KEY, inputFileName);
-            intent.putExtra(CryptoService.OUTPUT_FILE_NAME_EXTRA_KEY, outputFileName);
-            GlobalDocumentFileStateHolder.setInputFileParentDirectory(inputFileParentDirectory);
-            GlobalDocumentFileStateHolder.setOutputFileParentDirectory(outputFileParentDirectory);
-            intent.putExtra(CryptoService.INPUT_FILENAME_KEY, inputFileName);
-            intent.putExtra(CryptoService.OUTPUT_FILENAME_KEY, outputFileName);
+            intent.putExtra(CryptoService.INPUT_FILE_URI_EXTRA_KEY, inputFile.toString());
+            intent.putExtra(CryptoService.OUTPUT_FILE_URI_EXTRA_KEY, outputFile.toString());
             intent.putExtra(CryptoService.VERSION_EXTRA_KEY, SettingsHelper.getAESCryptVersion(getContext()));
             intent.putExtra(CryptoService.OPERATION_TYPE_EXTRA_KEY, operationMode);
             intent.putExtra(CryptoService.DELETE_INPUT_FILE_KEY, deleteInputFile);
@@ -395,26 +397,11 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
 
     //check for the necessary permissions. destroy and recreate the activity if permissions are asked for so that the files (which couldn't be seen previously) will be displayed
     private void checkPermissions() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            if (!Environment.isExternalStorageManager()) {
-                //show a dialog before sending to settings
-                new AlertDialog.Builder(getActivity()).setTitle(R.string.manage_storage_permission_title).setMessage(R.string.manage_storage_permission_string).setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        //request for the permission
-                        Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
-                        Uri uri = Uri.fromParts("package", getActivity().getPackageName(), null);
-                        intent.setData(uri);
-                        startActivity(intent);
-                    }
-                }).show();
-            }
-        } else {
-            if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_FILE_PERMISSION_REQUEST_CODE);
-            }
-            if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, READ_FILE_PERMISSION_REQUEST_CODE);
-            }
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_FILE_PERMISSION_REQUEST_CODE);
+        }
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, READ_FILE_PERMISSION_REQUEST_CODE);
         }
     }
 
@@ -489,9 +476,9 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
     * if in decryption mode, and input filename ends with '.aes', remove '.aes'
     * if in decryption mode and input filename does not end with '.aes', return empty string*/
     private String getDefaultOutputFileName() {
-        String result = null;
-        if (inputFileName != null) {
-            String fileName = inputFileName;
+        String result = "";
+        if (inputFile != null) {
+            String fileName = StorageAccessFrameworkHelper.getFilenameFromUri(inputFile, getContext());
             if (operationMode == CryptoThread.OPERATION_TYPE_ENCRYPTION) {
                 result = fileName.concat(".aes");
             } else if (operationMode == CryptoThread.OPERATION_TYPE_DECRYPTION) {
@@ -511,22 +498,28 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
      */
     private boolean isValidElsePrintErrors() {
         boolean valid = true;
-        if (inputFileParentDirectory == null || inputFileName == null) {
+        if (inputFile == null) {
             valid = false;
             showError(R.string.no_input_file_selected);
-        } else if (outputFileParentDirectory == null || outputFileName == null) {
+        } else if (outputFile == null) {
             valid = false;
             showError(R.string.no_output_file_selected);
         } else if (operationMode == CryptoThread.OPERATION_TYPE_ENCRYPTION && !passwordEditText.getText().toString().equals(confirmPasswordEditText.getText().toString())) {
             valid = false;
             showError(R.string.passwords_do_not_match);
-        } else if (inputFileParentDirectory.equals(outputFileParentDirectory) && inputFileName.equals(outputFileName)) {
-            valid = false;
-            showError(R.string.the_input_and_output_files_must_be_different);
         } else if (CryptoThread.operationInProgress) {
             valid = false;
             showError(R.string.another_operation_is_already_in_progress);
-        }
+        }/* TODO fix test if files are same file
+        else if (outputFileParentDirectory != null){
+            DocumentFile outputFileDocumentFile = outputFileParentDirectory.findFile(outputFileName);
+            if (outputFileDocumentFile != null && outputFileDocumentFile.getUri().equals(inputFile.getUri())) {
+                //TODO not perfect way to check same file. Best know how to do regarding how android hides file info
+                //can fail when opening input file via intent (i.e. choosing file from another app)
+                valid = false;
+                showError(R.string.the_input_and_output_files_must_be_different);
+            }
+        }*/
         return valid;
     }
 
@@ -560,14 +553,12 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         }
         outState.putBoolean(SAVED_INSTANCE_STATE_SHOW_PASSWORD, showPassword);
         outState.putBoolean(SAVED_INSTANCE_STATE_OPERATION_MODE, operationMode);
-        if (inputFileParentDirectory != null) {
-            GlobalDocumentFileStateHolder.setSavedInputParentDirectoryForRotate(inputFileParentDirectory);
-            outState.putString(SAVED_INSTANCE_STATE_INPUT_FILENAME, inputFileName);
+        if (inputFile != null) {
+            outState.putString(SAVED_INSTANCE_STATE_INPUT_FILE, inputFile.toString());
             outState.putBoolean(SAVED_INSTANCE_STATE_DELETE_INPUT_FILE, deleteInputFile);
         }
-        if (outputFileParentDirectory != null) {
-            GlobalDocumentFileStateHolder.setSavedOutputParentDirectoryForRotate(outputFileParentDirectory);
-            outState.putString(SAVED_INSTANCE_STATE_OUTPUT_FILENAME, outputFileName);
+        if (outputFile != null) {
+            outState.putString(SAVED_INSTANCE_STATE_OUTPUT_FILE, outputFile.toString());
         }
 
         /*
@@ -593,16 +584,13 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         } else {
             enableDecryptionMode();
         }
-        DocumentFile inputFileParentDirectory = GlobalDocumentFileStateHolder.getAndClearSavedInputParentDirectoryForRotate();
-        DocumentFile outputFileParentDirectory = GlobalDocumentFileStateHolder.getAndClearSavedOutputParentDirectoryForRotate();
-        if (inputFileParentDirectory != null) {
-            String filename = savedInstanceState.getString(SAVED_INSTANCE_STATE_INPUT_FILENAME, null);
-            setFile(inputFileParentDirectory, filename, false);
+        String inputFileString = savedInstanceState.getString(SAVED_INSTANCE_STATE_INPUT_FILE, "");
+        String outputFileString = savedInstanceState.getString(SAVED_INSTANCE_STATE_OUTPUT_FILE, "");
+        if (!inputFileString.isEmpty()) {
+            setInputFile(Uri.parse(inputFileString));
         }
-        updateFileUI(false);
-        if (outputFileParentDirectory != null) {
-            String filename = savedInstanceState.getString(SAVED_INSTANCE_STATE_OUTPUT_FILENAME, null);
-            setFile(outputFileParentDirectory, filename, true);
+        if(!outputFileString.isEmpty()) {
+            setOutputFile(Uri.parse(outputFileString));
         }
         updateFileUI(true);
         String password = getAndClearPassword();

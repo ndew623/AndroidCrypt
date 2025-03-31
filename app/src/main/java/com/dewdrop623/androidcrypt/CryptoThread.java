@@ -1,5 +1,6 @@
 package com.dewdrop623.androidcrypt;
 
+import android.net.Uri;
 import android.support.v4.provider.DocumentFile;
 
 import java.io.IOException;
@@ -30,7 +31,7 @@ public class CryptoThread extends Thread {
     public static final int VERSION_2 = 2;
 
 
-    private static HashMap<String, ProgressDisplayer> progressDiplayers = new HashMap<>();
+    private static final HashMap<String, ProgressDisplayer> progressDiplayers = new HashMap<>();
 
     public interface ProgressDisplayer {
         //[minutes|seconds]ToCompletion=-1 => unknown
@@ -44,27 +45,27 @@ public class CryptoThread extends Thread {
     private static long totalBytesRead = 0;
     private static long fileSize = 0;
 
-    private CryptoService cryptoService;
+    private final CryptoService cryptoService;
     private static boolean operationType;
 
-    private String inputFileName;
-    private String outputFileName;
-    private String password;
-    private int version;
+    private final Uri inputFile;
+    private final Uri outputFile;
+    private final String password;
+    private final int version;
     private boolean deleteInputFile = false;
     private static int completedMessageStringId = R.string.done;
 
     /**
      * Takes a cryptoService, input and output uris, the password, a version (use VERSION_X constants), and operation type (defined by the OPERATION_TYPE_X constants)
      */
-    public CryptoThread(CryptoService cryptoService, String inputFileName, String outputFileName, String password, int version, boolean operationType, boolean deleteInputFile) {
+    public CryptoThread(CryptoService cryptoService, Uri inputFile, Uri outputFile, String password, int version, boolean operationType, boolean deleteInputFile) {
         this.cryptoService = cryptoService;
-        this.inputFileName = inputFileName;
-        this.outputFileName = outputFileName;
+        this.inputFile = inputFile;
+        this.outputFile = outputFile;
         this.password = password;
         this.version = version;
         this.deleteInputFile = deleteInputFile;
-        this.operationType = operationType;
+        CryptoThread.operationType = operationType;
     }
 
     @Override
@@ -88,7 +89,7 @@ public class CryptoThread extends Thread {
         OutputStream outputStream = null;
         //get the input stream
         try {
-            inputStream = StorageAccessFrameworkHelper.getFileInputStream(cryptoService, inputFileName);
+            inputStream = cryptoService.getContentResolver().openInputStream(inputFile);
         } catch (IOException ioe) {
             successful = false;
             ioe.printStackTrace();
@@ -97,7 +98,7 @@ public class CryptoThread extends Thread {
 
         //get the output stream
         try {
-            outputStream = StorageAccessFrameworkHelper.getFileOutputStream(cryptoService, outputFileName);
+            outputStream = cryptoService.getContentResolver().openOutputStream(outputFile);
         } catch (IOException ioe) {
             successful = false;
             ioe.printStackTrace();
@@ -162,8 +163,25 @@ public class CryptoThread extends Thread {
         delete the input file
          */
         if (successful && deleteInputFile && operationInProgress) {
-            deleteInputFile();
+            boolean successfullyDeleted = deleteInputFile();
+            if (!successfullyDeleted) {
+                cryptoService.showToastOnGuiThread(R.string.failed_to_delete_input_file);
+            }
         }
+
+        /*
+        if operation didn't encounter errors (successful == true)
+        and didn't get canceled (operationInProgress is still true):
+        display toast to notify of success
+        */
+        if (successful && operationInProgress) {
+            if (operationType == OPERATION_TYPE_ENCRYPTION) {
+                cryptoService.showToastOnGuiThread(R.string.encryption_completed);
+            } else {
+                cryptoService.showToastOnGuiThread(R.string.decryption_completed);
+            }
+        }
+
         //stop the service
         cryptoService.stopForeground(false);
         operationInProgress = false;
@@ -209,9 +227,8 @@ public class CryptoThread extends Thread {
     }
 
     private boolean deleteInputFile() {
-        DocumentFile inputFile = GlobalDocumentFileStateHolder.getInputFileParentDirectory().findFile(inputFileName);
         if (inputFile != null) {
-            return inputFile.delete();
+            return DocumentFile.fromSingleUri(cryptoService, inputFile).delete();
         } else {
             return false;
         }
