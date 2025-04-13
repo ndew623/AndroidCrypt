@@ -1,0 +1,6 @@
+add_subdirectory(aes_universal)
+if(TERRA_ENABLE_INTEL_INTRINSICS)
+    add_subdirectory(aes_intel)
+endif()
+add_subdirectory(aes_key_wrap)
+add_subdirectory(aes)

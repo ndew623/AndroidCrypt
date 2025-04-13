@@ -6,6 +6,10 @@
 # Sets the minimum CMake version required for this project.
 cmake_minimum_required(VERSION 3.22.1)
 
+# Set the C++ standard to C++20
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)  # Enforce the standard
+
 # Declares the project name. The project name can be accessed via ${ PROJECT_NAME},
 # Since this is the top level CMakeLists.txt, the project name is also accessible
 # with ${CMAKE_PROJECT_NAME} (both CMake variables are in-sync within the top level
@@ -34,7 +38,10 @@ option(aescrypt_engine_INSTALL "Install the AES Crypt Engine" OFF)
 option(aescrypt_engine_CLANG_TIDY "Use clang-tidy to perform linting during build" OFF)
 option(aescrypt_engine_BUILD_TESTS "Build Tests for the AES Crypt Engine" OFF)
 
+add_subdirectory(libaes-master)
 add_subdirectory(dependencies)
+add_subdirectory(aescrypt_engine-master)
+
 
 # Specifies libraries CMake should link to your target library. You
 # can link libraries from various origins, such as libraries defined in this

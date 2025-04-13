@@ -8,12 +8,12 @@ else()
     set(TERRAPANE_SOURCE_URI "https://github.com/terrapane")
 endif()
 
-# Retrieve STF only if building tests
+# Retrieve Simple Test Framework only if building tests
 if(aescrypt_engine_BUILD_TESTS)
     # Fetch the Simple Test Framework library
     FetchContent_Declare(stf
         GIT_REPOSITORY ${TERRAPANE_SOURCE_URI}/stf.git
-        GIT_TAG        master
+        GIT_TAG        v1.0.1
         GIT_SHALLOW    true)
 
     # It is not necessary to install the STF library
@@ -23,66 +23,59 @@ if(aescrypt_engine_BUILD_TESTS)
     FetchContent_MakeAvailable(stf)
 endif()
 
-# Fetch the AES Crypt Engine
-#FetchContent_Declare(aescrypt_engine
-        #GIT_REPOSITORY ${TERRAPANE_SOURCE_URI}/aescrypt_engine.git
-        #GIT_TAG        master
-        #GIT_SHALLOW    true)
-
 # Fetch the AES library
 #FetchContent_Declare(libaes
     #GIT_REPOSITORY ${TERRAPANE_SOURCE_URI}/libaes.git
-    #GIT_TAG        master
+    #GIT_TAG        v1.0.6
     #GIT_SHALLOW    true)
 
 # Fetch security utilities library
 FetchContent_Declare(secutil
     GIT_REPOSITORY ${TERRAPANE_SOURCE_URI}/secutil.git
-    GIT_TAG        master
+    GIT_TAG        v1.0.5
     GIT_SHALLOW    true)
 
 # Fetch character-related utilities
 FetchContent_Declare(charutil
     GIT_REPOSITORY ${TERRAPANE_SOURCE_URI}/charutil.git
-    GIT_TAG        master
+    GIT_TAG        v1.0.2
     GIT_SHALLOW    true)
 
 # Fetch the random generator library
 FetchContent_Declare(random
     GIT_REPOSITORY ${TERRAPANE_SOURCE_URI}/random.git
-    GIT_TAG        master
+    GIT_TAG        v1.0.1
     GIT_SHALLOW    true)
 
 # Fetch the hashing library
 FetchContent_Declare(libhash
     GIT_REPOSITORY ${TERRAPANE_SOURCE_URI}/libhash.git
-    GIT_TAG        master
+    GIT_TAG        v1.0.6
     GIT_SHALLOW    true)
 
 # Fetch the Key Derivation Function library
 FetchContent_Declare(libkdf
     GIT_REPOSITORY ${TERRAPANE_SOURCE_URI}/libkdf.git
-    GIT_TAG        master
+    GIT_TAG        v1.0.6
     GIT_SHALLOW    true)
 
 # Fetch the Logger library
 FetchContent_Declare(logger
     GIT_REPOSITORY ${TERRAPANE_SOURCE_URI}/logger.git
-    GIT_TAG        master
+    GIT_TAG        v1.0.4
     GIT_SHALLOW    true)
 
 # If not installing aescrypt_engine, turn off installation for dependencies
-if(NOT aescrypt_engine_INSTALL)
-    #set(libaes_INSTALL OFF)
-    set(secutil_INSTALL OFF)
-    set(charutil_INSTALL OFF)
-    set(random_INSTALL OFF)
-    set(libhash_INSTALL OFF)
-    set(libkdf_INSTALL OFF)
-    set(logger_INSTALL OFF)
-endif()
+#set(libaes_INSTALL ${aescrypt_engine_INSTALL})
+set(secutil_INSTALL ${aescrypt_engine_INSTALL})
+set(charutil_INSTALL ${aescrypt_engine_INSTALL})
+set(random_INSTALL ${aescrypt_engine_INSTALL})
+set(libhash_INSTALL ${aescrypt_engine_INSTALL})
+set(libkdf_INSTALL ${aescrypt_engine_INSTALL})
+set(logger_INSTALL ${aescrypt_engine_INSTALL})
 
 # Make dependencies available
-#FetchContent_MakeAvailable(aescrypt_engine libaes secutil charutil random libhash libkdf logger)
-#Without libaes or aescrypt_engine
+#FetchContent_MakeAvailable(libaes secutil charutil random libhash libkdf logger)
+
+#no libaes
 FetchContent_MakeAvailable(secutil charutil random libhash libkdf logger)
