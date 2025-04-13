@@ -66,10 +66,10 @@ FetchContent_Declare(libkdf
     GIT_SHALLOW    true)
 
 # Fetch the Logger library
-FetchContent_Declare(logger
-    GIT_REPOSITORY ${TERRAPANE_SOURCE_URI}/logger.git
-    GIT_TAG        master
-    GIT_SHALLOW    true)
+#FetchContent_Declare(logger
+    #GIT_REPOSITORY ${TERRAPANE_SOURCE_URI}/logger.git
+    #GIT_TAG        master
+    #GIT_SHALLOW    true)
 
 # If not installing aescrypt_engine, turn off installation for dependencies
 if(NOT aescrypt_engine_INSTALL)
@@ -79,10 +79,10 @@ if(NOT aescrypt_engine_INSTALL)
     set(random_INSTALL OFF)
     set(libhash_INSTALL OFF)
     set(libkdf_INSTALL OFF)
-    set(logger_INSTALL OFF)
+    #set(logger_INSTALL OFF)
 endif()
 
 # Make dependencies available
 #FetchContent_MakeAvailable(aescrypt_engine libaes secutil charutil random libhash libkdf logger)
-#Without libaes or aescrypt_engine
-FetchContent_MakeAvailable(secutil charutil random libhash libkdf logger)
+#Without libaes, logger, aescrypt_engine
+FetchContent_MakeAvailable(secutil charutil random libhash libkdf)

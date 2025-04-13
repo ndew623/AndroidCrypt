@@ -38,6 +38,8 @@ option(aescrypt_engine_INSTALL "Install the AES Crypt Engine" OFF)
 option(aescrypt_engine_CLANG_TIDY "Use clang-tidy to perform linting during build" OFF)
 option(aescrypt_engine_BUILD_TESTS "Build Tests for the AES Crypt Engine" OFF)
 
+add_subdirectory(conio-master)
+add_subdirectory(logger-master)
 add_subdirectory(libaes-master)
 add_subdirectory(dependencies)
 add_subdirectory(aescrypt_engine-master)
