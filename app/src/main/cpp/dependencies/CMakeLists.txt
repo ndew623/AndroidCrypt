@@ -54,16 +54,16 @@ FetchContent_Declare(random
     GIT_SHALLOW    true)
 
 # Fetch the hashing library
-FetchContent_Declare(libhash
-    GIT_REPOSITORY ${TERRAPANE_SOURCE_URI}/libhash.git
-    GIT_TAG        master
-    GIT_SHALLOW    true)
+#FetchContent_Declare(libhash
+    #GIT_REPOSITORY ${TERRAPANE_SOURCE_URI}/libhash.git
+    #GIT_TAG        master
+    #GIT_SHALLOW    true)
 
 # Fetch the Key Derivation Function library
-FetchContent_Declare(libkdf
-    GIT_REPOSITORY ${TERRAPANE_SOURCE_URI}/libkdf.git
-    GIT_TAG        master
-    GIT_SHALLOW    true)
+#FetchContent_Declare(libkdf
+    #GIT_REPOSITORY ${TERRAPANE_SOURCE_URI}/libkdf.git
+    #GIT_TAG        master
+    #GIT_SHALLOW    true)
 
 # Fetch the Logger library
 #FetchContent_Declare(logger
@@ -77,12 +77,12 @@ if(NOT aescrypt_engine_INSTALL)
     set(secutil_INSTALL OFF)
     set(charutil_INSTALL OFF)
     set(random_INSTALL OFF)
-    set(libhash_INSTALL OFF)
-    set(libkdf_INSTALL OFF)
+    #set(libhash_INSTALL OFF)
+    #set(libkdf_INSTALL OFF)
     #set(logger_INSTALL OFF)
 endif()
 
 # Make dependencies available
 #FetchContent_MakeAvailable(aescrypt_engine libaes secutil charutil random libhash libkdf logger)
 #Without libaes, logger, aescrypt_engine
-FetchContent_MakeAvailable(secutil charutil random libhash libkdf)
+FetchContent_MakeAvailable(secutil charutil random)

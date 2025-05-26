@@ -1,0 +1,7 @@
+add_subdirectory(hash)
+add_subdirectory(hmac)
+add_subdirectory(sha1)
+add_subdirectory(sha224)
+add_subdirectory(sha256)
+add_subdirectory(sha384)
+add_subdirectory(sha512)
