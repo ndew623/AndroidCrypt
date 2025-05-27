@@ -29,6 +29,7 @@ public class CryptoThread extends Thread {
     public static final boolean OPERATION_TYPE_DECRYPTION = false;
     public static final int VERSION_1 = 1;
     public static final int VERSION_2 = 2;
+    public static final int VERSION_3 = 3;
 
 
     private static final HashMap<String, ProgressDisplayer> progressDiplayers = new HashMap<>();

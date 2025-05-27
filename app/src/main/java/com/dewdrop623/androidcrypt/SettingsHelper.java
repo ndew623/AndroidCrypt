@@ -11,7 +11,7 @@ public final class SettingsHelper {
 
     /*Defaults*/
     public static final boolean USE_DARK_THEME_DEFAULT = false;
-    public static final int AESCRYPT_DEFAULT_VERSION = CryptoThread.VERSION_2;
+    public static final int AESCRYPT_DEFAULT_VERSION = CryptoThread.VERSION_3;
 
     private static final String SHARED_PREFERENCES_FILE = "com.dewdrop623.androidcrypt.SettingsHelper.SHARED_PREFERENCES_FILE";
     private static final String AESCRYPT_VERSION_PREF = "com.dewdrop623.androidcrypt.SettingsHelper.AESCRYPT_VERSION_PREF";
@@ -47,7 +47,7 @@ public final class SettingsHelper {
      */
 
     public static void setAESCryptVersion(Context context, int version) {
-        if (version != CryptoThread.VERSION_1 && version != CryptoThread.VERSION_2) {
+        if (version != CryptoThread.VERSION_1 && version != CryptoThread.VERSION_2 && version != CryptoThread.VERSION_3) {
             version = AESCRYPT_DEFAULT_VERSION;
         }
         sharedPreferencesPutInt(context, AESCRYPT_VERSION_PREF, version);

@@ -27,7 +27,9 @@ public class SettingsFragment extends Fragment {
 
         RadioGroup aescryptVersionRadioGroup = view.findViewById(R.id.aescryptVersionRadioGroup);
         int currentAESCryptVersionSetting = SettingsHelper.getAESCryptVersion(getContext());
-        if (currentAESCryptVersionSetting == CryptoThread.VERSION_2) {
+        if (currentAESCryptVersionSetting == CryptoThread.VERSION_3) {
+            aescryptVersionRadioGroup.check(R.id.version3RadioButton);
+        } else if (currentAESCryptVersionSetting == CryptoThread.VERSION_2) {
             aescryptVersionRadioGroup.check(R.id.version2RadioButton);
         } else if (currentAESCryptVersionSetting == CryptoThread.VERSION_1) {
             aescryptVersionRadioGroup.check(R.id.version1RadioButton);
@@ -49,6 +51,7 @@ public class SettingsFragment extends Fragment {
             int textColor = ((MainActivity)getActivity()).getDarkThemeColor(android.R.attr.textColorPrimary);
             ((RadioButton) aescryptVersionRadioGroup.findViewById(R.id.version1RadioButton)).setTextColor(textColor);
             ((RadioButton) aescryptVersionRadioGroup.findViewById(R.id.version2RadioButton)).setTextColor(textColor);
+            ((RadioButton) aescryptVersionRadioGroup.findViewById(R.id.version3RadioButton)).setTextColor(textColor);
             ((RadioButton) themeRadioGroup.findViewById(R.id.darkThemeRadioButton)).setTextColor(textColor);
             ((RadioButton) themeRadioGroup.findViewById(R.id.lightThemeRadioButton)).setTextColor(textColor);
 
@@ -65,6 +68,8 @@ public class SettingsFragment extends Fragment {
                 SettingsHelper.setAESCryptVersion(getContext(), CryptoThread.VERSION_1);
             } else if (i == R.id.version2RadioButton) {
                 SettingsHelper.setAESCryptVersion(getContext(), CryptoThread.VERSION_2);
+            } else if (i == R.id.version3RadioButton) {
+                SettingsHelper.setAESCryptVersion(getContext(), CryptoThread.VERSION_3);
             }
         }
     };
