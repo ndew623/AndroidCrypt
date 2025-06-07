@@ -2,6 +2,7 @@ package com.dewdrop623.androidcrypt;
 
 import android.net.Uri;
 import android.support.v4.provider.DocumentFile;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -108,30 +109,41 @@ public class CryptoThread extends Thread {
 
         if (inputStream != null && outputStream != null) {
             //call AESCrypt
-            try {
-                fileSize = inputStream.available();
-                AESCrypt aesCrypt = new AESCrypt(password);
-                if (operationType == OPERATION_TYPE_ENCRYPTION) {
-                    //Encrypt
-                    aesCrypt.encrypt(version, inputStream, outputStream);
-                } else {
-                    //Decrypt
-                    aesCrypt.decrypt(fileSize, inputStream, outputStream);
+
+            if  (operationType == OPERATION_TYPE_ENCRYPTION && version == CryptoThread.VERSION_3) {
+                JNIInterface.encrypt(inputStream, outputStream, new JNIProgressCallback() {
+                    @Override
+                    public void progressCallback(int progressValue) {
+                        Log.d("CryptoThread-progress", progressValue+"");
+                    }
+                }, null);
+            } else {
+
+                try {
+                    fileSize = inputStream.available();
+                    AESCrypt aesCrypt = new AESCrypt(password);
+                    if (operationType == OPERATION_TYPE_ENCRYPTION) {
+                        //Encrypt
+                        aesCrypt.encrypt(version, inputStream, outputStream);
+                    } else {
+                        //Decrypt
+                        aesCrypt.decrypt(fileSize, inputStream, outputStream);
+                    }
+                } catch (GeneralSecurityException gse) {
+                    successful = false;
+                    gse.printStackTrace();
+                    cryptoService.showToastOnGuiThread(R.string.error_platform_does_not_support_the_required_cryptographic_methods);
+                } catch (UnsupportedEncodingException uee) {
+                    successful = false;
+                    uee.printStackTrace();
+                    cryptoService.showToastOnGuiThread(R.string.error_utf16_encoding_is_not_supported);
+                } catch (IOException ioe) {
+                    successful = false;
+                    cryptoService.showToastOnGuiThread(ioe.getMessage());
+                } catch (NullPointerException npe) {
+                    successful = false;
+                    cryptoService.showToastOnGuiThread(npe.getMessage());
                 }
-            } catch (GeneralSecurityException gse) {
-                successful = false;
-                gse.printStackTrace();
-                cryptoService.showToastOnGuiThread(R.string.error_platform_does_not_support_the_required_cryptographic_methods);
-            } catch (UnsupportedEncodingException uee) {
-                successful = false;
-                uee.printStackTrace();
-                cryptoService.showToastOnGuiThread(R.string.error_utf16_encoding_is_not_supported);
-            } catch (IOException ioe) {
-                successful = false;
-                cryptoService.showToastOnGuiThread(ioe.getMessage());
-            } catch (NullPointerException npe) {
-                successful = false;
-                cryptoService.showToastOnGuiThread(npe.getMessage());
             }
         }
 

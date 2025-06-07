@@ -135,4 +135,7 @@ Java_com_dewdrop623_androidcrypt_JNIInterface_encrypt(JNIEnv *env, jclass jclass
 
     std::vector<std::pair<std::string, std::string>> extensions = {};
     encrypt_result = encryptor.Encrypt(static_cast<std::u8string>(password), iterations, jniIstream, jniOstream, extensions, NULL, 0);
+
+    // *** IMPORTANT NOTE: FINAL FLUSH IS REQUIRED TO WRITE LAST DATAi ***
+    jniOstream.flush();
 }

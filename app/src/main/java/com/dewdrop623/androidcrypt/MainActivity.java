@@ -16,6 +16,10 @@ import android.view.View;
 
 public class MainActivity extends AppCompatActivity {
 
+    static {
+        System.loadLibrary("androidcrypt");
+    }
+
     public static final String INPUT_FILE_ARGUMENT_KEY = "com.dewdrop623.androidcrypt.MainActivity.INPUT_FILE_ARGUMENT_KEY";
 
     private FloatingActionButton fab;
