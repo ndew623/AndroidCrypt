@@ -70,13 +70,14 @@ public class CryptoThread extends Thread {
         CryptoThread.operationType = operationType;
     }
 
+
     @Override
     public void run() {
         boolean successful = true;
         operationInProgress = true;
         lastUpdateAtByteNumber = 0;
         totalBytesRead = 0;
-        timeOperationStarted = System.currentTimeMillis();
+        timeOperationStarted = 0;
 
         if (operationType == OPERATION_TYPE_ENCRYPTION) {
             completedMessageStringId = R.string.encryption_completed;
@@ -110,40 +111,10 @@ public class CryptoThread extends Thread {
         if (inputStream != null && outputStream != null) {
             //call AESCrypt
 
-            if  (operationType == OPERATION_TYPE_ENCRYPTION && version == CryptoThread.VERSION_3) {
-                JNIInterface.encrypt(inputStream, outputStream, new JNIProgressCallback() {
-                    @Override
-                    public void progressCallback(int progressValue) {
-                        Log.d("CryptoThread-progress", progressValue+"");
-                    }
-                }, null);
+            if  (version == CryptoThread.VERSION_3) {
+                version3Operation(inputStream, outputStream);
             } else {
-
-                try {
-                    fileSize = inputStream.available();
-                    AESCrypt aesCrypt = new AESCrypt(password);
-                    if (operationType == OPERATION_TYPE_ENCRYPTION) {
-                        //Encrypt
-                        aesCrypt.encrypt(version, inputStream, outputStream);
-                    } else {
-                        //Decrypt
-                        aesCrypt.decrypt(fileSize, inputStream, outputStream);
-                    }
-                } catch (GeneralSecurityException gse) {
-                    successful = false;
-                    gse.printStackTrace();
-                    cryptoService.showToastOnGuiThread(R.string.error_platform_does_not_support_the_required_cryptographic_methods);
-                } catch (UnsupportedEncodingException uee) {
-                    successful = false;
-                    uee.printStackTrace();
-                    cryptoService.showToastOnGuiThread(R.string.error_utf16_encoding_is_not_supported);
-                } catch (IOException ioe) {
-                    successful = false;
-                    cryptoService.showToastOnGuiThread(ioe.getMessage());
-                } catch (NullPointerException npe) {
-                    successful = false;
-                    cryptoService.showToastOnGuiThread(npe.getMessage());
-                }
+                successful = preVersion3Operation(inputStream, outputStream);
             }
         }
 
@@ -200,13 +171,25 @@ public class CryptoThread extends Thread {
         operationInProgress = false;
     }
 
-    public static void updateProgressOnInterval(long bytesRead) {
-        totalBytesRead += bytesRead;
+    public static void updateProgressOnIntervalTotal(long totalBytesRead) {
+        if (timeOperationStarted == 0) {
+            //set time operation started on first progress update,
+            //because version 3 encryption with jni takes awhile to start
+            //and that throws off the estimate to completion
+            //maybe it has to load the binary each time or something
+            timeOperationStarted = System.currentTimeMillis();
+        }
+        CryptoThread.totalBytesRead = totalBytesRead;
         if (totalBytesRead - lastUpdateAtByteNumber > updateIntervalInBytes) {
             int [] timeToCompletion = getTimeToCompletion();
             lastUpdateAtByteNumber = totalBytesRead;
             updateProgressDisplayers(totalBytesRead, fileSize, timeToCompletion);
         }
+    }
+
+    public static void updateProgressOnInterval(long bytesRead) {
+        totalBytesRead += bytesRead;
+        updateProgressOnIntervalTotal(totalBytesRead);
     }
 
     //for each progress displayer: if not null: update, else remove it from progressDisplayers because it is null.
@@ -279,5 +262,53 @@ public class CryptoThread extends Thread {
 
     public static int getCompletedMessageStringId() {
         return completedMessageStringId;
+    }
+    private JNIProgressCallback jniProgressCallback = new JNIProgressCallback() {
+        @Override
+        public void progressCallback(int totalBytes) {
+            updateProgressOnIntervalTotal(totalBytes);
+        }
+    };
+    private void version3Operation(InputStream inputStream, OutputStream outputStream) {
+        try {
+            fileSize = inputStream.available();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();//TODO better error handling
+        }
+        if (operationType == OPERATION_TYPE_ENCRYPTION) {
+            JNIInterface.encrypt(password, inputStream, outputStream, jniProgressCallback, null);
+        } else if (operationType == OPERATION_TYPE_DECRYPTION) {
+            JNIInterface.decrypt(password, inputStream, outputStream, jniProgressCallback, null);
+        }
+    }
+
+    private boolean preVersion3Operation(InputStream inputStream, OutputStream outputStream) {
+        boolean successful = true;
+        try {
+            fileSize = inputStream.available();
+            AESCrypt aesCrypt = new AESCrypt(password);
+            if (operationType == OPERATION_TYPE_ENCRYPTION) {
+                //Encrypt
+                aesCrypt.encrypt(version, inputStream, outputStream);
+            } else {
+                //Decrypt
+                aesCrypt.decrypt(fileSize, inputStream, outputStream);
+            }
+        } catch (GeneralSecurityException gse) {
+            successful = false;
+            gse.printStackTrace();
+            cryptoService.showToastOnGuiThread(R.string.error_platform_does_not_support_the_required_cryptographic_methods);
+        } catch (UnsupportedEncodingException uee) {
+            successful = false;
+            uee.printStackTrace();
+            cryptoService.showToastOnGuiThread(R.string.error_utf16_encoding_is_not_supported);
+        } catch (IOException ioe) {
+            successful = false;
+            cryptoService.showToastOnGuiThread(ioe.getMessage());
+        } catch (NullPointerException npe) {
+            successful = false;
+            cryptoService.showToastOnGuiThread(npe.getMessage());
+        }
+        return successful;
     }
 }
