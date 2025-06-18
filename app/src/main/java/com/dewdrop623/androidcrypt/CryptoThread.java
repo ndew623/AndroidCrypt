@@ -2,7 +2,6 @@ package com.dewdrop623.androidcrypt;
 
 import android.net.Uri;
 import android.support.v4.provider.DocumentFile;
-import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,6 +21,7 @@ public class CryptoThread extends Thread {
 
     //Do not do more than one operation at once.
     public static boolean operationInProgress = false;
+    private static int version;
 
     /*
     * Constants.
@@ -53,7 +53,6 @@ public class CryptoThread extends Thread {
     private final Uri inputFile;
     private final Uri outputFile;
     private final String password;
-    private final int version;
     private boolean deleteInputFile = false;
     private static int completedMessageStringId = R.string.done;
 
@@ -241,6 +240,9 @@ public class CryptoThread extends Thread {
         } else {
             completedMessageStringId = R.string.decryption_canceled;
         }
+        if (version == VERSION_3) {
+            JNIInterface.cancel();
+        }
         operationInProgress = false;
     }
 
@@ -275,10 +277,11 @@ public class CryptoThread extends Thread {
         } catch (IOException ioe) {
             ioe.printStackTrace();//TODO better error handling
         }
+        LogStream logStream = new LogStream();
         if (operationType == OPERATION_TYPE_ENCRYPTION) {
-            JNIInterface.encrypt(password, inputStream, outputStream, jniProgressCallback, null);
+            JNIInterface.encrypt(password, inputStream, outputStream, jniProgressCallback, logStream);
         } else if (operationType == OPERATION_TYPE_DECRYPTION) {
-            JNIInterface.decrypt(password, inputStream, outputStream, jniProgressCallback, null);
+            JNIInterface.decrypt(password, inputStream, outputStream, jniProgressCallback, logStream);
         }
     }
 

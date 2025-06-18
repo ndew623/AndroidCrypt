@@ -112,9 +112,36 @@ public:
     JNIIstream(JNIEnv * javaEnv, const jobject & javaInputStream, const int bufferSize): std::istream(&buffer), buffer(javaEnv, javaInputStream, bufferSize) {}
 };
 
+//use destructor to run function when object leaves scope
+struct Deferer {
+private:
+    std::function<void()> deferred;
+public:
+    Deferer(std::function<void()> deferred): deferred(deferred){};
+    ~Deferer() {
+        deferred();
+    };
+};
+Terra::AESCrypt::Engine::Encryptor * encryptorPtr = NULL;
+Terra::AESCrypt::Engine::Decryptor * decryptorPtr = NULL;
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_dewdrop623_androidcrypt_JNIInterface_cancel(JNIEnv *env, jclass jclass1) {
+    if (encryptorPtr != NULL) {
+        encryptorPtr -> Cancel();
+    }
+    if (decryptorPtr != NULL) {
+        decryptorPtr -> Cancel();
+    }
+}
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_dewdrop623_androidcrypt_JNIInterface_encrypt(JNIEnv *env, jclass jclass1, jstring jpassword, jobject inputStream, jobject outputStream, jobject progressCallback, jobject logStream) {
+    JNIOstream jniLogStream{env, logStream, 100};
+
+    jniLogStream << "log stream test";
+
     //get progress callback method
     jclass progressCallbackClass = env->GetObjectClass(progressCallback);
     jmethodID progressCallbackMethodId = env->GetMethodID(progressCallbackClass, "progressCallback", "(I)V");
@@ -139,6 +166,13 @@ Java_com_dewdrop623_androidcrypt_JNIInterface_encrypt(JNIEnv *env, jclass jclass
     //TODO pass logger to constructor
     Terra::AESCrypt::Engine::Encryptor encryptor{};
 
+    //keep a global reference to encryptor to call cancel function
+    encryptorPtr = &encryptor;
+    //use struct destructor to cleanup reference
+    Deferer deferer([&]() -> void {
+        encryptorPtr = NULL;
+    });
+
     std::vector<std::pair<std::string, std::string>> extensions = {};
     encrypt_result = encryptor.Encrypt(password, iterations, jniIstream, jniOstream, extensions, callback, bufferSize/10);
 
@@ -151,6 +185,8 @@ Java_com_dewdrop623_androidcrypt_JNIInterface_encrypt(JNIEnv *env, jclass jclass
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_dewdrop623_androidcrypt_JNIInterface_decrypt(JNIEnv *env, jclass jclass1, jstring jpassword, jobject inputStream, jobject outputStream, jobject progressCallback, jobject logStream) {
+    JNIOstream jniLogStream{env, logStream, 100};
+
     jclass progressCallbackClass = env->GetObjectClass(progressCallback);
     jmethodID progressCallbackMethodId = env->GetMethodID(progressCallbackClass, "progressCallback", "(I)V");
     auto callback = [&](const std::string & instance, std::size_t bytesRead) {
@@ -172,6 +208,13 @@ Java_com_dewdrop623_androidcrypt_JNIInterface_decrypt(JNIEnv *env, jclass jclass
 
     //TODO pass logger to constructor
     Terra::AESCrypt::Engine::Decryptor decryptor{};
+
+    //keep a global reference to encryptor to call cancel function
+    decryptorPtr = &decryptor;
+    //use struct destructor to cleanup reference
+    Deferer deferer([&]() -> void {
+        decryptorPtr = NULL;
+    });
 
     std::vector<std::pair<std::string, std::string>> extensions = {};
     decrypt_result = decryptor.Decrypt(password, jniIstream, jniOstream, callback, bufferSize/10);
