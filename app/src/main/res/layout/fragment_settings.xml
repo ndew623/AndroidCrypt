@@ -10,40 +10,6 @@
         android:padding="16dp">
 
         <TextView
-            android:id="@+id/aescryptVersionTitleTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/aescrypt_version" />
-
-        <RadioGroup
-            android:id="@+id/aescryptVersionRadioGroup"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start"
-            android:layout_marginBottom="16dp"
-            android:orientation="vertical">
-
-            <RadioButton
-                android:id="@+id/version1RadioButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingEnd="16dp"
-                android:text="@string/version_1_radio_button_text"/>
-
-            <RadioButton
-                android:id="@+id/version2RadioButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/version_2_radio_button_text" />
-
-            <RadioButton
-                android:id="@+id/version3RadioButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/version_3_radio_button_text" />
-        </RadioGroup>
-
-        <TextView
             android:id="@+id/themeTitleTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

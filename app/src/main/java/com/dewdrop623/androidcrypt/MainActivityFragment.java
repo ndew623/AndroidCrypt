@@ -387,7 +387,6 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
             Intent intent = new Intent(context, CryptoService.class);
             intent.putExtra(CryptoService.INPUT_FILE_URI_EXTRA_KEY, inputFile.toString());
             intent.putExtra(CryptoService.OUTPUT_FILE_URI_EXTRA_KEY, outputFile.toString());
-            intent.putExtra(CryptoService.VERSION_EXTRA_KEY, SettingsHelper.getAESCryptVersion(getContext()));
             intent.putExtra(CryptoService.OPERATION_TYPE_EXTRA_KEY, operationMode);
             intent.putExtra(CryptoService.DELETE_INPUT_FILE_KEY, deleteInputFile);
             MainActivityFragment.password = passwordEditText.getText().toString().toCharArray();

@@ -58,4 +58,6 @@
     <string name="already_decrypting">Already Decrypting</string>
     <string name="aescrypt_internal_error">Internal AES Crypt Error</string>
     <string name="unknown_status">Unknown Completion Status</string>
+    <string name="could_not_read_input_file_size">Error: could not read input file size</string>
+    <string name="error_could_not_open_output_file">Error: could not open output file</string>
 </resources>

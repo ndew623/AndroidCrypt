@@ -24,16 +24,12 @@ public class CryptoThread extends Thread {
 
     //Do not do more than one operation at once.
     public static boolean operationInProgress = false;
-    private static int version;
 
     /*
     * Constants.
      */
     public static final boolean OPERATION_TYPE_ENCRYPTION = true;
     public static final boolean OPERATION_TYPE_DECRYPTION = false;
-    public static final int VERSION_1 = 1;
-    public static final int VERSION_2 = 2;
-    public static final int VERSION_3 = 3;
 
     private static final HashMap<String, ProgressDisplayer> progressDiplayers = new HashMap<>();
 
@@ -64,12 +60,11 @@ public class CryptoThread extends Thread {
     /**
      * Takes a cryptoService, input and output uris, the password, a version (use VERSION_X constants), and operation type (defined by the OPERATION_TYPE_X constants)
      */
-    public CryptoThread(CryptoService cryptoService, Uri inputFile, Uri outputFile, String password, int version, boolean operationType, boolean deleteInputFile) {
+    public CryptoThread(CryptoService cryptoService, Uri inputFile, Uri outputFile, String password, boolean operationType, boolean deleteInputFile) {
         this.cryptoService = cryptoService;
         this.inputFile = inputFile;
         this.outputFile = outputFile;
         this.password = password;
-        this.version = version;
         this.deleteInputFile = deleteInputFile;
         CryptoThread.operationType = operationType;
 
@@ -117,10 +112,11 @@ public class CryptoThread extends Thread {
         //get the input stream
         try {
             inputStream = cryptoService.getContentResolver().openInputStream(inputFile);
+            fileSize = inputStream.available();
         } catch (IOException ioe) {
             successful = false;
             ioe.printStackTrace();
-            cryptoService.showToastOnGuiThread(R.string.error_could_not_get_input_file);
+            completedMessageStringId = R.string.error_could_not_get_input_file;
         }
 
         //get the output stream
@@ -129,16 +125,16 @@ public class CryptoThread extends Thread {
         } catch (IOException ioe) {
             successful = false;
             ioe.printStackTrace();
-            cryptoService.showToastOnGuiThread(ioe.getMessage());
+            completedMessageStringId = R.string.error_could_not_open_output_file;
         }
 
         if (inputStream != null && outputStream != null) {
             //call AESCrypt
-
-            if  (version == CryptoThread.VERSION_3) {
-                version3Operation(inputStream, outputStream);
-            } else {
-                successful = preVersion3Operation(inputStream, outputStream);
+            LogStream logStream = new LogStream("JNI Execution");
+            if (operationType == OPERATION_TYPE_ENCRYPTION) {
+                successful = JNIInterface.encrypt(password, inputStream, outputStream, jniCallbackInterface, logStream);
+            } else if (operationType == OPERATION_TYPE_DECRYPTION) {
+                successful = JNIInterface.decrypt(password, inputStream, outputStream, jniCallbackInterface, logStream);
             }
         }
 
@@ -149,7 +145,7 @@ public class CryptoThread extends Thread {
             } catch (IOException ioe) {
                 successful = false;
                 ioe.printStackTrace();
-                cryptoService.showToastOnGuiThread(R.string.error_could_not_close_input_file);
+                completedMessageStringId = R.string.error_could_not_close_input_file;
             }
         }
         if (outputStream != null) {
@@ -157,7 +153,8 @@ public class CryptoThread extends Thread {
                 outputStream.close();
             } catch (IOException ioe) {
                 successful = false;
-                cryptoService.showToastOnGuiThread(R.string.error_could_not_close_output_file);
+                ioe.printStackTrace();
+                completedMessageStringId = R.string.error_could_not_close_output_file;
             }
         }
 
@@ -166,27 +163,14 @@ public class CryptoThread extends Thread {
         updateProgressDisplayers(fileSize, fileSize, timeToCompletion);
 
         /*
-        if operation didn't encounter errors (successful == true), didn't get canceled
-        (operationInProgress is still true), and user asked (deleteInputFile == true):
+        if operation didn't encounter errors and was not canceled (i.e. successful == true),
+        and user asked (deleteInputFile == true):
         delete the input file
          */
-        if (successful && deleteInputFile && operationInProgress) {
+        if (successful && deleteInputFile) {
             boolean successfullyDeleted = deleteInputFile();
             if (!successfullyDeleted) {
                 cryptoService.showToastOnGuiThread(R.string.failed_to_delete_input_file);
-            }
-        }
-
-        /*
-        if operation didn't encounter errors (successful == true)
-        and didn't get canceled (operationInProgress is still true):
-        display toast to notify of success
-        */
-        if (successful && operationInProgress) {
-            if (operationType == OPERATION_TYPE_ENCRYPTION) {
-                cryptoService.showToastOnGuiThread(R.string.encryption_completed);
-            } else {
-                cryptoService.showToastOnGuiThread(R.string.decryption_completed);
             }
         }
 
@@ -260,14 +244,7 @@ public class CryptoThread extends Thread {
 
     //Called by the cancel button in MainActivityFragment.
     public static void cancel() {
-        if (operationType == OPERATION_TYPE_ENCRYPTION) {
-            completedMessageStringId = R.string.encryption_canceled;
-        } else {
-            completedMessageStringId = R.string.decryption_canceled;
-        }
-        if (version == VERSION_3) {
-            JNIInterface.cancel();
-        }
+        JNIInterface.cancel();
         operationInProgress = false;
     }
 
@@ -303,50 +280,8 @@ public class CryptoThread extends Thread {
             } else if (decryptResultStatusMessages.containsKey(status)){
                 message_string_id = decryptResultStatusMessages.get(status);
             }
+            completedMessageStringId = message_string_id;
             cryptoService.showToastOnGuiThread(message_string_id);
         }
     };
-    private void version3Operation(InputStream inputStream, OutputStream outputStream) {
-        try {
-            fileSize = inputStream.available();
-        } catch (IOException ioe) {
-            ioe.printStackTrace();//TODO better error handling
-        }
-        LogStream logStream = new LogStream("JNI Execution");
-        if (operationType == OPERATION_TYPE_ENCRYPTION) {
-            JNIInterface.encrypt(password, inputStream, outputStream, jniCallbackInterface, logStream);
-        } else if (operationType == OPERATION_TYPE_DECRYPTION) {
-            JNIInterface.decrypt(password, inputStream, outputStream, jniCallbackInterface, logStream);
-        }
-    }
-
-    private boolean preVersion3Operation(InputStream inputStream, OutputStream outputStream) {
-        boolean successful = true;
-        try {
-            fileSize = inputStream.available();
-            AESCrypt aesCrypt = new AESCrypt(password);
-            if (operationType == OPERATION_TYPE_ENCRYPTION) {
-                //Encrypt
-                aesCrypt.encrypt(version, inputStream, outputStream);
-            } else {
-                //Decrypt
-                aesCrypt.decrypt(fileSize, inputStream, outputStream);
-            }
-        } catch (GeneralSecurityException gse) {
-            successful = false;
-            gse.printStackTrace();
-            cryptoService.showToastOnGuiThread(R.string.error_platform_does_not_support_the_required_cryptographic_methods);
-        } catch (UnsupportedEncodingException uee) {
-            successful = false;
-            uee.printStackTrace();
-            cryptoService.showToastOnGuiThread(R.string.error_utf16_encoding_is_not_supported);
-        } catch (IOException ioe) {
-            successful = false;
-            cryptoService.showToastOnGuiThread(ioe.getMessage());
-        } catch (NullPointerException npe) {
-            successful = false;
-            cryptoService.showToastOnGuiThread(npe.getMessage());
-        }
-        return successful;
-    }
 }

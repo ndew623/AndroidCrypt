@@ -160,7 +160,7 @@ Java_com_dewdrop623_androidcrypt_JNIInterface_cancel(JNIEnv *env, jclass jclass1
     }
 }
 extern "C"
-JNIEXPORT void JNICALL
+JNIEXPORT jboolean JNICALL
 Java_com_dewdrop623_androidcrypt_JNIInterface_encrypt(JNIEnv *env, jclass jclass1, jstring jpassword, jobject inputStream, jobject outputStream, jobject callbackInterface, jobject logStream) {
     JNIOstream jniLogStream{env, logStream, 100};
 
@@ -188,9 +188,6 @@ Java_com_dewdrop623_androidcrypt_JNIInterface_encrypt(JNIEnv *env, jclass jclass
 
     Terra::Logger::LoggerPointer logger = std::make_shared<Terra::Logger::Logger>(jniLogStream);
 
-    logger->Log("This is a test message");
-
-    //TODO pass logger to constructor
     Terra::AESCrypt::Engine::Encryptor encryptor{logger};
 
     //keep a global reference to encryptor to call cancel function
@@ -211,9 +208,10 @@ Java_com_dewdrop623_androidcrypt_JNIInterface_encrypt(JNIEnv *env, jclass jclass
         completion_status = ENCRYPT_RESULT_CODES.at(encrypt_result);
     }
     env->CallVoidMethod(callbackInterface, completedCallbackMethodId, (jint)completion_status);
+    return (jboolean)(encrypt_result==Terra::AESCrypt::Engine::EncryptResult::Success);
 }
 extern "C"
-JNIEXPORT void JNICALL
+JNIEXPORT jboolean JNICALL
 Java_com_dewdrop623_androidcrypt_JNIInterface_decrypt(JNIEnv *env, jclass jclass1, jstring jpassword, jobject inputStream, jobject outputStream, jobject callbackInterface, jobject logStream) {
     JNIOstream jniLogStream{env, logStream, 100};
 
@@ -239,8 +237,6 @@ Java_com_dewdrop623_androidcrypt_JNIInterface_decrypt(JNIEnv *env, jclass jclass
 
     Terra::Logger::LoggerPointer logger = std::make_shared<Terra::Logger::Logger>(jniLogStream);
 
-    logger->Log("This is a test message");
-
     Terra::AESCrypt::Engine::Decryptor decryptor{logger};
 
     //keep a global reference to encryptor to call cancel function
@@ -261,4 +257,5 @@ Java_com_dewdrop623_androidcrypt_JNIInterface_decrypt(JNIEnv *env, jclass jclass
         completion_status = DECRYPT_RESULT_CODES.at(decrypt_result);
     }
     env->CallVoidMethod(callbackInterface, completedCallbackMethodId, (jint)completion_status);
+    return (jboolean)(decrypt_result==Terra::AESCrypt::Engine::DecryptResult::Success);
 }
