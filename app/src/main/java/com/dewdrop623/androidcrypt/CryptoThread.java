@@ -1,5 +1,7 @@
 package com.dewdrop623.androidcrypt;
 
+import static java.util.Map.entry;
+
 import android.net.Uri;
 import android.support.v4.provider.DocumentFile;
 
@@ -9,6 +11,7 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.util.HashMap;
+import java.util.Map;
 
 import es.vocali.util.AESCrypt;
 
@@ -31,7 +34,6 @@ public class CryptoThread extends Thread {
     public static final int VERSION_1 = 1;
     public static final int VERSION_2 = 2;
     public static final int VERSION_3 = 3;
-
 
     private static final HashMap<String, ProgressDisplayer> progressDiplayers = new HashMap<>();
 
@@ -56,6 +58,9 @@ public class CryptoThread extends Thread {
     private boolean deleteInputFile = false;
     private static int completedMessageStringId = R.string.done;
 
+    private Map<Integer, Integer> encryptResultStatusMessages = new HashMap<>();
+    private Map<Integer, Integer> decryptResultStatusMessages = new HashMap<>();
+
     /**
      * Takes a cryptoService, input and output uris, the password, a version (use VERSION_X constants), and operation type (defined by the OPERATION_TYPE_X constants)
      */
@@ -67,6 +72,26 @@ public class CryptoThread extends Thread {
         this.version = version;
         this.deleteInputFile = deleteInputFile;
         CryptoThread.operationType = operationType;
+
+        encryptResultStatusMessages.put(1, R.string.encryption_completed);
+        encryptResultStatusMessages.put(2, R.string.io_error);
+        encryptResultStatusMessages.put(3, R.string.invalid_extension_error);
+        encryptResultStatusMessages.put(4, R.string.invalid_password_error);
+        encryptResultStatusMessages.put(5, R.string.invalid_iterations_error);
+        encryptResultStatusMessages.put(6, R.string.already_encrypting);
+        encryptResultStatusMessages.put(7, R.string.encryption_canceled);
+        encryptResultStatusMessages.put(8, R.string.aescrypt_internal_error);
+
+        decryptResultStatusMessages.put(101, R.string.decryption_completed);
+        decryptResultStatusMessages.put(102, R.string.invalid_aescrypt_stream_error);
+        decryptResultStatusMessages.put(103, R.string.unsupported_aescrypt_version_error);
+        decryptResultStatusMessages.put(104, R.string.io_error);
+        decryptResultStatusMessages.put(105, R.string.invalid_password_error);
+        decryptResultStatusMessages.put(106, R.string.invalid_iterations_error);
+        decryptResultStatusMessages.put(107, R.string.altered_message_error);
+        decryptResultStatusMessages.put(108, R.string.already_decrypting);
+        decryptResultStatusMessages.put(109, R.string.decryption_canceled);
+        decryptResultStatusMessages.put(110, R.string.aescrypt_internal_error);
     }
 
 
@@ -265,10 +290,20 @@ public class CryptoThread extends Thread {
     public static int getCompletedMessageStringId() {
         return completedMessageStringId;
     }
-    private JNIProgressCallback jniProgressCallback = new JNIProgressCallback() {
+    private JNICallbackInterface jniCallbackInterface = new JNICallbackInterface() {
         @Override
         public void progressCallback(int totalBytes) {
             updateProgressOnIntervalTotal(totalBytes);
+        }
+        @Override
+        public void completedCallback(int status) {
+            int message_string_id = R.string.unknown_status;
+            if (getCurrentOperationType() == OPERATION_TYPE_ENCRYPTION && encryptResultStatusMessages.containsKey(status)) {
+                message_string_id = encryptResultStatusMessages.get(status);
+            } else if (decryptResultStatusMessages.containsKey(status)){
+                message_string_id = decryptResultStatusMessages.get(status);
+            }
+            cryptoService.showToastOnGuiThread(message_string_id);
         }
     };
     private void version3Operation(InputStream inputStream, OutputStream outputStream) {
@@ -277,11 +312,11 @@ public class CryptoThread extends Thread {
         } catch (IOException ioe) {
             ioe.printStackTrace();//TODO better error handling
         }
-        LogStream logStream = new LogStream();
+        LogStream logStream = new LogStream("JNI Execution");
         if (operationType == OPERATION_TYPE_ENCRYPTION) {
-            JNIInterface.encrypt(password, inputStream, outputStream, jniProgressCallback, logStream);
+            JNIInterface.encrypt(password, inputStream, outputStream, jniCallbackInterface, logStream);
         } else if (operationType == OPERATION_TYPE_DECRYPTION) {
-            JNIInterface.decrypt(password, inputStream, outputStream, jniProgressCallback, logStream);
+            JNIInterface.decrypt(password, inputStream, outputStream, jniCallbackInterface, logStream);
         }
     }
 

@@ -64,4 +64,15 @@
     <string name="light">Light</string>
     <string name="failed_to_delete_input_file">ERROR failed to delete input file</string>
     <string name="files_other_apps_no_delete">Files that were selected using another app cannot be deleted by AndroidCrypt.</string>
+    <string name="io_error">IO Error</string>
+    <string name="invalid_extension_error">Invalid Extension Error</string>
+    <string name="invalid_password_error">Invalid Password Error</string>
+    <string name="invalid_iterations_error">Invalid Iterations Error</string>
+    <string name="invalid_aescrypt_stream_error">Invalid AES Crypt Stream Error</string>
+    <string name="unsupported_aescrypt_version_error">Unsupported AES Crypt Version Error</string>
+    <string name="altered_message_error">Altered Message Error</string>
+    <string name="already_decrypting">Already Decrypting</string>
+    <string name="aescrypt_internal_error">Internal AES Crypt Error</string>
+    <string name="already_encrypting">Already Encrypting</string>
+    <string name="unknown_status">Unknown Completion Status</string>
 </resources>
