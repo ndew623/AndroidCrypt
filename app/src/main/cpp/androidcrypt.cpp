@@ -166,10 +166,10 @@ Java_com_dewdrop623_androidcrypt_JNIInterface_encrypt(JNIEnv *env, jclass jclass
 
     //get progress aesCryptProgressCallback method
     jclass callbackInterfaceClass = env->GetObjectClass(callbackInterface);
-    jmethodID progressCallbackMethodId = env->GetMethodID(callbackInterfaceClass, "progressCallback", "(I)V");
+    jmethodID progressCallbackMethodId = env->GetMethodID(callbackInterfaceClass, "progressCallback", "(J)V");
     jmethodID completedCallbackMethodId = env->GetMethodID(callbackInterfaceClass, "completedCallback", "(I)V");
     auto aesCryptProgressCallback = [&](const std::string & instance, std::size_t totalBytes) {
-        env->CallVoidMethod(callbackInterface, progressCallbackMethodId, (jint)totalBytes);
+        env->CallVoidMethod(callbackInterface, progressCallbackMethodId, (jlong)totalBytes);
     };
 
     //convert password to u8string
@@ -216,10 +216,10 @@ Java_com_dewdrop623_androidcrypt_JNIInterface_decrypt(JNIEnv *env, jclass jclass
     JNIOstream jniLogStream{env, logStream, 100};
 
     jclass callbackInterfaceClass = env->GetObjectClass(callbackInterface);
-    jmethodID progressCallbackMethodId = env->GetMethodID(callbackInterfaceClass, "progressCallback", "(I)V");
+    jmethodID progressCallbackMethodId = env->GetMethodID(callbackInterfaceClass, "progressCallback", "(J)V");
     jmethodID completedCallbackMethodId = env->GetMethodID(callbackInterfaceClass, "completedCallback", "(I)V");
     auto aesCryptProgressCallback = [&](const std::string & instance, std::size_t bytesRead) {
-        env->CallVoidMethod(callbackInterface, progressCallbackMethodId, (jint)bytesRead);
+        env->CallVoidMethod(callbackInterface, progressCallbackMethodId, (jlong)bytesRead);
     };
 
     const char * passwordcstr = env->GetStringUTFChars(jpassword, NULL);

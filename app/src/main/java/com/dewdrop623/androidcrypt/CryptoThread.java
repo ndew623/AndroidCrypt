@@ -269,7 +269,7 @@ public class CryptoThread extends Thread {
     }
     private JNICallbackInterface jniCallbackInterface = new JNICallbackInterface() {
         @Override
-        public void progressCallback(int totalBytes) {
+        public void progressCallback(long totalBytes) {
             updateProgressOnIntervalTotal(totalBytes);
         }
         @Override
