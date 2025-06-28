@@ -49,6 +49,10 @@ const std::map<Terra::AESCrypt::Engine::DecryptResult, int> DECRYPT_RESULT_CODES
         {Terra::AESCrypt::Engine::DecryptResult::InternalError, 110},
 };
 
+const int INPUT_BUFFER_SIZE = 1049000;// 1 MiB
+const int OUTPUT_BUFFER_SIZE = 1049000;// 1 MiB
+const int KEY_ITERATIONS = 300000;
+
 class JNIOutputBuffer : public std::streambuf {
 public:
     JNIOutputBuffer(JNIEnv * javaEnv, const jobject &javaOutputStream, int bufferSize)
@@ -66,12 +70,15 @@ protected:
     }
     int sync() override {
         jsize length = static_cast<jsize>(pptr()-pbase());
+        //NewByteArray memory must be freed by javaEnv->DeleteLocalRef(javaByteArray)
         jbyteArray javaByteArray = javaEnv->NewByteArray(length);
         javaEnv->SetByteArrayRegion(javaByteArray, 0, length, reinterpret_cast<const jbyte*>(&buffer.front()));
         javaEnv->CallVoidMethod(javaOutputStream, writeMethod, javaByteArray);
         javaEnv->CallVoidMethod(javaOutputStream, flushMethod);
 
         setp(&buffer.front(), &buffer.back());
+        //frees memory from NewByteArray
+        javaEnv->DeleteLocalRef(javaByteArray);
         return std::streambuf::sync();
     };
 private:
@@ -103,6 +110,7 @@ protected:
             return traits_type::to_int_type(*gptr());
         }
         jsize length = static_cast<jsize>(bufferSize);
+        //NewByteArray memory must be freed by javaEnv->DeleteLocalRef(javaByteArray)
         jbyteArray javaByteArray = javaEnv->NewByteArray(length);
         // Read from Java InputStream
         jint bytesRead = javaEnv->CallIntMethod(javaInputStream, readMethod, javaByteArray);
@@ -113,6 +121,8 @@ protected:
         javaEnv->GetByteArrayRegion(javaByteArray, 0, bytesRead, reinterpret_cast<jbyte*>(&buffer.front()));
         // Set buffer pointers
         setg(&buffer.front(), &buffer.front(), &buffer.front() + bytesRead);
+        //frees memory from NewByteArray
+        javaEnv->DeleteLocalRef(javaByteArray);
         return traits_type::to_int_type(*gptr());
 
 
@@ -159,9 +169,10 @@ Java_com_dewdrop623_androidcrypt_JNIInterface_cancel(JNIEnv *env, jclass jclass1
         decryptorPtr -> Cancel();
     }
 }
+
 extern "C"
 JNIEXPORT jboolean JNICALL
-Java_com_dewdrop623_androidcrypt_JNIInterface_encrypt(JNIEnv *env, jclass jclass1, jstring jpassword, jobject inputStream, jobject outputStream, jobject callbackInterface, jobject logStream) {
+Java_com_dewdrop623_androidcrypt_JNIInterface_encrypt(JNIEnv *env, jclass jclass1, jstring jpassword, jobject inputStream, jobject outputStream, jobject callbackInterface, jobject logStream, jlong progressFrequencyBytes) {
     JNIOstream jniLogStream{env, logStream, 100};
 
     //get progress aesCryptProgressCallback method
@@ -176,13 +187,8 @@ Java_com_dewdrop623_androidcrypt_JNIInterface_encrypt(JNIEnv *env, jclass jclass
     const char * passwordcstr = env->GetStringUTFChars(jpassword, NULL);
     std::u8string password(reinterpret_cast<const char8_t *>(passwordcstr));
 
-
-    //TODO define these somewhere else?
-    int bufferSize = 1049000;
-    int iterations = 300000;
-
-    JNIIstream jniIstream{env, inputStream, bufferSize};
-    JNIOstream jniOstream{env, outputStream, bufferSize};
+    JNIIstream jniIstream{env, inputStream, INPUT_BUFFER_SIZE};
+    JNIOstream jniOstream{env, outputStream, OUTPUT_BUFFER_SIZE};
 
     Terra::AESCrypt::Engine::EncryptResult encrypt_result{};
 
@@ -198,7 +204,7 @@ Java_com_dewdrop623_androidcrypt_JNIInterface_encrypt(JNIEnv *env, jclass jclass
     });
 
     std::vector<std::pair<std::string, std::string>> extensions = {};
-    encrypt_result = encryptor.Encrypt(password, iterations, jniIstream, jniOstream, extensions, aesCryptProgressCallback, bufferSize / 10);
+    encrypt_result = encryptor.Encrypt(password, KEY_ITERATIONS, jniIstream, jniOstream, extensions, aesCryptProgressCallback, progressFrequencyBytes);
 
     // *** IMPORTANT NOTE: FINAL FLUSH IS REQUIRED TO WRITE LAST DATA ***
     jniOstream.flush();
@@ -212,7 +218,7 @@ Java_com_dewdrop623_androidcrypt_JNIInterface_encrypt(JNIEnv *env, jclass jclass
 }
 extern "C"
 JNIEXPORT jboolean JNICALL
-Java_com_dewdrop623_androidcrypt_JNIInterface_decrypt(JNIEnv *env, jclass jclass1, jstring jpassword, jobject inputStream, jobject outputStream, jobject callbackInterface, jobject logStream) {
+Java_com_dewdrop623_androidcrypt_JNIInterface_decrypt(JNIEnv *env, jclass jclass1, jstring jpassword, jobject inputStream, jobject outputStream, jobject callbackInterface, jobject logStream, jlong progressFrequencyBytes) {
     JNIOstream jniLogStream{env, logStream, 100};
 
     jclass callbackInterfaceClass = env->GetObjectClass(callbackInterface);
@@ -225,13 +231,8 @@ Java_com_dewdrop623_androidcrypt_JNIInterface_decrypt(JNIEnv *env, jclass jclass
     const char * passwordcstr = env->GetStringUTFChars(jpassword, NULL);
     std::u8string password(reinterpret_cast<const char8_t *>(passwordcstr));
 
-
-    //TODO define these somewhere else?
-    int bufferSize = 1049000;
-    int iterations = 300000;
-
-    JNIIstream jniIstream{env, inputStream, bufferSize};
-    JNIOstream jniOstream{env, outputStream, bufferSize};
+    JNIIstream jniIstream{env, inputStream, INPUT_BUFFER_SIZE};
+    JNIOstream jniOstream{env, outputStream, OUTPUT_BUFFER_SIZE};
 
     Terra::AESCrypt::Engine::DecryptResult decrypt_result{};
 
@@ -247,7 +248,7 @@ Java_com_dewdrop623_androidcrypt_JNIInterface_decrypt(JNIEnv *env, jclass jclass
     });
 
     std::vector<std::pair<std::string, std::string>> extensions = {};
-    decrypt_result = decryptor.Decrypt(password, jniIstream, jniOstream, aesCryptProgressCallback, bufferSize / 10);
+    decrypt_result = decryptor.Decrypt(password, jniIstream, jniOstream, aesCryptProgressCallback, progressFrequencyBytes);
 
     // *** IMPORTANT NOTE: FINAL FLUSH IS REQUIRED TO WRITE LAST DATA ***
     jniOstream.flush();

@@ -131,10 +131,11 @@ public class CryptoThread extends Thread {
         if (inputStream != null && outputStream != null) {
             //call AESCrypt
             LogStream logStream = new LogStream("JNI Execution");
+            long progressFrequencyBytes = Math.max((long)(fileSize*0.01), 100l);
             if (operationType == OPERATION_TYPE_ENCRYPTION) {
-                successful = JNIInterface.encrypt(password, inputStream, outputStream, jniCallbackInterface, logStream);
+                successful = JNIInterface.encrypt(password, inputStream, outputStream, jniCallbackInterface, logStream, progressFrequencyBytes);
             } else if (operationType == OPERATION_TYPE_DECRYPTION) {
-                successful = JNIInterface.decrypt(password, inputStream, outputStream, jniCallbackInterface, logStream);
+                successful = JNIInterface.decrypt(password, inputStream, outputStream, jniCallbackInterface, logStream, progressFrequencyBytes);
             }
         }
 
