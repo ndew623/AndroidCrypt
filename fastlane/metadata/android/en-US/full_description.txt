@@ -1,0 +1,1 @@
+AndroidCrypt is a file encryption utility that is compatible with the open source desktop software AES Crypt (https://www.aescrypt.com/).
