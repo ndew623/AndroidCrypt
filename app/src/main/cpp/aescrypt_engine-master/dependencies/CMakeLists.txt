@@ -24,10 +24,10 @@ if(aescrypt_engine_BUILD_TESTS)
 endif()
 
 # Fetch the AES library
-#FetchContent_Declare(libaes
-    #GIT_REPOSITORY ${TERRAPANE_SOURCE_URI}/libaes.git
-    #GIT_TAG        v1.0.6
-    #GIT_SHALLOW    true)
+FetchContent_Declare(libaes
+    GIT_REPOSITORY ${TERRAPANE_SOURCE_URI}/libaes.git
+    GIT_TAG        v1.0.6
+    GIT_SHALLOW    true)
 
 # Fetch security utilities library
 FetchContent_Declare(secutil
@@ -48,10 +48,10 @@ FetchContent_Declare(random
     GIT_SHALLOW    true)
 
 # Fetch the hashing library
-#FetchContent_Declare(libhash
-    #GIT_REPOSITORY ${TERRAPANE_SOURCE_URI}/libhash.git
-    #GIT_TAG        v1.0.6
-    #GIT_SHALLOW    true)
+FetchContent_Declare(libhash
+    GIT_REPOSITORY ${TERRAPANE_SOURCE_URI}/libhash.git
+    GIT_TAG        v1.0.6
+    GIT_SHALLOW    true)
 
 # Fetch the Key Derivation Function library
 #FetchContent_Declare(libkdf
@@ -67,9 +67,9 @@ FetchContent_Declare(random
 
 # If not installing aescrypt_engine, turn off installation for dependencies
 #set(libaes_INSTALL ${aescrypt_engine_INSTALL})
-set(secutil_INSTALL ${aescrypt_engine_INSTALL})
-set(charutil_INSTALL ${aescrypt_engine_INSTALL})
-set(random_INSTALL ${aescrypt_engine_INSTALL})
+# set(secutil_INSTALL ${aescrypt_engine_INSTALL})
+# set(charutil_INSTALL ${aescrypt_engine_INSTALL})
+# set(random_INSTALL ${aescrypt_engine_INSTALL})
 #set(libhash_INSTALL ${aescrypt_engine_INSTALL})
 #set(libkdf_INSTALL ${aescrypt_engine_INSTALL})
 #set(logger_INSTALL ${aescrypt_engine_INSTALL})
@@ -78,4 +78,4 @@ set(random_INSTALL ${aescrypt_engine_INSTALL})
 #FetchContent_MakeAvailable(libaes secutil charutil random libhash libkdf logger)
 
 #locally downloaded libs removed
-FetchContent_MakeAvailable(secutil charutil random)
+FetchContent_MakeAvailable(libaes secutil charutil random libhash)
