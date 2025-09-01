@@ -95,9 +95,9 @@ STF_TEST(TestEncryption, StandardTestVectors)
         std::string ciphertext;
 
         // Create an Encryptor object
-        Encryptor encryptor(logger, std::to_string(counter++));
+        Encryptor encryptor(logger, std::to_string(counter));
 
-        // First encrypt the string
+        // Encrypt the plaintext string
         {
             // Define a place to put the encrypted text
             std::ostringstream oss;
@@ -115,10 +115,10 @@ STF_TEST(TestEncryption, StandardTestVectors)
             ciphertext = oss.str();
         }
 
-        // Then decrypt what was encrypted and compare the results
+        // Decrypt what was encrypted and compare the results
         {
             // Create a Decrypt object
-            Decryptor decryptor(logger, std::to_string(counter++));
+            Decryptor decryptor(logger, std::to_string(counter));
 
             // Define a place to put the decrypted text
             std::ostringstream oss;
@@ -137,6 +137,9 @@ STF_TEST(TestEncryption, StandardTestVectors)
             // Compare the strings
             STF_ASSERT_EQ(plaintext, oss.str());
         }
+
+        // Increment the test number counter
+        counter++;
     }
 }
 

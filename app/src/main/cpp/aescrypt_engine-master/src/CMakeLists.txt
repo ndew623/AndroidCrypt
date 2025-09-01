@@ -32,8 +32,8 @@ endif()
 # Use the following compile options
 target_compile_options(aescrypt_engine
     PRIVATE
-        $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:-Wpedantic -Wextra -Wall>
-        $<$<CXX_COMPILER_ID:MSVC>:>)
+        $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:-Wpedantic -Wextra -Wall -Werror>
+        $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX /Zc:__cplusplus>)
 
 # Link against dependencies
 target_link_libraries(aescrypt_engine

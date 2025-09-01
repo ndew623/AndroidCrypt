@@ -1,7 +1,7 @@
 /*
  *  decryptor.cpp
  *
- *  Copyright (C) 2024
+ *  Copyright (C) 2024, 2025
  *  Terrapane Corporation
  *  All Rights Reserved
  *
@@ -20,6 +20,7 @@
 
 #include <climits>
 #include <algorithm>
+#include <array>
 #include <terra/aescrypt/engine/decryptor.h>
 #include <terra/secutil/secure_erase.h>
 #include <terra/secutil/secure_vector.h>
@@ -31,7 +32,7 @@
 #include "engine_common.h"
 
 // It is assumed a character is 8 bits; assumption used stream I/O
-static_assert(CHAR_BIT == 8);
+static_assert(CHAR_BIT == (1 << 3), "Characters are assumed to be 8 bits");
 
 namespace Terra::AESCrypt::Engine
 {
@@ -130,9 +131,9 @@ std::ostream &operator<<(std::ostream &o, const DecryptResult result)
  *  Comments:
  *      None.
  */
-Decryptor::Decryptor(const Logger::LoggerPointer &parent_logger,
+Decryptor::Decryptor(Logger::LoggerPointer parent_logger,
                      const std::string &instance) :
-    logger{std::make_shared<Logger::Logger>(parent_logger,
+    logger{std::make_shared<Logger::Logger>(std::move(parent_logger),
                                             CreateComponent("DEC", instance))},
     instance{instance},
     active{false},
@@ -629,7 +630,8 @@ DecryptResult Decryptor::ReadOctets(std::istream &source,
 DecryptResult Decryptor::ConsumeExtensions(std::istream &source)
 {
     std::uint16_t extension_length{};
-    std::uint8_t buffer[2]{};
+    std::array<std::uint8_t, 2> buffer{};
+    DecryptResult result = DecryptResult::Success;
 
     // Since stream format version 0 & 1 did not use extensions, just return
     if (stream_version < 2) return DecryptResult::Success;
@@ -638,16 +640,16 @@ DecryptResult Decryptor::ConsumeExtensions(std::istream &source)
     while (true)
     {
         // Read the extension length
-        auto result = ReadOctets(source, buffer);
+        result = ReadOctets(source, buffer);
         if (result != DecryptResult::Success)
         {
             logger->error << "Unable to read extension header" << std::flush;
-            return result;
+            break;
         }
 
         // Put the extension length in host order
         extension_length = (static_cast<std::uint16_t>(buffer[0]) << 8) |
-                           (static_cast<std::uint16_t>(buffer[1])     );
+                           (static_cast<std::uint16_t>(buffer[1]));
 
         // If the extension length is 0, break out of the loop
         if (extension_length == 0) break;
@@ -659,7 +661,7 @@ DecryptResult Decryptor::ConsumeExtensions(std::istream &source)
         if (!source.good())
         {
             // Assume the worst
-            DecryptResult result = DecryptResult::IOError;
+            result = DecryptResult::IOError;
 
             // If the end of the stream is reached, assume an invalid stream
             if (source.eof()) result = DecryptResult::InvalidAESCryptStream;
@@ -667,12 +669,11 @@ DecryptResult Decryptor::ConsumeExtensions(std::istream &source)
             logger->error << "Failed skipping over extension: "
                           << result
                           << std::flush;
-
-            return result;
+            break;
         }
     }
 
-    return DecryptResult::Success;
+    return result;
 }
 
 /*
@@ -751,16 +752,34 @@ DecryptResult Decryptor::DeriveKey(const std::u8string &password,
         if (stream_version <= 2)
         {
             // KDF used in AES Crypt formats 0, 1, and 2
-            Crypto::KDF::ACKDF(pw, iv, key);
+            auto kdf_result = Crypto::KDF::ACKDF(pw, iv, key);
+
+            // Verify the key length
+            if (kdf_result.size() != key.size())
+            {
+                logger->error << "Unexpected key length returned from KDF"
+                              << std::flush;
+
+                return DecryptResult::InternalError;
+            }
         }
         else
         {
             // KDF used in AES Crypt formats 3 and onward
-            Crypto::KDF::PBKDF2(PBKDF2_Hash_Algorithm,
-                                pw,
-                                iv,
-                                kdf_iterations,
-                                key);
+            auto kdf_result = Crypto::KDF::PBKDF2(PBKDF2_Hash_Algorithm,
+                                                  pw,
+                                                  iv,
+                                                  kdf_iterations,
+                                                  key);
+
+            // Verify the key length
+            if (kdf_result.size() != key.size())
+            {
+                logger->error << "Unexpected key length returned from KDF"
+                              << std::flush;
+
+                return DecryptResult::InternalError;
+            }
         }
     }
     catch (const Crypto::KDF::KDFException &e)

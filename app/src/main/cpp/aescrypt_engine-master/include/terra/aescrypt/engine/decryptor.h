@@ -1,7 +1,7 @@
 /*
  *  decryptor.h
  *
- *  Copyright (C) 2024
+ *  Copyright (C) 2024, 2025
  *  Terrapane Corporation
  *  All Rights Reserved
  *
@@ -79,7 +79,7 @@ class Decryptor
         using ProgressCallback =
             std::function<void(const std::string &instance, std::size_t)>;
 
-        Decryptor(const Logger::LoggerPointer &parent_logger = {},
+        Decryptor(Logger::LoggerPointer parent_logger = {},
                   const std::string &instance = {});
         virtual ~Decryptor();
 

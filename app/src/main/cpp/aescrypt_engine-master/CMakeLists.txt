@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.21)
 
 # Define the AES Crypt Engine project
 project(aescrypt_engine
-        VERSION 4.0.10.0
+        VERSION 4.1.1.0
         DESCRIPTION "AES Crypt Engine"
         LANGUAGES CXX)
 
