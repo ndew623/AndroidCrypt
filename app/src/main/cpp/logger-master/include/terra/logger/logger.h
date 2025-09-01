@@ -1,7 +1,7 @@
 /*
  *  logger.h
  *
- *  Copyright (C) 2024
+ *  Copyright (C) 2024, 2025
  *  Terrapane Corporation
  *  All Rights Reserved
  *
@@ -78,9 +78,9 @@
  *
  *  Portability Issues:
  *      Legacy Windows command prompts do not support color, though versions
- *      of Windows since Windows 10 TH2 (v1511) can be made to work.  If
- *      one wishes to get color logging in legacy terminals, first call
- *      the Terra::ConIO::EnableStdOutANSIOutput() or
+ *      of Windows since Windows 10 TH2 (1511) / Windows 10.10586 can be made to
+ *      work.  If one wishes to get color logging in legacy terminals, first
+ *      call the Terra::ConIO::EnableStdOutANSIOutput() or
  *      Terra::ConIO::EnableStdErrANSIOutput() function to enable it for
  *      the logging stream.
  */
@@ -102,7 +102,8 @@ namespace Terra::Logger
 enum class LogFacility
 {
     Stream,                                     // Streaming output
-    Syslog                                      // Linux/Unix syslog
+    Syslog,                                     // Linux/Unix syslog
+    Inherit                                     // Inherited from parent
 };
 
 // Define the time precision options
@@ -133,7 +134,7 @@ class Logger : public LoggerInterface
                LogLevel minimum_log_level = LogLevel::Debug);
         Logger(std::ostream &stream,
                LogLevel minimum_log_level = LogLevel::Debug);
-        Logger(const LoggerPointer &parent_logger,
+        Logger(LoggerPointer parent_logger,
                const std::string &component,
                LogLevel minimum_log_level = LogLevel::Debug);
         virtual ~Logger();
@@ -143,9 +144,19 @@ class Logger : public LoggerInterface
             Log(LogLevel::Info, message);
         }
 
-        LogFacility GetLogFacility() const { return log_facility; }
+        // Return the facility used by the root Logger
+        LogFacility GetLogFacility() const
+        {
+            if (parent_logger) return parent_logger->GetLogFacility();
+
+            return log_facility;
+        }
         LogLevel GetLogLevel() const { return minimum_log_level; }
+
+        // Enabling color on a child Logger has no effect
         void EnableColor(bool color) { enable_color = color; };
+
+        // Setting time precision on a child Logger has no effect
         void SetTimePrecision(TimePrecision precision)
         {
             time_precision = precision;

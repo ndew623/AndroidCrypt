@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.21)
 
 # Define the Logger project
 project(logger
-        VERSION 1.0.4.0
+        VERSION 1.0.6.0
         DESCRIPTION "Logger Library"
         LANGUAGES CXX)
 

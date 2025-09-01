@@ -1,7 +1,7 @@
 /*
  *  logger_macros.h
  *
- *  Copyright (C) 2024
+ *  Copyright (C) 2024, 2025
  *  Terrapane Corporation
  *  All Rights Reserved
  *
@@ -12,12 +12,11 @@
  *      This file defines C preprocessor macros that can be used with the Logger
  *      to provide an alternative means calling the Logger to log messages.
  *
- *      One may utilize "compile out" debugging log messages that use the
- *      LOGGER_DEBUG macro.  This is controlled with the
- *      logger_DEBUG_MACROS_ALWAYS option defined in the Logger project build.
- *      Those using this library outside of the CMake environment may need to
- *      explicitly define LOGGER_DEBUG_ALWAYS to force building LOGGER_DEBUG()
- *      calls.
+ *      One may "compile out" debugging log messages that use the LOGGER_DEBUG
+ *      macro.  This is controlled with the logger_DEBUG_MACROS_ALWAYS option
+ *      defined in the Logger project build.  Those using this library outside
+ *      of the CMake environment may need to explicitly define
+ *      LOGGER_DEBUG_ALWAYS to force building LOGGER_DEBUG() calls.
  *
  *      The logging macros use the Logger output stream members, so calls like
  *      the following are valid:

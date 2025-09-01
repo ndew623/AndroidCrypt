@@ -1,7 +1,7 @@
 /*
  *  logger.cpp
  *
- *  Copyright (C) 2024
+ *  Copyright (C) 2024, 2025
  *  Terrapane Corporation
  *  All Rights Reserved
  *
@@ -20,11 +20,8 @@
 #include <chrono>
 #include <ctime>
 #include <iomanip>
-#if defined(__linux__) || defined(__FreeBSD__) || defined(__APPLE__)
+#if defined(__unix__) || defined(__APPLE__)
 #include <syslog.h>
-#define SYSLOG_SUPPORTED 1
-#else
-#undef SYSLOG_SUPPORTED
 #endif
 #include <terra/logger/logger.h>
 #include <terra/logger/null_ostream.h>
@@ -60,8 +57,6 @@ LoggerPointer CreateNullLogger()
 
     return std::make_shared<Logger>(Null_Stream);
 }
-
-} // namespace
 
 /*
  *  LogLevelString()
@@ -113,6 +108,8 @@ std::string LogLevelString(LogLevel log_level)
     return log_level_string;
 }
 
+#if defined(__unix__) || defined(__APPLE__)
+
 /*
  *  LogLevelToSyslog()
  *
@@ -134,7 +131,6 @@ int LogLevelToSyslog(LogLevel log_level)
 {
     int priority{};
 
-#ifdef SYSLOG_SUPPORTED
     switch (log_level)
     {
         case LogLevel::Critical:
@@ -161,10 +157,13 @@ int LogLevelToSyslog(LogLevel log_level)
             priority = LOG_INFO;
             break;
     }
-#endif
 
     return priority;
 }
+
+#endif
+
+} // namespace
 
 /*
  *  Logger::Logger()
@@ -177,7 +176,7 @@ int LogLevelToSyslog(LogLevel log_level)
  *  Parameters:
  *      parent_logger [in]
  *          A shared pointer to the parent logger for this child Logger object.
- *          This may be a nullptr, indicating there is no parent Logger.
+ *          This must NOT be a nullptr value.
  *
  *      component [in]
  *          A short (3 or 4 characters recommended) string that identifies the
@@ -254,10 +253,11 @@ Logger::Logger(LoggerPointer parent_logger,
  *  Comments:
  *      None.
  */
-Logger::Logger(const std::string &identifier, LogLevel minimum_log_level) :
+Logger::Logger([[maybe_unused]] const std::string &identifier,
+               LogLevel minimum_log_level) :
     Logger({}, {}, minimum_log_level, LogFacility::Syslog, std::clog)
 {
-#ifdef SYSLOG_SUPPORTED
+#if defined(__unix__) || defined(__APPLE__)
     // Open syslog for logging
     if (identifier.empty())
     {
@@ -323,8 +323,9 @@ Logger::Logger(std::ostream &stream, LogLevel minimum_log_level) :
  *  Logger::Logger()
  *
  *  Description:
- *      Constructor for the Logger object that will direct output to the
- *      specified stream.  This constructor will create a child Logger object.
+ *      This constructor will create a child Logger object for the given
+ *      parent Logger object.  If the parent Logger object is a nullptr,
+ *      this constructor will create a parent Logger that suppresses output.
  *
  *  Parameters:
  *      parent_logger [in]
@@ -348,14 +349,13 @@ Logger::Logger(std::ostream &stream, LogLevel minimum_log_level) :
  *  Comments:
  *      None.
  */
-Logger::Logger(const LoggerPointer &parent_logger,
+Logger::Logger(LoggerPointer parent_logger,
                const std::string &component,
                LogLevel minimum_log_level) :
-    Logger(parent_logger ? parent_logger : CreateNullLogger(),
+    Logger(parent_logger ? std::move(parent_logger) : CreateNullLogger(),
            component,
            minimum_log_level,
-           parent_logger ? parent_logger->GetLogFacility() :
-                           LogFacility::Stream,
+           LogFacility::Inherit,
            std::clog)
 {
 }
@@ -377,7 +377,7 @@ Logger::Logger(const LoggerPointer &parent_logger,
  */
 Logger::~Logger()
 {
-#ifdef SYSLOG_SUPPORTED
+#if defined(__unix__) || defined(__APPLE__)
     // Only the parent logger needs to take action
     if ((!parent_logger) && (log_facility == LogFacility::Syslog)) closelog();
 #endif
@@ -484,7 +484,9 @@ void Logger::HandleLogMessage(LogLevel log_level,
  *      Nothing.
  *
  *  Comments:
- *      None.
+ *      This function is called only by the root Logger object in the heirarchy
+ *      of parent/child Logger objects.  As such, it can safely rely on
+ *      log_facility being set to something other than "Inherit".
  */
 void Logger::EmitLogMessage(LogLevel log_level,
                             const std::string &message) const
@@ -494,7 +496,7 @@ void Logger::EmitLogMessage(LogLevel log_level,
     // Emitting to syslog?
     if (log_facility == LogFacility::Syslog)
     {
-#ifdef SYSLOG_SUPPORTED
+#if defined(__unix__) || defined(__APPLE__)
         syslog(LogLevelToSyslog(log_level), "%s", message.c_str());
 #endif
         return;
@@ -560,7 +562,8 @@ void Logger::EmitLogMessage(LogLevel log_level,
  *      None.
  *
  *  Returns:
- *      A timestamp string to apply to logged messages.
+ *      A timestamp string to apply to logged messages or empty string if there
+ *      was an error.
  *
  *  Comments:
  *      This function uses std::chrono::system_clock, which is subject to
@@ -602,9 +605,9 @@ std::string Logger::GetCurrentTimestamp() const
 
     // Convert the time_t value to the local time
 #ifdef _WIN32
-    localtime_s(&local_time, &time);
+    if (localtime_s(&local_time, &time) != 0) return {};
 #else
-    localtime_r(&time, &local_time);
+    if (localtime_r(&time, &local_time) == nullptr) return {};
 #endif
 
     // Output the timestamp string
