@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.21)
 
 # Define the Key Derivation Function (KDF) project
 project(libkdf
-        VERSION 1.0.7.0
+        VERSION 1.0.8.0
         DESCRIPTION "Key Derivation Function (KDF) Library"
         LANGUAGES CXX)
 
