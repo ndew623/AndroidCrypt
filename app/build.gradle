@@ -5,10 +5,10 @@ android {
     defaultConfig {
         applicationId "com.dewdrop623.androidcrypt"
         minSdkVersion 21
-        targetSdkVersion 34
-        compileSdk 34
-        versionCode 13
-        versionName "2.0.0"
+        targetSdkVersion 35
+        compileSdk 35
+        versionCode 14
+        versionName "2.0.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         externalNativeBuild {
