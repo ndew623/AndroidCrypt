@@ -18,7 +18,7 @@
 #ifdef _WIN32
 #include <io.h>     // For _isatty()
 #include <stdio.h>  // For _fileno()
-#elif defined(__linux__) || defined(__FreeBSD__) || defined(__APPLE__)
+#elif defined(__unix__) || defined(__APPLE__)
 #include <unistd.h> // For isatty()
 #include <stdlib.h> // For getenv()
 #include <string.h> // For strcmp()
@@ -41,7 +41,7 @@ STF_TEST(ANSICapable, StdOutANSICapable)
 #if defined(_WIN32)
     // If this is a TTY, then return true
     if (_isatty(_fileno(stdout))) expected = true;
-#elif defined (__linux__) || defined(__FreeBSD__) || defined(__APPLE__)
+#elif defined(__unix__) || defined(__APPLE__)
     // If this is not a TTY, return false
     if (isatty(STDOUT_FILENO)) expected = true;
 #endif

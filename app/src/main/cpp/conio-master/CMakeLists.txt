@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.21)
 
 # Define the Console I/O Library Project
 project(conio
-        VERSION 1.0.2.0
+        VERSION 1.0.4.0
         DESCRIPTION "Console I/O Library"
         LANGUAGES CXX)
 

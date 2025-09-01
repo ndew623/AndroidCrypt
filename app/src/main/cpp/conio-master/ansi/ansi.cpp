@@ -135,10 +135,11 @@ int main()
     // Get the current stream flags
     std::ios_base::fmtflags flags(std::cout.flags());
 
-    for (unsigned i = 0; i < 256; i++)
+    for (std::size_t i = 0; i < 256; i++)
     {
         std::string text = "Color " + std::to_string(i);
-        std::cout << ANSI::ColorFG256(i) << std::setw(9) << std::left << text;
+        std::cout << ANSI::ColorFG256(static_cast<std::uint8_t>(i))
+                  << std::setw(9) << std::left << text;
         if (((i % 8) == 0) || (i == 255))
         {
             std::cout << std::endl;

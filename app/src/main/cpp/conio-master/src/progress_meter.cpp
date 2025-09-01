@@ -20,7 +20,7 @@
 
 #include <iostream>
 #include <algorithm>
-#if defined (__linux__) || defined(__FreeBSD__) || defined(__APPLE__)
+#if defined(__unix__) || defined(__APPLE__)
 #include <langinfo.h>
 #elif defined (_WIN32)
 #define NOMINMAX
@@ -214,8 +214,8 @@ void ProgressMeter::Update(std::size_t position)
     // If not running, just return
     if (!running) return;
 
-    // If the position is beyond the length, adjust the position
-    if (position > length) position = length;
+    // Constrain the position value to no exceed length
+    position = std::min(position, length);
 
     // Get the width of the terminal window (as this might have changed)
     std::size_t new_meter_width =

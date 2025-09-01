@@ -24,8 +24,8 @@ namespace Terra::ConIO::ANSI
 namespace
 {
 
-const char *CSI = "\033[";
-const char *SGRT = "m";
+const char * const CSI = "\033[";
+const char *const SGRT = "m";
 
 }
 

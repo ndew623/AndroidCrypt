@@ -33,8 +33,8 @@ endif()
 # Use the following compile options
 target_compile_options(conio
     PRIVATE
-        $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>: -Wpedantic -Wextra -Wall>
-        $<$<CXX_COMPILER_ID:MSVC>: >)
+        $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:-Wpedantic -Wextra -Wall -Werror>
+        $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>)
 
 # Install target and associated include files
 if(conio_INSTALL)
