@@ -24,22 +24,25 @@ if(aescrypt_engine_BUILD_TESTS)
 endif()
 
 # Fetch the AES library
-FetchContent_Declare(libaes
-    GIT_REPOSITORY ${TERRAPANE_SOURCE_URI}/libaes.git
-    GIT_TAG        v1.1.1
-    GIT_SHALLOW    true)
+#FetchContent_Declare(libaes
+    #GIT_REPOSITORY ${TERRAPANE_SOURCE_URI}/libaes.git
+    #GIT_TAG        v1.1.1
+    #GIT_SHALLOW    true)
 
 # Fetch security utilities library
-FetchContent_Declare(secutil
-    GIT_REPOSITORY ${TERRAPANE_SOURCE_URI}/secutil.git
-    GIT_TAG        v1.0.7
-    GIT_SHALLOW    true)
+#FetchContent_Declare(secutil
+    #GIT_REPOSITORY ${TERRAPANE_SOURCE_URI}/secutil.git
+    #GIT_TAG        v1.0.7
+    #GIT_SHALLOW    true)
 
 # Fetch character-related utilities
+#FetchContent_Declare(charutil
+    #GIT_REPOSITORY ${TERRAPANE_SOURCE_URI}/charutil.git
+    #GIT_TAG        v1.0.3
+    #GIT_SHALLOW    true)
 FetchContent_Declare(charutil
     GIT_REPOSITORY ${TERRAPANE_SOURCE_URI}/charutil.git
-    GIT_TAG        v1.0.3
-    GIT_SHALLOW    true)
+    GIT_TAG        c633b3b64b720085068f427295d5ed5c71164afd)
 
 # Fetch the random generator library
 FetchContent_Declare(random
@@ -76,4 +79,4 @@ FetchContent_Declare(random
 
 # Make dependencies available
 #FetchContent_MakeAvailable(libaes secutil charutil random libhash libkdf logger)
-FetchContent_MakeAvailable(libaes secutil charutil random)
+FetchContent_MakeAvailable(charutil random)

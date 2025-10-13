@@ -30,14 +30,14 @@ endif()
     #GIT_SHALLOW    true)
 
 # Fetch the Security Utilities library
-FetchContent_Declare(secutil
-    GIT_REPOSITORY ${TERRAPANE_SOURCE_URI}/secutil.git
-    GIT_TAG        v1.0.7
-    GIT_SHALLOW    true)
+#FetchContent_Declare(secutil
+    #GIT_REPOSITORY ${TERRAPANE_SOURCE_URI}/secutil.git
+    #GIT_TAG        v1.0.7
+    #GIT_SHALLOW    true)
 
 # If not installing libkdf, turn off installation for dependencies
 #set(libhash_INSTALL ${libkdf_INSTALL})
 #set(secutil_INSTALL ${libkdf_INSTALL})
 
 # Make dependencies available
-FetchContent_MakeAvailable(secutil)
+#FetchContent_MakeAvailable(secutil)

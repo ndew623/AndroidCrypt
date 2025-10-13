@@ -36,16 +36,15 @@ endif()
     #GIT_SHALLOW    true)
 
 # Fetch security utilities library
-FetchContent_Declare(secutil
-    GIT_REPOSITORY ${TERRAPANE_SOURCE_URI}/secutil.git
-    GIT_TAG        master
-    GIT_SHALLOW    true)
+#FetchContent_Declare(secutil
+    #GIT_REPOSITORY ${TERRAPANE_SOURCE_URI}/secutil.git
+    #GIT_TAG        master
+    #GIT_SHALLOW    true)
 
 # Fetch character-related utilities
 FetchContent_Declare(charutil
     GIT_REPOSITORY ${TERRAPANE_SOURCE_URI}/charutil.git
-    GIT_TAG        master
-    GIT_SHALLOW    true)
+    GIT_TAG        c633b3b64b720085068f427295d5ed5c71164afd)
 
 # Fetch the random generator library
 FetchContent_Declare(random
@@ -74,7 +73,7 @@ FetchContent_Declare(random
 # If not installing aescrypt_engine, turn off installation for dependencies
 if(NOT aescrypt_engine_INSTALL)
     #set(libaes_INSTALL OFF)
-    set(secutil_INSTALL OFF)
+    #set(secutil_INSTALL OFF)
     set(charutil_INSTALL OFF)
     set(random_INSTALL OFF)
     #set(libhash_INSTALL OFF)
@@ -85,4 +84,4 @@ endif()
 # Make dependencies available
 #FetchContent_MakeAvailable(aescrypt_engine libaes secutil charutil random libhash libkdf logger)
 #Without libaes, logger, aescrypt_engine
-FetchContent_MakeAvailable(secutil charutil random)
+FetchContent_MakeAvailable(charutil random)

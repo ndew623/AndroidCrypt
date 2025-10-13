@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     namespace "com.dewdrop623.androidcrypt"
+    ndkVersion "29.0.14033849 rc4"
     defaultConfig {
         applicationId "com.dewdrop623.androidcrypt"
         minSdkVersion 21
