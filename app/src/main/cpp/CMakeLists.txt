@@ -38,9 +38,9 @@ option(aescrypt_engine_INSTALL "Install the AES Crypt Engine" OFF)
 option(aescrypt_engine_CLANG_TIDY "Use clang-tidy to perform linting during build" OFF)
 option(aescrypt_engine_BUILD_TESTS "Build Tests for the AES Crypt Engine" OFF)
 
-add_subdirectory(androidcrypt-conio)
-add_subdirectory(androidcrypt-logger)
-add_subdirectory(androidcrypt-aescrypt_engine)
+add_subdirectory(androidcrypt-cpp/androidcrypt-conio)
+add_subdirectory(androidcrypt-cpp/androidcrypt-logger)
+add_subdirectory(androidcrypt-cpp/androidcrypt-aescrypt_engine)
 
 
 # Specifies libraries CMake should link to your target library. You

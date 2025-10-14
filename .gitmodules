@@ -1,0 +1,3 @@
+[submodule "app/src/main/cpp/androidcrypt-cpp"]
+	path = app/src/main/cpp/androidcrypt-cpp
+	url = git@github.com:ndew623/androidcrypt-cpp.git
