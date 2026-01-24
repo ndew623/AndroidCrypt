@@ -38,13 +38,9 @@ option(aescrypt_engine_INSTALL "Install the AES Crypt Engine" OFF)
 option(aescrypt_engine_CLANG_TIDY "Use clang-tidy to perform linting during build" OFF)
 option(aescrypt_engine_BUILD_TESTS "Build Tests for the AES Crypt Engine" OFF)
 
-add_subdirectory(conio-master)
-add_subdirectory(logger-master)
-add_subdirectory(libaes-master)
-add_subdirectory(libhash-master)
-add_subdirectory(libkdf-master)
-add_subdirectory(dependencies)
-add_subdirectory(aescrypt_engine-master)
+add_subdirectory(androidcrypt-cpp/androidcrypt-conio)
+add_subdirectory(androidcrypt-cpp/androidcrypt-logger)
+add_subdirectory(androidcrypt-cpp/androidcrypt-aescrypt_engine)
 
 
 # Specifies libraries CMake should link to your target library. You
@@ -53,12 +49,7 @@ add_subdirectory(aescrypt_engine-master)
 target_link_libraries(${CMAKE_PROJECT_NAME}
         PRIVATE
         Terra::aescrypt_engine
-        Terra::secutil
-        Terra::charutil
-        Terra::kdf
-        Terra::random
         PUBLIC
         android
         log
-        Terra::logger
-        Terra::libhash)
+        Terra::logger)

@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     namespace "com.dewdrop623.androidcrypt"
+    ndkVersion "29.0.14033849 rc4"
     defaultConfig {
         applicationId "com.dewdrop623.androidcrypt"
         minSdkVersion 21
@@ -11,8 +12,13 @@ android {
         versionName "2.0.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
+        ndk {
+            abiFilters "arm64-v8a", "x86_64"
+        }
         externalNativeBuild {
             cmake {
+                //arguments "-DANDROID_ABI=arm64-v8a,x86_64"
+                //arguments "-DANDROID_ABI=arm64-v8a"
                 cppFlags ''
             }
         }
