@@ -4,9 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.dewdrop623.androidcrypt.MainActivity">
+    tools:context="com.dewdrop623.androidcrypt.MainActivity"
+    android:fitsSystemWindows="true">
 
     <RelativeLayout
+        android:id="@+id/main_activity_root"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
