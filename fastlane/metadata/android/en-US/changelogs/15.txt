@@ -1,0 +1,4 @@
+- Update to include the latest version of AES Crypt.
+- Layout adjustments for newer devices.
+
+Support is removed for older devices that do not support 64-bit native code. The original AES Crypt source code does not support 32-bit instruction sets.
