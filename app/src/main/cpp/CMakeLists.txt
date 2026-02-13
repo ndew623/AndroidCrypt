@@ -38,6 +38,28 @@ option(aescrypt_engine_INSTALL "Install the AES Crypt Engine" OFF)
 option(aescrypt_engine_CLANG_TIDY "Use clang-tidy to perform linting during build" OFF)
 option(aescrypt_engine_BUILD_TESTS "Build Tests for the AES Crypt Engine" OFF)
 
+#git submodule
+find_package(Git QUIET)
+if(GIT_FOUND)
+    # Update submodules as needed
+    option(GIT_SUBMODULE "Check submodules during build" ON)
+    if(GIT_SUBMODULE)
+        message(STATUS "Submodule update")
+        execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
+                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                RESULT_VARIABLE GIT_SUBMOD_RESULT)
+        if(NOT GIT_SUBMOD_RESULT EQUAL "0")
+            message(FATAL_ERROR "git submodule update --init --recursive failed with ${GIT_SUBMOD_RESULT}, please checkout submodules")
+        endif()
+    endif()
+endif()
+
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/androidcrypt-cpp/androidcrypt-aescrypt_engine"
+OR NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/androidcrypt-cpp/androidcrypt-conio"
+OR NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/androidcrypt-cpp/androidcrypt-logger")
+    message(FATAL_ERROR "The submodules were not downloaded! GIT_SUBMODULE was turned off or failed. Please update submodules and try again.")
+endif()
+
 add_subdirectory(androidcrypt-cpp/androidcrypt-conio)
 add_subdirectory(androidcrypt-cpp/androidcrypt-logger)
 add_subdirectory(androidcrypt-cpp/androidcrypt-aescrypt_engine)
