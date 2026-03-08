@@ -23,3 +23,16 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+/*
+something when trying to make automated tests work. may not be needed.
+https://github.com/android/testing-samples/blob/main/unit/BasicUnitAndroidTest/build.gradle
+ext {
+    buildToolsVersion = "31.0.0"
+    androidxAnnotationVersion = "1.2.0"
+    coreVersion = "1.5.0"
+    extJUnitVersion = "1.1.4"
+    runnerVersion = "1.5.0"
+    hamcrestVersion = "1.3"
+    truthVersion = "1.1.3"
+}*/
