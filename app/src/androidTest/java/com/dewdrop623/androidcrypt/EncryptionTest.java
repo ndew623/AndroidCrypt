@@ -16,7 +16,7 @@ import java.io.InputStream;
 import java.util.Random;
 
 @RunWith(AndroidJUnit4.class)
-public class TestTest {
+public class EncryptionTest {
 
     private int bufferSizeBytes = 1049000; //MiB, defined in androidcrypt.cpp as a const int
     @Before

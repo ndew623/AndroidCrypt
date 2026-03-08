@@ -389,7 +389,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
             intent.putExtra(CryptoService.OUTPUT_FILE_URI_EXTRA_KEY, outputFile.toString());
             intent.putExtra(CryptoService.OPERATION_TYPE_EXTRA_KEY, operationMode);
             intent.putExtra(CryptoService.DELETE_INPUT_FILE_KEY, deleteInputFile);
-            MainActivityFragment.password = passwordEditText.getText().toString().toCharArray();
+            MainActivityFragment.setPassword(passwordEditText.getText().toString().toCharArray());
             context.startService(intent);
         }
     }
@@ -522,6 +522,13 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         return valid;
     }
 
+    public static void setPassword(char[] password) {
+       if (MainActivityFragment.password != null) {
+           Arrays.fill(MainActivityFragment.password, '\0');
+       }
+       MainActivityFragment.password = password;
+    }
+
     /*
     * Get the password as a String and overwrite it in memory.
     * Overwriting the char[] here may be useless since the EditText returns the password as a String and AESCrypt requires it as a String,
@@ -564,7 +571,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
          * may not be able to get password from view if screen was rotated while viewing another fragment.
          */
         if (passwordEditText != null) {
-            MainActivityFragment.password = passwordEditText.getText().toString().toCharArray();
+            MainActivityFragment.setPassword(passwordEditText.getText().toString().toCharArray());
         }
         return outState;
     }
