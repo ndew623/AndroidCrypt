@@ -49,6 +49,7 @@ const std::map<Terra::AESCrypt::Engine::DecryptResult, int> DECRYPT_RESULT_CODES
         {Terra::AESCrypt::Engine::DecryptResult::InternalError, 110},
 };
 
+//Buffer size defined for tests in CryptoTests.java, update there as well if changed.
 const int INPUT_BUFFER_SIZE = 1049000;// 1 MiB
 const int OUTPUT_BUFFER_SIZE = 1049000;// 1 MiB
 const int KEY_ITERATIONS = 300000;
