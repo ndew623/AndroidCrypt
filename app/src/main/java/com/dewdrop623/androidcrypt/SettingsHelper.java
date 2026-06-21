@@ -11,9 +11,11 @@ public final class SettingsHelper {
 
     /*Defaults*/
     public static final boolean USE_DARK_THEME_DEFAULT = false;
+    private static final boolean DENIED_NOTIFICATIONS_DEFAULT = false;
 
     private static final String SHARED_PREFERENCES_FILE = "com.dewdrop623.androidcrypt.SettingsHelper.SHARED_PREFERENCES_FILE";
     private static final String USE_DARK_THEME = "com.dewdrop623.androidcrypt.SettingsHelper.USE_DARK_THEME";
+    private static final String DENIED_NOTIFICATIONS = "com.dewdrop623.androidcrypt.SettingsHelper.DENIED_NOTIFICATIONS";
 
     private static SharedPreferences sharedPreferences;
 
@@ -54,5 +56,16 @@ public final class SettingsHelper {
 
     public static boolean getUseDarkTeme(Context context) {
         return getSharedPreferencesFile(context).getBoolean(USE_DARK_THEME, USE_DARK_THEME_DEFAULT);
+    }
+    public static void setDeniedNotifications(Context context, boolean denied) {
+        sharedPreferencesPutBoolean(context, DENIED_NOTIFICATIONS, denied);
+    }
+
+    /***********************************
+     * Get settings
+     */
+
+    public static boolean getDeniedNotifications(Context context) {
+        return getSharedPreferencesFile(context).getBoolean(DENIED_NOTIFICATIONS, DENIED_NOTIFICATIONS_DEFAULT);
     }
 }

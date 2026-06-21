@@ -60,4 +60,10 @@
     <string name="unknown_status">Unknown Completion Status</string>
     <string name="could_not_read_input_file_size">Error: could not read input file size</string>
     <string name="error_could_not_open_output_file">Error: could not open output file</string>
+    <string name="enable_notifications">Habilitar notificaciones</string>
+    <string name="notification_rationale">AndroidCrypt necesita permiso para mostrar una notificación de progreso durante las operaciones de cifrado/descifrado.</string>
+    <string name="ok">Aceptar</string>
+    <string name="deny">Denegar</string>
+    <string name="progress_notification_enabled">Notificación de progreso activada</string>
+    <string name="progress_notification_disabled">Notificación de progreso desactivada</string>
 </resources>

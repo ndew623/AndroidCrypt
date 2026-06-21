@@ -15,11 +15,13 @@
         <item name="android:colorControlNormal">@color/colorAccent</item>
         <item name="android:windowBackground">@color/darkThemeBackground</item>
         <item name="android:textColorPrimary">@color/darkThemeTextColor</item>
+        <item name="android:textColorSecondary">@color/darkThemeTextColor</item>
         <item name="android:textColorHint">@color/darkThemeTextColorHint</item>
     </style>
-    <style name="DarkAlertDialogTheme" parent="Base.Theme.AppCompat.Dialog.Alert">
+    <style name="DarkAlertDialogTheme" parent="Theme.MaterialComponents.Dialog">
         <item name="android:textColorPrimary">@color/darkThemeTextColor</item>
-        <item name="android:background">@color/darkThemeBackground</item>
+        <item name="android:windowBackground">@color/darkThemeBackground</item>
+        <item name="colorPrimary">@color/darkThemeColorPrimaryDark</item>
     </style>
     <style name="DialogButton" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
         <item name="android:layout_width">wrap_content</item>

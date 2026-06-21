@@ -1,19 +1,14 @@
 package com.dewdrop623.androidcrypt;
 
-import static java.util.Map.entry;
-
 import android.net.Uri;
-import android.support.v4.provider.DocumentFile;
+
+import androidx.documentfile.provider.DocumentFile;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.security.GeneralSecurityException;
 import java.util.HashMap;
 import java.util.Map;
-
-import es.vocali.util.AESCrypt;
 
 /**
  * CryptoThread handles the usage of AESCrypt to do crypto operations.

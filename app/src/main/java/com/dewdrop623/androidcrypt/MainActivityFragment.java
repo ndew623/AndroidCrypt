@@ -9,11 +9,11 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.res.ResourcesCompat;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.annotation.Nullable;
 import android.text.InputType;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
@@ -508,16 +508,7 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
         } else if (CryptoThread.operationInProgress) {
             valid = false;
             showError(R.string.another_operation_is_already_in_progress);
-        }/* TODO fix test if files are same file
-        else if (outputFileParentDirectory != null){
-            DocumentFile outputFileDocumentFile = outputFileParentDirectory.findFile(outputFileName);
-            if (outputFileDocumentFile != null && outputFileDocumentFile.getUri().equals(inputFile.getUri())) {
-                //TODO not perfect way to check same file. Best know how to do regarding how android hides file info
-                //can fail when opening input file via intent (i.e. choosing file from another app)
-                valid = false;
-                showError(R.string.the_input_and_output_files_must_be_different);
-            }
-        }*/
+        }
         return valid;
     }
 

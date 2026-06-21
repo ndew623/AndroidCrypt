@@ -1,23 +1,29 @@
 package com.dewdrop623.androidcrypt;
 
+
+import android.Manifest;
 import android.content.Intent;
-import android.graphics.Insets;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewCompat;
-import android.support.v4.view.WindowInsetsCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.content.res.AppCompatResources;
-import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowInsetsController;
+import android.widget.Toast;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.content.res.AppCompatResources;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -37,6 +43,15 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int CHOOSE_INPUT_FILE_REQUEST_CODE = 1654;
     private static final int CHOOSE_OUTPUT_FILE_REQUEST_CODE = 1655;
+
+    private final ActivityResultLauncher<String> notificationRequestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+        if (isGranted) {
+            Toast.makeText(this, R.string.progress_notification_enabled, Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, R.string.progress_notification_disabled, Toast.LENGTH_SHORT).show();
+            SettingsHelper.setDeniedNotifications(this, true);
+        }
+    });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +89,30 @@ public class MainActivity extends AppCompatActivity {
         });
         setFabVisible(mainActivityFragmentOnTop);
         getSupportActionBar().setDisplayHomeAsUpEnabled(!mainActivityFragmentOnTop);
+        checkNotificationPermission();
+    }
+
+    private void checkNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                if (!SettingsHelper.getDeniedNotifications(this)) {//check user has not already said no
+                    showNotificationPermissionRationaleDialog();
+                }
+            }
+        }
+    }
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
+    private void showNotificationPermissionRationaleDialog() {
+        int style = SettingsHelper.getUseDarkTeme(this) ? R.style.DarkAlertDialogTheme : 0;
+        new AlertDialog.Builder(this, style).setTitle(R.string.enable_notifications)
+                .setMessage(R.string.notification_rationale)
+                .setPositiveButton(R.string.ok, (dialog, which) -> {
+                    notificationRequestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+                })
+                .setNegativeButton(R.string.deny, (dialog, which) -> {
+                    dialog.dismiss();
+                    SettingsHelper.setDeniedNotifications(this, true);
+                }).show();
     }
 
     private MainActivityFragment getMainActivityFragment() {
