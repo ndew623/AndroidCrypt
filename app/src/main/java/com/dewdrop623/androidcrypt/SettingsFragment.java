@@ -1,12 +1,12 @@
 package com.dewdrop623.androidcrypt;
 
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
  */
 public class SettingsFragment extends Fragment {
 
+    MainActivity mainActivity;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,6 +26,12 @@ public class SettingsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
+        try {
+            mainActivity = (MainActivity) requireActivity();
+        } catch (IllegalStateException ise) {
+            Log.e("SettingsFragment", "No activity for settings fragment");
+            return view;
+        }
 
         RadioGroup themeRadioGroup = view.findViewById(R.id.themeRadioGroup);
         boolean currentUseDarkThemeSetting = SettingsHelper.getUseDarkTeme(getContext());
@@ -35,17 +42,21 @@ public class SettingsFragment extends Fragment {
         }
         themeRadioGroup.setOnCheckedChangeListener(themeRadioGroupOnCheckedChangedListener);
 
-
-        /*update ui to match theme preferences*/
-        if (SettingsHelper.getUseDarkTeme(getContext())) {
-            int textColor = ((MainActivity)getActivity()).getDarkThemeColor(android.R.attr.textColorPrimary);
-            ((RadioButton) themeRadioGroup.findViewById(R.id.darkThemeRadioButton)).setTextColor(textColor);
-            ((RadioButton) themeRadioGroup.findViewById(R.id.lightThemeRadioButton)).setTextColor(textColor);
-
-            ((TextView) view.findViewById(R.id.themeTitleTextView)).setTextColor(textColor);
+        if (mainActivity.missingNotificationPermission()) {
+            view.findViewById(R.id.notificationPermissionSettingLinearLayout).setVisibility(View.VISIBLE);
+            view.findViewById(R.id.notificationPermissionSettingButton).setOnClickListener(notificationButtonOnClickListener);
         }
         return view;
     }
+
+    private final View.OnClickListener notificationButtonOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                mainActivity.showNotificationPermissionRationaleDialog();
+            }
+        }
+    };
 
     private final RadioGroup.OnCheckedChangeListener themeRadioGroupOnCheckedChangedListener = new RadioGroup.OnCheckedChangeListener() {
         @Override
@@ -55,7 +66,7 @@ public class SettingsFragment extends Fragment {
             } else if (checkedId == R.id.lightThemeRadioButton) {
                 SettingsHelper.setUseDarkTheme(getContext(), false);
             }
-            getActivity().recreate();
+            mainActivity.recreate();
         }
     };
 }

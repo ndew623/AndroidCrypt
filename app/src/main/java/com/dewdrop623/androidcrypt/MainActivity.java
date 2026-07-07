@@ -2,6 +2,7 @@ package com.dewdrop623.androidcrypt;
 
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -92,17 +93,23 @@ public class MainActivity extends AppCompatActivity {
         checkNotificationPermission();
     }
 
-    private void checkNotificationPermission() {
+    public boolean missingNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                if (!SettingsHelper.getDeniedNotifications(this)) {//check user has not already said no
-                    showNotificationPermissionRationaleDialog();
-                }
+            return ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED;
+        } else {
+            return false;
+        }
+    }
+    @SuppressLint("NewApi")
+    private void checkNotificationPermission() {
+        if (missingNotificationPermission()) {//checks api level, so we can safely have @SuppressLint("NewApi")
+            if (!SettingsHelper.getDeniedNotifications(this)) {//check user has not already said no
+                showNotificationPermissionRationaleDialog();
             }
         }
     }
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
-    private void showNotificationPermissionRationaleDialog() {
+    public void showNotificationPermissionRationaleDialog() {
         int style = SettingsHelper.getUseDarkTeme(this) ? R.style.DarkAlertDialogTheme : 0;
         new AlertDialog.Builder(this, style).setTitle(R.string.enable_notifications)
                 .setMessage(R.string.notification_rationale)

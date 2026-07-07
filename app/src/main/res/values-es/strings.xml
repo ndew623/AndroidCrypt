@@ -66,4 +66,6 @@
     <string name="deny">Denegar</string>
     <string name="progress_notification_enabled">Notificación de progreso activada</string>
     <string name="progress_notification_disabled">Notificación de progreso desactivada</string>
+    <string name="notification_permissions">Permisos de notificación</string>
+    <string name="allow_progress_notification">Permitir notificaciones de progreso</string>
 </resources>
