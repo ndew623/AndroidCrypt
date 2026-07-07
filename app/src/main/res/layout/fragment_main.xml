@@ -129,6 +129,7 @@
 
             <TextView
                 android:id="@+id/progressDisplayTextView"
+                android:textColor="?android:attr/textColorPrimary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
