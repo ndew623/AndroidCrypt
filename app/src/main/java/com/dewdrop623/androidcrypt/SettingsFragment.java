@@ -6,8 +6,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.RadioGroup;
+import android.widget.Switch;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
@@ -46,8 +49,19 @@ public class SettingsFragment extends Fragment {
             view.findViewById(R.id.notificationPermissionSettingLinearLayout).setVisibility(View.VISIBLE);
             view.findViewById(R.id.notificationPermissionSettingButton).setOnClickListener(notificationButtonOnClickListener);
         }
+
+        Switch showSupportEndingWarningSwitch = view.findViewById(R.id.showSupportEndingSettingSwitch);
+        showSupportEndingWarningSwitch.setChecked(SettingsHelper.getShowSupportEndingWarning(getContext()));
+        showSupportEndingWarningSwitch.setOnCheckedChangeListener(supportEndingWarningSwitchOnCheckedChangedListener);
         return view;
     }
+
+    private final CompoundButton.OnCheckedChangeListener supportEndingWarningSwitchOnCheckedChangedListener = new CompoundButton.OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(@NonNull CompoundButton compoundButton, boolean b) {
+            SettingsHelper.setShowSupportEndingWarning(mainActivity, b);
+        }
+    };
 
     private final View.OnClickListener notificationButtonOnClickListener = new View.OnClickListener() {
         @Override

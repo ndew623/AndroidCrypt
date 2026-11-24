@@ -13,9 +13,12 @@ public final class SettingsHelper {
     public static final boolean USE_DARK_THEME_DEFAULT = false;
     private static final boolean DENIED_NOTIFICATIONS_DEFAULT = false;
 
+    private static final boolean SHOW_SUPPORT_ENDING_WARNING_DEFAULT = true;
+
     private static final String SHARED_PREFERENCES_FILE = "com.dewdrop623.androidcrypt.SettingsHelper.SHARED_PREFERENCES_FILE";
     private static final String USE_DARK_THEME = "com.dewdrop623.androidcrypt.SettingsHelper.USE_DARK_THEME";
     private static final String DENIED_NOTIFICATIONS = "com.dewdrop623.androidcrypt.SettingsHelper.DENIED_NOTIFICATIONS";
+    private static final String SUPPORT_ENDING_WARNING = "com.dewdrop623.androidcrypt.SettingsHelper.SUPPORT_ENDING_WARNING";
 
     private static SharedPreferences sharedPreferences;
 
@@ -67,5 +70,12 @@ public final class SettingsHelper {
 
     public static boolean getDeniedNotifications(Context context) {
         return getSharedPreferencesFile(context).getBoolean(DENIED_NOTIFICATIONS, DENIED_NOTIFICATIONS_DEFAULT);
+    }
+
+    public static boolean getShowSupportEndingWarning(Context context) {
+        return getSharedPreferencesFile(context).getBoolean(SUPPORT_ENDING_WARNING, SHOW_SUPPORT_ENDING_WARNING_DEFAULT);
+    }
+    public static void setShowSupportEndingWarning(Context context, boolean show) {
+        sharedPreferencesPutBoolean(context, SUPPORT_ENDING_WARNING, show);
     }
 }

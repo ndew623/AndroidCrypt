@@ -1,6 +1,8 @@
 package com.dewdrop623.androidcrypt;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -9,6 +11,8 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.ContextCompat;
@@ -16,7 +20,13 @@ import androidx.core.content.res.ResourcesCompat;
 import androidx.annotation.Nullable;
 import android.text.InputType;
 import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.TextPaint;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -31,6 +41,7 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -167,6 +178,10 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
                 enableDecryptionMode();
             }
         }
+
+        if (SettingsHelper.getShowSupportEndingWarning(getContext())) {
+            showSupportEndingDialog();
+        }
     }
 
     /*
@@ -198,6 +213,9 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
             return true;
         } else if (itemId == R.id.action_settings) {
             ((MainActivity) getActivity()).displaySecondaryFragmentScreen(new SettingsFragment(), context.getString(R.string.action_settings), null);
+            return true;
+        } else if (itemId == R.id.action_end_support_warning) {
+            showSupportEndingDialog();
             return true;
         }
         return false;
@@ -237,6 +255,76 @@ public class MainActivityFragment extends Fragment implements CryptoThread.Progr
                 }
             });
         }
+    }
+
+    private void showSupportEndingDialog() {
+        SpannableStringBuilder message = new SpannableStringBuilder();
+        message.append(getString(R.string.support_ending_message_1));
+        message.append(" ");
+        int link1Start = message.length();
+        message.append(getString(R.string.support_ending_message_2_link));
+        int link1End = message.length();
+        message.append(getString(R.string.support_ending_message_3));
+        int link2Start = message.length();
+        message.append(getString(R.string.support_ending_message_4_link));
+        int link2End = message.length();
+        message.append(" ");
+        message.append(getString(R.string.support_ending_message_5));
+        int link3Start = message.length();
+        message.append(getString(R.string.support_ending_message_6_link));
+        int link3End = message.length();
+        message.append(" ");
+        message.append(getString(R.string.support_ending_message_7));
+
+        message.setSpan(getClickableLink("https://play.google.com/store/apps/details?id=com.terrapane.aescrypt"), link1Start, link1End, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        message.setSpan(getClickableLink("https://f-droid.org/en/packages/org.fossify.filemanager"), link2Start, link2End, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        message.setSpan(getClickableLink("https://play.google.com/store/apps/details?id=ru.zdevs.zarchiver"), link3Start, link3End, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        TextView messageView = new TextView(getContext());
+        messageView.setText(message);
+        messageView.setTextSize(16);
+        messageView.setPadding(24,8,24,8);
+        messageView.setMovementMethod(LinkMovementMethod.getInstance());
+        messageView.setLinksClickable(true);
+
+        ScrollView scrollView = new ScrollView(getContext());
+        scrollView.setFillViewport(true);
+        scrollView.addView(messageView);
+
+        TextView titleTextView = new TextView(getContext());
+        titleTextView.setText(R.string.support_ending);
+        titleTextView.setTextSize(20);
+        titleTextView.setTextColor(ContextCompat.getColor(getContext(), android.R.color.black));
+        titleTextView.setTypeface(null, android.graphics.Typeface.BOLD);
+        titleTextView.setGravity(Gravity.CENTER_VERTICAL);
+        titleTextView.setPadding(24,24,24,16);
+
+        new AlertDialog.Builder(getContext())
+                .setCustomTitle(titleTextView)
+                .setView(scrollView)
+                .setPositiveButton(android.R.string.ok, null)
+                .show();
+
+    }
+
+    private ClickableSpan getClickableLink(final String url) {
+        return new ClickableSpan() {
+            @Override
+            public void onClick(@NonNull View view) {
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                try {
+                    view.getContext().startActivity(intent);
+                } catch(ActivityNotFoundException e) {
+                    Log.e("AndroidCrypt:MainActivityFragment", "Couldn't open url. No compatible app.");
+                }
+            }
+            @Override
+            public void updateDrawState(@NonNull TextPaint drawState) {
+                super.updateDrawState(drawState);
+                drawState.setColor(Color.BLUE);
+                drawState.setUnderlineText(true);
+            }
+        };
     }
 
     private final View.OnClickListener operationModeButtonsOnClickListener = new View.OnClickListener() {
