@@ -68,4 +68,13 @@
     <string name="progress_notification_disabled">Notificación de progreso desactivada</string>
     <string name="notification_permissions">Permisos de notificación</string>
     <string name="allow_progress_notification">Permitir notificaciones de progreso</string>
+    <string name="support_ending">Fin del soporte</string>
+    <string name="support_ending_message_1">El desarrollador de AES Crypt (la biblioteca de cifrado en la que se basa AndroidCrypt) está convirtiendo la herramienta en un producto de pago.\n\nEsta aplicación dejará de recibir soporte.\n\nPuedes encontrar aquí la nueva aplicación oficial de AES Crypt para Android</string>
+    <string name="support_ending_message_2_link">aquí</string>
+    <string name="support_ending_message_3">. Esta aplicación será compatible con el mismo formato de archivo que AndroidCrypt.\n\nPara utilizar herramientas gratuitas de cifrado de archivos entre ordenadores y dispositivos móviles, recomiendo buscar herramientas compatibles con archivos comprimidos 7z cifrados.\n</string>
+    <string name="support_ending_message_4_link">Fossify File Manager</string>
+    <string name="support_ending_message_5">es un gestor de archivos de código abierto disponible en F-Droid que permite crear y abrir archivos comprimidos 7z cifrados.\n</string>
+    <string name="support_ending_message_6_link">ZArchiver</string>
+    <string name="support_ending_message_7">es una aplicación gratuita disponible en Google Play Store que también es compatible con archivos comprimidos 7z cifrados.\nAdvertencia: Estas aplicaciones gratuitas utilizan formatos comunes de compresión de archivos. No son compatibles con el formato de AES Crypt que utiliza AndroidCrypt.</string>
+    <string name="showSupportEndingSettingTitle">Mostrar el aviso de fin del soporte al iniciar</string>
 </resources>

@@ -88,10 +88,10 @@
     <string name="support_ending">Support Ending</string>
     <string name="support_ending_message_1">The developer of AES Crypt (the encryption library behind AndroidCrypt) is converting the tool into a paid product.\n\nThis app will no longer be supported.\n\nYou can find the new, official AES Crypt Android app</string>
     <string name="support_ending_message_2_link">here</string>
-    <string name="support_ending_message_3">.\n\nFor file encryption tools between desktop and mobile that are free, I recommend looking for tools that support 7zip encrypted archives.\n</string>
+    <string name="support_ending_message_3">. This app will support the same file format as AndroidCrypt.\n\nFor file encryption tools between desktop and mobile that are free, I recommend looking for tools that support 7zip encrypted archives.\n</string>
     <string name="support_ending_message_4_link">Fossify File Manager</string>
-    <string name="support_ending_message_5">is an open source file manager on Fdroid that supports creating and opening encrypted 7zip archives.\n</string>
+    <string name="support_ending_message_5">is an open source file manager on F-Droid that supports creating and opening encrypted 7zip archives.\n</string>
     <string name="support_ending_message_6_link">ZArchiver</string>
-    <string name="support_ending_message_7">is a free app on the Google Play Store that also has support for encrypted 7zip archives.</string>
+    <string name="support_ending_message_7">is a free app on the Google Play Store that also has support for encrypted 7zip archives.\nWarning: These free apps use common file compression formats. They are not compatible with the AES Crypt format that AndroidCrypt uses.</string>
     <string name="showSupportEndingSettingTitle">Show support ending warning on start</string>
 </resources>
